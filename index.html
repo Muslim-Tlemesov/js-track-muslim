@@ -3463,6 +3463,130 @@ class ErrorBoundary extends React.Component {
  * (±до полутона) случайно смещается — не отличить одну ноту от другой
  * специально не получится, но звучит чуть живее, чем метроном.
  */
+/**
+ * Озвучка английских терминов в уроках через встроенный в браузер
+ * Web Speech API (SpeechSynthesis) — без единого аудиофайла и без
+ * сети во время работы приложения. Качество голоса зависит от
+ * устройства пользователя (это ограничение платформы, не наше) — но
+ * выбираем ЛУЧШИЙ доступный голос вместо системного по умолчанию,
+ * который обычно звучит куда более "роботизированно".
+ *
+ * Не для каждого термина в уроке есть смысл озвучивать — многие
+ * названия чисто русские ("переменная", "цикл", "объект"), там нечего
+ * произносить по-английски. TERM_PRONUNCIATIONS — явная таблица
+ * только для терминов с настоящим английским/техническим содержанием,
+ * с "очищенным" текстом для произношения (без кириллических пояснений
+ * в скобках, которые звучали бы бессмысленно английским голосом).
+ */
+const TERM_PRONUNCIATIONS = {
+  ".includes()": "dot includes",
+  ".length": "dot length",
+  ".then()": "dot then",
+  "DOM": "D O M",
+  "Object.assign(target, ...sources)": "Object dot assign",
+  "Object.entries(obj)": "Object dot entries",
+  "Object.freeze(obj)": "Object dot freeze",
+  "Object.keys(obj)": "Object dot keys",
+  "Object.values(obj)": "Object dot values",
+  "Promise (промис)": "Promise",
+  "addEventListener": "add event listener",
+  "async": "async",
+  "await": "await",
+  "camelCase": "camel case",
+  "classList.toggle()": "class list dot toggle",
+  "confirm()": "confirm",
+  "console.log()": "console dot log",
+  "const": "const",
+  "extends": "extends",
+  "fetch": "fetch",
+  "filter": "filter",
+  "for...in": "for in",
+  "for...of": "for of",
+  "forEach": "for each",
+  "immutable (неизменяемость)": "immutable",
+  "let": "let",
+  "map": "map",
+  "nullish coalescing (??)": "nullish coalescing",
+  "optional chaining (?.)": "optional chaining",
+  "push/pop": "push, pop",
+  "querySelector": "query selector",
+  "reduce": "reduce",
+  "rest-параметр (...)": "rest parameter",
+  "slice": "slice",
+  "sort": "sort",
+  "splice": "splice",
+  "spread (...)": "spread",
+  "spread у объектов { ...obj }": "spread",
+  "style.backgroundColor": "style dot background color",
+  "textContent": "text content",
+  "this": "this",
+  "undefined / null": "undefined, null",
+  "var": "var",
+  "класс (class)": "class",
+  "конструктор (constructor)": "constructor",
+  "обработчик события (event listener)": "event listener",
+  "префикс is/has/can для булевых значений": "is, has, can",
+  "строка (string)": "string",
+  "шаблонная строка (template literal)": "template literal",
+  "экземпляр (instance)": "instance",
+};
+
+let cachedEnglishVoice = null;
+let voiceSearchAttempted = false;
+
+/**
+ * Ищет лучший доступный английский голос среди системных — сначала
+ * специально помеченные "естественные"/облачные голоса (обычно куда
+ * менее роботизированные, чем локальный голос по умолчанию), потом
+ * любой en-US/en-GB, и только в крайнем случае — что найдётся с en.
+ */
+function pickBestEnglishVoice() {
+  if (typeof window === "undefined" || !window.speechSynthesis) return null;
+  const voices = window.speechSynthesis.getVoices();
+  if (!voices || voices.length === 0) return null;
+  const byPriority = [
+    (v) => /google/i.test(v.name) && /en-US|en_US/i.test(v.lang + v.name),
+    (v) => /natural|neural|enhanced|premium/i.test(v.name) && /^en/i.test(v.lang),
+    (v) => v.localService === false && /^en/i.test(v.lang),
+    (v) => /^en-US$/i.test(v.lang),
+    (v) => /^en-GB$/i.test(v.lang),
+    (v) => /^en/i.test(v.lang),
+  ];
+  for (const test of byPriority) {
+    const found = voices.find(test);
+    if (found) return found;
+  }
+  return null;
+}
+
+/**
+ * Проговаривает переданный текст английским голосом. Голос ищется один
+ * раз и кэшируется — getVoices() у части браузеров грузит список
+ * асинхронно, поэтому если список ещё пуст при самом первом вызове,
+ * подписываемся на voiceschanged и пробуем снова.
+ */
+function speakTerm(text) {
+  if (typeof window === "undefined" || !window.speechSynthesis) return;
+  window.speechSynthesis.cancel(); // прерываем предыдущую озвучку, если ещё не закончилась
+  const utter = new window.SpeechSynthesisUtterance(text);
+  utter.lang = "en-US";
+  utter.rate = 0.92; // чуть медленнее обычного — термин легче разобрать на слух
+  utter.pitch = 1;
+  if (!cachedEnglishVoice && !voiceSearchAttempted) {
+    cachedEnglishVoice = pickBestEnglishVoice();
+    if (!cachedEnglishVoice && window.speechSynthesis.onvoiceschanged !== undefined) {
+      window.speechSynthesis.addEventListener(
+        "voiceschanged",
+        () => { cachedEnglishVoice = pickBestEnglishVoice(); },
+        { once: true }
+      );
+    }
+    voiceSearchAttempted = true;
+  }
+  if (cachedEnglishVoice) utter.voice = cachedEnglishVoice;
+  window.speechSynthesis.speak(utter);
+}
+
 function playCorrectTick(soundEnabled = true) {
   if (!soundEnabled) return;
   if (typeof document !== "undefined" && document.hidden) return;
@@ -11046,6 +11170,26 @@ const LessonCard = memo(function LessonCard({ T, lesson, topicId, topicTitle, on
             >
               {t.term}
             </span>
+            {TERM_PRONUNCIATIONS[t.term] && (
+              <button
+                onClick={() => speakTerm(TERM_PRONUNCIATIONS[t.term])}
+                aria-label={`Прослушать произношение: ${TERM_PRONUNCIATIONS[t.term]}`}
+                title="Прослушать произношение"
+                style={{
+                  background: "none", border: "none", cursor: "pointer",
+                  // minWidth/minHeight, а не просто padding — тап-область
+                  // держим близко к 44px (стандарт для комфортного пальца
+                  // на телефоне, см. остальные тач-таргеты приложения),
+                  // при этом сама иконка визуально остаётся компактной и
+                  // не раздувает строку с термином.
+                  minWidth: 36, minHeight: 36, marginRight: 2,
+                  color: T.textDim, display: "inline-flex", alignItems: "center", justifyContent: "center",
+                  verticalAlign: "middle",
+                }}
+              >
+                <Volume2 size={14} strokeWidth={2.2} />
+              </button>
+            )}
             <span style={{ fontSize: 13.5, lineHeight: 1.6, color: T.textDim }}>{t.def}</span>
           </div>
         ))}
