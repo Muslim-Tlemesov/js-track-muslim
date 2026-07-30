@@ -1674,6 +1674,31 @@ function formatArg(a) {
 const MAX_LOOP_ITERATIONS = 100000;
 
 /**
+ * Мобильные клавиатуры (в основном Gboard на Android, «умная
+ * пунктуация») могут молча заменить последовательности вроде ">=" на
+ * юникод-символ "≥", даже когда студент физически набрал два обычных
+ * символа. autoCorrect="off" на textarea (см. CodeEditor) должен это
+ * предотвращать, но не все клавиатуры полностью его слушаются для
+ * подстановки символов — это отдельная категория от orthographic
+ * autocorrect. Используется и в checkSyntaxError (живая проверка), и в
+ * runUserCodeSync/buildWorkerSource (на случай, если студент нажал
+ * "Выполнить" раньше debounce'а живой проверки, или вставил код из
+ * буфера обмена) — без неё была бы голая ошибка "Unexpected token '≤'"
+ * вместо понятного объяснения, что вообще произошло.
+ */
+const MOBILE_KEYBOARD_SUBSTITUTES = {
+  "≥": ">=",
+  "≤": "<=",
+  "≡": "===",
+  "≠": "!==",
+  "\u2018": "'",
+  "\u2019": "'",
+  "\u201C": '"',
+  "\u201D": '"',
+  "\u2026": "...",
+};
+
+/**
  * Best-effort защита от случайных бесконечных циклов (typo вроде i--
  * вместо i++, забытое обновление счётчика). Оборачивает счётчиком
  * итераций только УСЛОВИЕ while(...) и C-style for(;;) — не тело
@@ -1854,6 +1879,16 @@ function splitTopLevel(str, sep) {
  */
 function runUserCodeSync(code, extraArgs = {}) {
   const logs = [];
+  // Та же проверка, что и в checkSyntaxError (см. подробный комментарий
+  // там) — здесь нужна ОТДЕЛЬНО на случай, если студент нажал
+  // "Выполнить" раньше, чем сработал debounce живой проверки синтаксиса
+  // (500мс), или вставил код из буфера обмена. Без неё тут была бы
+  // голая ошибка вида "Unexpected token '≤'" вместо понятного объяснения.
+  for (const [wrong, right] of Object.entries(MOBILE_KEYBOARD_SUBSTITUTES)) {
+    if (code.includes(wrong)) {
+      return { logs, error: `клавиатура заменила «${right}» на символ «${wrong}» — удали его и введи «${right}» вручную, по одному символу` };
+    }
+  }
   const fakeConsole = {
     log: (...args) => logs.push(args.map(formatArg).join(" ")),
   };
@@ -1925,10 +1960,21 @@ ${guardCondition.toString()}
 ${guardForHeader.toString()}
 ${splitTopLevel.toString()}
 const MAX_LOOP_ITERATIONS = ${MAX_LOOP_ITERATIONS};
+const MOBILE_KEYBOARD_SUBSTITUTES = ${JSON.stringify(MOBILE_KEYBOARD_SUBSTITUTES)};
 
 self.onmessage = function (e) {
   const code = e.data.code;
   const logs = [];
+  // См. подробный комментарий у checkSyntaxError/runUserCodeSync в
+  // основном коде приложения — та же защита нужна и здесь, в воркере,
+  // поскольку это основной путь выполнения для обычных code-вопросов
+  // и "Консоли" (без liveKind-объектов).
+  for (const wrong in MOBILE_KEYBOARD_SUBSTITUTES) {
+    if (code.indexOf(wrong) !== -1) {
+      self.postMessage({ logs: logs, error: "клавиатура заменила «" + MOBILE_KEYBOARD_SUBSTITUTES[wrong] + "» на символ «" + wrong + "» — удали его и введи «" + MOBILE_KEYBOARD_SUBSTITUTES[wrong] + "» вручную, по одному символу" });
+      return;
+    }
+  }
   const fakeConsole = {
     log: function () {
       const args = Array.prototype.slice.call(arguments);
@@ -2555,6 +2601,13 @@ function escapeHtml(s) {
  */
 function checkSyntaxError(code) {
   if (!code || !code.trim()) return null;
+  for (const [wrong, right] of Object.entries(MOBILE_KEYBOARD_SUBSTITUTES)) {
+    const idx = code.indexOf(wrong);
+    if (idx !== -1) {
+      const line = code.slice(0, idx).split("\n").length;
+      return { line, message: `клавиатура заменила «${right}» на символ «${wrong}» — удали его и введи «${right}» вручную, по одному символу` };
+    }
+  }
   if (typeof window === "undefined" || !window.Babel) return null;
   try {
     window.Babel.transform(code, { presets: [] });
@@ -2939,6 +2992,15 @@ const CodeEditor = memo(function CodeEditor({ T, value, onChange, onKeyDown, min
             onBlur={() => setTimeout(() => setAc(null), 120)}
             onKeyDown={handleKeyDown}
             spellCheck={false}
+            // Мобильные клавиатуры (в основном Gboard на Android) умеют
+            // молча заменять последовательности вроде ">=", "<=", "==="
+            // на юникод-символы "≥"/"≤"/"≡" ("умная пунктуация") — spellCheck
+            // сам по себе это не отключает. Без этих трёх атрибутов
+            // студент печатает нормальный JS, а в поле оказывается символ,
+            // который движок не понимает (SyntaxError "Unexpected token").
+            autoCorrect="off"
+            autoCapitalize="off"
+            autoComplete="off"
             style={{
               position: "relative", width: "100%", height: "100%", minHeight,
               background: "transparent", color: "transparent", caretColor: T.text,
@@ -9458,6 +9520,9 @@ const PredictScreen = memo(function PredictScreen({ T }) {
         placeholder="Что выведет console.log? Каждый вызов — с новой строки…"
         aria-label="Твой прогноз вывода console.log"
         spellCheck={false}
+        autoCorrect="off"
+        autoCapitalize="off"
+        autoComplete="off"
         onKeyDown={(e) => {
           if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
             e.preventDefault();
