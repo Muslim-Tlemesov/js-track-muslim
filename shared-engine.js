@@ -16,22 +16,50 @@
  * запустить его вне Claude.ai — при отсутствии API прогресс просто не
  * сохраняется между сессиями, вместо падения приложения.
  */
+/**
+ * Слой хранения прогресса. window.storage — API, специфичный для
+ * среды разработки (Claude.ai) — на обычном сайте (GitHub Pages и
+ * везде ещё) его не существует. Реальный, всегда доступный механизм —
+ * localStorage: он есть в любом браузере без исключений, синхронный
+ * по природе, но обёрнут в те же async-методы для единообразия
+ * остального кода. window.storage используется ДОПОЛНИТЕЛЬНО, если
+ * доступен (например, при разработке внутри Claude.ai), но никогда
+ * не единственный источник — иначе прогресс не сохранялся бы вовсе.
+ */
 const safeStorage = {
   async get(key) {
     try {
-      if (typeof window === "undefined" || !window.storage) return null;
-      return await window.storage.get(key);
+      const raw = localStorage.getItem(key);
+      if (raw !== null) return { key, value: raw };
     } catch {
-      return null;
+      // localStorage недоступен (приватный режим Safari и т.п.) —
+      // пробуем дальше через window.storage, если он есть.
     }
+    try {
+      if (typeof window !== "undefined" && window.storage) {
+        return await window.storage.get(key);
+      }
+    } catch {
+      // нет данных ни там, ни там
+    }
+    return null;
   },
   async set(key, value) {
+    let localOk = false;
     try {
-      if (typeof window === "undefined" || !window.storage) return null;
-      return await window.storage.set(key, value);
+      localStorage.setItem(key, value);
+      localOk = true;
     } catch {
-      return null;
+      // localStorage недоступен — не страшно, если сработает window.storage ниже
     }
+    try {
+      if (typeof window !== "undefined" && window.storage) {
+        await window.storage.set(key, value);
+      }
+    } catch {
+      // window.storage недоступен — не страшно, если localStorage сработал выше
+    }
+    return localOk ? { key, value } : null;
   },
 };
 

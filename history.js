@@ -79,10 +79,7 @@ function PageRoot() {
         ...core,
         achievementsTotal: ACHIEVEMENTS.length
       });
-      const histRes = await safeStorage.get(HISTORY_KEY);
-      try {
-        if (histRes && histRes.value) setHistoryLog(JSON.parse(histRes.value));
-      } catch {/* нет лога истории */}
+      setHistoryLog(await getHistoryEntries());
     })();
   }, []);
   const handleToggleTheme = async () => {
@@ -92,16 +89,6 @@ function PageRoot() {
     const next = !soundEnabled;
     setSoundEnabled(next);
     await safeStorage.set(SOUND_KEY, next ? "on" : "off");
-  };
-  const handleResetProgress = async () => {
-    const ok = window.confirm("Сбросить весь прогресс? Это действие нельзя отменить.");
-    if (!ok) return;
-    await Promise.all([safeStorage.set(STORAGE_KEY, JSON.stringify({})), safeStorage.set(XP_KEY, JSON.stringify({
-      xp: 0
-    })), safeStorage.set(ACHIEVEMENTS_KEY, JSON.stringify({
-      unlocked: []
-    }))]);
-    window.location.reload();
   };
   if (!state) {
     return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Header, {
@@ -120,7 +107,7 @@ function PageRoot() {
       onToggleTheme: handleToggleTheme,
       soundEnabled: soundEnabled,
       onToggleSound: handleToggleSound,
-      onResetProgress: handleResetProgress
+      onResetProgress: handleResetProgressWithConfirm
     }), /*#__PURE__*/React.createElement("main", {
       id: "main-content",
       tabIndex: -1,
@@ -152,7 +139,7 @@ function PageRoot() {
     onToggleTheme: handleToggleTheme,
     soundEnabled: soundEnabled,
     onToggleSound: handleToggleSound,
-    onResetProgress: handleResetProgress
+    onResetProgress: handleResetProgressWithConfirm
   }), /*#__PURE__*/React.createElement("main", {
     id: "main-content",
     tabIndex: -1,

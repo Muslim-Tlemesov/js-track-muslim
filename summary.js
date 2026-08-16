@@ -165,11 +165,7 @@ function PageRoot() {
       try {
         if (achRes && achRes.value) fastestAnswerMs = JSON.parse(achRes.value).fastestAnswerMs ?? null;
       } catch {/* нет данных */}
-      const histRes = await safeStorage.get(HISTORY_KEY);
-      let historyLog = [];
-      try {
-        if (histRes && histRes.value) historyLog = JSON.parse(histRes.value);
-      } catch {/* нет данных */}
+      const historyLog = await getHistoryEntries();
       const dueReviewQuestions = await getDueReviewQuestions();
       setState({
         ...core,
@@ -187,16 +183,6 @@ function PageRoot() {
     const next = !soundEnabled;
     setSoundEnabled(next);
     await safeStorage.set(SOUND_KEY, next ? "on" : "off");
-  };
-  const handleResetProgress = async () => {
-    const ok = window.confirm("Сбросить весь прогресс? Это действие нельзя отменить.");
-    if (!ok) return;
-    await Promise.all([safeStorage.set(STORAGE_KEY, JSON.stringify({})), safeStorage.set(XP_KEY, JSON.stringify({
-      xp: 0
-    })), safeStorage.set(ACHIEVEMENTS_KEY, JSON.stringify({
-      unlocked: []
-    }))]);
-    window.location.reload();
   };
   const handleCertNameChange = value => {
     setCertName(value);
@@ -292,7 +278,7 @@ function PageRoot() {
       onToggleTheme: handleToggleTheme,
       soundEnabled: soundEnabled,
       onToggleSound: handleToggleSound,
-      onResetProgress: handleResetProgress
+      onResetProgress: handleResetProgressWithConfirm
     }), /*#__PURE__*/React.createElement("main", {
       id: "main-content",
       tabIndex: -1,
@@ -327,7 +313,7 @@ function PageRoot() {
     onToggleTheme: handleToggleTheme,
     soundEnabled,
     onToggleSound: handleToggleSound,
-    onResetProgress: handleResetProgress
+    onResetProgress: handleResetProgressWithConfirm
   };
   if (isComplete && !showDetails) {
     return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Header, headerProps), /*#__PURE__*/React.createElement("main", {
@@ -337,7 +323,7 @@ function PageRoot() {
     }, /*#__PURE__*/React.createElement(CelebrationView, {
       state: state,
       onShowDetails: () => setShowDetails(true),
-      onResetProgress: handleResetProgress,
+      onResetProgress: handleResetProgressWithConfirm,
       certName: certName,
       onCertNameChange: handleCertNameChange,
       onDownloadCertificate: downloadCertificate,

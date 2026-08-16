@@ -4,7 +4,7 @@
 // страницы разом, а не одна — иначе офлайн работала бы только та
 // страница, что была открыта в момент установки service worker.
 
-const CACHE_NAME = "js-track-v4-multipage";
+const CACHE_NAME = "js-track-v7-multipage";
 
 const PAGES = [
   "index", "questions", "practice", "summary", "profile", "sandbox",
@@ -15,13 +15,20 @@ const APP_SHELL = [
   "./",
   ...PAGES.map((p) => `./${p}.html`),
   ...PAGES.map((p) => `./${p}.css`),
-  "./shared/shared.css",
-  "./shared/engine.js",
-  "./shared/mascot-icons.jsx",
-  "./shared/Header.jsx",
-  "./shared/Common.jsx",
-  "./shared/CodeEditor.jsx",
-  "./shared/LessonCard.jsx",
+  "./vendor-react.production.min.js",
+  "./vendor-react-dom.production.min.js",
+  "./shared-shared.css",
+  "./shared-engine-content.js",
+  "./shared-engine-core.js",
+  "./shared-engine-code.js",
+  "./shared-engine-editor.js",
+  "./shared-engine-debugger.js",
+  "./shared-engine-features.js",
+  "./shared-mascot-icons.js",
+  "./shared-Header.js",
+  "./shared-Common.js",
+  "./shared-CodeEditor.js",
+  "./shared-LessonCard.js",
   "./manifest.json",
   "./icon-16.png",
   "./icon-32.png",

@@ -105,14 +105,16 @@ function CodeQuestion({
     if (checked) return;
     setIsRunning(true);
     setTimeout(async () => {
-      // Вопросы про DOM (dom-3..dom-6) передают "живой" объект-заглушку
-      // (button/card/title/el) вместо реального DOM — без этого код
-      // ссылался бы на несуществующую переменную и падал бы с
-      // ReferenceError при любой попытке ответа.
-      const extraArgs = question.liveKind && question.liveVarName ? {
-        [question.liveVarName]: makeLiveObject(question.liveKind)
-      } : {};
-      const result = await runUserCode(code, extraArgs);
+      // Вопросы про DOM (dom-3..dom-6) используют "живой" объект-
+      // заглушку (button/card/title/el) вместо реального DOM.
+      // liveKind/liveVarName — простые строки, безопасно уходят в
+      // Worker (сам объект строится уже внутри него) — раньше такие
+      // вопросы принудительно шли в синхронный путь на главном потоке,
+      // где тяжёлая команда без явного цикла могла подвесить вкладку.
+      const result = await runUserCode(code, {
+        liveKind: question.liveKind,
+        liveVarName: question.liveVarName
+      });
       setRunResult(result);
       setIsRunning(false);
       const isCorrect = !result.error && logsMatch(result.logs, question.expectedLogs);
@@ -198,16 +200,6 @@ function PageRoot() {
     const next = !soundEnabled;
     setSoundEnabled(next);
     await safeStorage.set(SOUND_KEY, next ? "on" : "off");
-  };
-  const handleResetProgress = async () => {
-    const ok = window.confirm("Сбросить весь прогресс? Это действие нельзя отменить.");
-    if (!ok) return;
-    await Promise.all([safeStorage.set(STORAGE_KEY, JSON.stringify({})), safeStorage.set(XP_KEY, JSON.stringify({
-      xp: 0
-    })), safeStorage.set(ACHIEVEMENTS_KEY, JSON.stringify({
-      unlocked: []
-    }))]);
-    window.location.reload();
   };
   const handleJumpToTopic = topicId => {
     const lessonIdx = NAV_ITEMS.findIndex(it => it.type === "lesson" && it.topicId === topicId);
@@ -298,7 +290,7 @@ function PageRoot() {
       onToggleTheme: handleToggleTheme,
       soundEnabled: soundEnabled,
       onToggleSound: handleToggleSound,
-      onResetProgress: handleResetProgress
+      onResetProgress: handleResetProgressWithConfirm
     }), /*#__PURE__*/React.createElement("main", {
       id: "main-content",
       tabIndex: -1,
@@ -323,7 +315,7 @@ function PageRoot() {
     onToggleTheme: handleToggleTheme,
     soundEnabled: soundEnabled,
     onToggleSound: handleToggleSound,
-    onResetProgress: handleResetProgress
+    onResetProgress: handleResetProgressWithConfirm
   }), /*#__PURE__*/React.createElement("main", {
     id: "main-content",
     tabIndex: -1,

@@ -35,20 +35,15 @@ function PageRoot() {
         ...core,
         achievementsTotal: ACHIEVEMENTS.length
       });
-      const histRes = await safeStorage.get(HISTORY_KEY);
-      try {
-        if (histRes && histRes.value) {
-          const historyLog = JSON.parse(histRes.value);
-          if (historyLog.length > 0) {
-            const earliestTs = historyLog.reduce((min, e) => e.ts < min ? e.ts : min, historyLog[0].ts);
-            setMemberSince(new Date(earliestTs).toLocaleDateString("ru-RU", {
-              year: "numeric",
-              month: "long",
-              day: "numeric"
-            }));
-          }
-        }
-      } catch {/* нет лога истории */}
+      const historyLog = await getHistoryEntries();
+      if (historyLog.length > 0) {
+        const earliestTs = historyLog.reduce((min, e) => e.ts < min ? e.ts : min, historyLog[0].ts);
+        setMemberSince(new Date(earliestTs).toLocaleDateString("ru-RU", {
+          year: "numeric",
+          month: "long",
+          day: "numeric"
+        }));
+      }
     })();
   }, []);
   const handleToggleTheme = async () => {
@@ -58,16 +53,6 @@ function PageRoot() {
     const next = !soundEnabled;
     setSoundEnabled(next);
     await safeStorage.set(SOUND_KEY, next ? "on" : "off");
-  };
-  const handleResetProgress = async () => {
-    const ok = window.confirm("Сбросить весь прогресс? Это действие нельзя отменить.");
-    if (!ok) return;
-    await Promise.all([safeStorage.set(STORAGE_KEY, JSON.stringify({})), safeStorage.set(XP_KEY, JSON.stringify({
-      xp: 0
-    })), safeStorage.set(ACHIEVEMENTS_KEY, JSON.stringify({
-      unlocked: []
-    }))]);
-    window.location.reload();
   };
   const handleCertNameChange = value => {
     setCertName(value);
@@ -106,7 +91,7 @@ function PageRoot() {
       onToggleTheme: handleToggleTheme,
       soundEnabled: soundEnabled,
       onToggleSound: handleToggleSound,
-      onResetProgress: handleResetProgress
+      onResetProgress: handleResetProgressWithConfirm
     }), /*#__PURE__*/React.createElement("main", {
       id: "main-content",
       tabIndex: -1,
@@ -129,7 +114,7 @@ function PageRoot() {
     onToggleTheme: handleToggleTheme,
     soundEnabled: soundEnabled,
     onToggleSound: handleToggleSound,
-    onResetProgress: handleResetProgress
+    onResetProgress: handleResetProgressWithConfirm
   }), /*#__PURE__*/React.createElement("main", {
     id: "main-content",
     tabIndex: -1,

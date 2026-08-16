@@ -43,16 +43,6 @@ function PageRoot() {
     setSoundEnabled(next);
     await safeStorage.set(SOUND_KEY, next ? "on" : "off");
   };
-  const handleResetProgress = async () => {
-    const ok = window.confirm("Сбросить весь прогресс? Это действие нельзя отменить.");
-    if (!ok) return;
-    await Promise.all([safeStorage.set(STORAGE_KEY, JSON.stringify({})), safeStorage.set(XP_KEY, JSON.stringify({
-      xp: 0
-    })), safeStorage.set(ACHIEVEMENTS_KEY, JSON.stringify({
-      unlocked: []
-    }))]);
-    window.location.reload();
-  };
   const stopAllIntervals = () => {
     if (pendingRunTimeoutRef.current) {
       clearTimeout(pendingRunTimeoutRef.current);
@@ -93,10 +83,12 @@ function PageRoot() {
         intervalsRef.current = intervalsRef.current.filter(x => x !== id);
       };
       const result = await runUserCode(code, {
-        startBtn,
-        display,
-        setInterval: trackedSetInterval,
-        clearInterval: trackedClearInterval
+        extraArgs: {
+          startBtn,
+          display,
+          setInterval: trackedSetInterval,
+          clearInterval: trackedClearInterval
+        }
       });
       setRunResult(result);
       setIsRunning(false);
@@ -129,7 +121,7 @@ function PageRoot() {
     onToggleTheme: handleToggleTheme,
     soundEnabled,
     onToggleSound: handleToggleSound,
-    onResetProgress: handleResetProgress
+    onResetProgress: handleResetProgressWithConfirm
   } : {
     currentPage: "project",
     totalCorrect: 0,
@@ -146,7 +138,7 @@ function PageRoot() {
     onToggleTheme: handleToggleTheme,
     soundEnabled,
     onToggleSound: handleToggleSound,
-    onResetProgress: handleResetProgress
+    onResetProgress: handleResetProgressWithConfirm
   };
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Header, headerProps), /*#__PURE__*/React.createElement("main", {
     id: "main-content",

@@ -21,7 +21,6 @@ function PageRoot() {
   const [isRunning, setIsRunning] = React.useState(false);
   const [timeLeftSec, setTimeLeftSec] = React.useState(EXAM_DURATION_SECONDS);
   const [timeUp, setTimeUp] = React.useState(false);
-  const liveObjRef = React.useRef(null);
   const lastSubmittedIdxRef = React.useRef(-1);
   React.useEffect(() => {
     (async () => {
@@ -62,16 +61,6 @@ function PageRoot() {
     setSoundEnabled(next);
     await safeStorage.set(SOUND_KEY, next ? "on" : "off");
   };
-  const handleResetProgress = async () => {
-    const ok = window.confirm("Сбросить весь прогресс? Это действие нельзя отменить.");
-    if (!ok) return;
-    await Promise.all([safeStorage.set(STORAGE_KEY, JSON.stringify({})), safeStorage.set(XP_KEY, JSON.stringify({
-      xp: 0
-    })), safeStorage.set(ACHIEVEMENTS_KEY, JSON.stringify({
-      unlocked: []
-    }))]);
-    window.location.reload();
-  };
   const current = questions[idx] || null;
   const isCode = current?.type === "code";
   const startExam = () => {
@@ -86,7 +75,6 @@ function PageRoot() {
     setTimeLeftSec(EXAM_DURATION_SECONDS);
     setTimeUp(false);
     lastSubmittedIdxRef.current = -1;
-    liveObjRef.current = qs[0]?.liveKind ? makeLiveObject(qs[0].liveKind) : null;
     setPhase("running");
   };
   const submitQuizAnswer = optionIdx => {
@@ -104,11 +92,10 @@ function PageRoot() {
     lastSubmittedIdxRef.current = idx;
     setIsRunning(true);
     setTimeout(async () => {
-      if (current.liveKind) liveObjRef.current = makeLiveObject(current.liveKind);
-      const extraArgs = current.liveVarName && liveObjRef.current ? {
-        [current.liveVarName]: liveObjRef.current
-      } : {};
-      const result = await runUserCode(code, extraArgs);
+      const result = await runUserCode(code, {
+        liveKind: current.liveKind,
+        liveVarName: current.liveVarName
+      });
       setRunResult(result);
       setIsRunning(false);
       setChecked(true);
@@ -129,7 +116,6 @@ function PageRoot() {
     setChecked(false);
     setCode(questions[nextIdx]?.starter || "");
     setRunResult(null);
-    liveObjRef.current = questions[nextIdx]?.liveKind ? makeLiveObject(questions[nextIdx].liveKind) : null;
   };
   const headerProps = headerState ? {
     currentPage: "exam",
@@ -147,7 +133,7 @@ function PageRoot() {
     onToggleTheme: handleToggleTheme,
     soundEnabled,
     onToggleSound: handleToggleSound,
-    onResetProgress: handleResetProgress
+    onResetProgress: handleResetProgressWithConfirm
   } : {
     currentPage: "exam",
     totalCorrect: 0,
@@ -164,7 +150,7 @@ function PageRoot() {
     onToggleTheme: handleToggleTheme,
     soundEnabled,
     onToggleSound: handleToggleSound,
-    onResetProgress: handleResetProgress
+    onResetProgress: handleResetProgressWithConfirm
   };
   let body;
   if (phase === "intro") {

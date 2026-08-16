@@ -21,7 +21,6 @@ function PageRoot() {
     correct: 0,
     total: 0
   });
-  const liveObjRef = React.useRef(null);
   React.useEffect(() => {
     (async () => {
       const mode = await loadAndApplyTheme();
@@ -57,16 +56,6 @@ function PageRoot() {
     setSoundEnabled(next);
     await safeStorage.set(SOUND_KEY, next ? "on" : "off");
   };
-  const handleResetProgress = async () => {
-    const ok = window.confirm("Сбросить весь прогресс? Это действие нельзя отменить.");
-    if (!ok) return;
-    await Promise.all([safeStorage.set(STORAGE_KEY, JSON.stringify({})), safeStorage.set(XP_KEY, JSON.stringify({
-      xp: 0
-    })), safeStorage.set(ACHIEVEMENTS_KEY, JSON.stringify({
-      unlocked: []
-    }))]);
-    window.location.reload();
-  };
   const isCode = current?.type === "code";
   const nextQuestion = () => {
     if (!eligiblePool || eligiblePool.length === 0) return;
@@ -77,7 +66,6 @@ function PageRoot() {
     setSelected(null);
     setChecked(false);
     setRunResult(null);
-    liveObjRef.current = chosen?.liveKind ? makeLiveObject(chosen.liveKind) : null;
   };
   const submitQuiz = optionIdx => {
     if (checked) return;
@@ -94,11 +82,10 @@ function PageRoot() {
     if (checked) return;
     setIsRunning(true);
     setTimeout(async () => {
-      if (current.liveKind) liveObjRef.current = makeLiveObject(current.liveKind);
-      const extraArgs = current.liveVarName && liveObjRef.current ? {
-        [current.liveVarName]: liveObjRef.current
-      } : {};
-      const result = await runUserCode(code, extraArgs);
+      const result = await runUserCode(code, {
+        liveKind: current.liveKind,
+        liveVarName: current.liveVarName
+      });
       setRunResult(result);
       setIsRunning(false);
       setChecked(true);
@@ -126,7 +113,7 @@ function PageRoot() {
     onToggleTheme: handleToggleTheme,
     soundEnabled,
     onToggleSound: handleToggleSound,
-    onResetProgress: handleResetProgress
+    onResetProgress: handleResetProgressWithConfirm
   } : {
     currentPage: "practice",
     totalCorrect: 0,
@@ -143,7 +130,7 @@ function PageRoot() {
     onToggleTheme: handleToggleTheme,
     soundEnabled,
     onToggleSound: handleToggleSound,
-    onResetProgress: handleResetProgress
+    onResetProgress: handleResetProgressWithConfirm
   };
   let body;
   if (eligiblePool === null) {

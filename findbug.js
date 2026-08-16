@@ -37,16 +37,6 @@ function PageRoot() {
     setSoundEnabled(next);
     await safeStorage.set(SOUND_KEY, next ? "on" : "off");
   };
-  const handleResetProgress = async () => {
-    const ok = window.confirm("Сбросить весь прогресс? Это действие нельзя отменить.");
-    if (!ok) return;
-    await Promise.all([safeStorage.set(STORAGE_KEY, JSON.stringify({})), safeStorage.set(XP_KEY, JSON.stringify({
-      xp: 0
-    })), safeStorage.set(ACHIEVEMENTS_KEY, JSON.stringify({
-      unlocked: []
-    }))]);
-    window.location.reload();
-  };
   const snippet = BUG_SHUFFLED[idx];
   const lines = snippet.code.split("\n");
   const isLast = idx === BUG_SHUFFLED.length - 1;
@@ -99,7 +89,7 @@ function PageRoot() {
     onToggleTheme: handleToggleTheme,
     soundEnabled,
     onToggleSound: handleToggleSound,
-    onResetProgress: handleResetProgress
+    onResetProgress: handleResetProgressWithConfirm
   } : {
     currentPage: "findbug",
     totalCorrect: 0,
@@ -116,7 +106,7 @@ function PageRoot() {
     onToggleTheme: handleToggleTheme,
     soundEnabled,
     onToggleSound: handleToggleSound,
-    onResetProgress: handleResetProgress
+    onResetProgress: handleResetProgressWithConfirm
   };
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Header, headerProps), /*#__PURE__*/React.createElement("main", {
     id: "main-content",
