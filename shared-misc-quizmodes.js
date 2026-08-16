@@ -1,215 +1,31 @@
 /* ==========================================================================
-   pages/shared/engine-features.js — всё остальное: резервное
-   копирование прогресса, история обучения и календарь активности,
-   тренажёр "Предскажи вывод", помощник для liveKind-вопросов, экзамен,
-   стартовый код мини-проекта, примеры для "Найди баг", озвучка
-   терминов, установка PWA, напоминания о серии, интервальное
-   повторение, публичная ссылка на прогресс. Загружается последним —
-   использует функции/данные из всех остальных engine-*.js файлов.
+   pages/shared/misc-quizmodes.js — данные для отдельных режимов — 'Предскажи вывод', экзамен, мини-проект, 'Найди баг', озвучка терминов.
+
+   Файл 17 из 18, на которые разбит движок (реорганизовано из 6
+   файлов после соответствующего разбора архитектуры — раньше
+   engine-core.js/engine-features.js смешивали storage+XP+streak+review
+   и PWA+напоминания+шеринг соответственно в одном файле каждый).
+   Порядок подключения в HTML важен — файлы делят одну глобальную
+   область видимости:
+     1. shared-data-topics.js
+     2. shared-data-questions.js
+     3. shared-data-achievements.js
+     4. shared-core-storage.js
+     5. shared-core-history.js
+     6. shared-core-streak.js
+     7. shared-code-runner.js
+     8. shared-code-syntax.js
+     9. shared-code-debugger.js
+     10. shared-code-worker.js
+     11. shared-pwa-install.js
+     12. shared-pwa-reminders.js
+     13. shared-core-progress.js
+     14. shared-core-review.js
+     15. shared-core-xp.js
+     16. shared-misc-backup.js
+     17. shared-misc-quizmodes.js
+     18. shared-misc-share.js
    ========================================================================== */
-
-
-/* ==========================================================================
-   Резервное копирование прогресса — экспорт/импорт всего состояния
-   одним JSON-файлом.
-   ========================================================================== */
-
-const PROGRESS_EXPORT_KEYS = [
-  STORAGE_KEY, XP_KEY, ACHIEVEMENTS_KEY, STREAK_KEY,
-  CERT_NAME_KEY, THEME_KEY, SOUND_KEY, SANDBOX_KEY, REVIEW_SCHEDULE_KEY,
-];
-
-/**
- * История обучения хранится отдельно от остального прогресса — в
- * IndexedDB (см. addHistoryEntry/getHistoryEntries в engine-core.js),
- * не в safeStorage — поэтому не проходит через обычный перебор
- * PROGRESS_EXPORT_KEYS и упаковывается отдельным полем payload.history.
- */
-async function buildProgressExportPayload() {
-  const data = {};
-  for (const key of PROGRESS_EXPORT_KEYS) {
-    const res = await safeStorage.get(key);
-    if (res && res.value !== undefined) data[key] = res.value;
-  }
-  const history = await getHistoryEntries();
-  return { app: "js.track", version: 2, exportedAt: new Date().toISOString(), data, history };
-}
-
-async function exportProgressData() {
-  const payload = await buildProgressExportPayload();
-  if (typeof URL === "undefined" || typeof URL.createObjectURL !== "function") {
-    return;
-  }
-  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
-  const link = document.createElement("a");
-  link.download = `js-track-progress-${getLocalDateKey()}.json`;
-  link.href = URL.createObjectURL(blob);
-  link.click();
-  URL.revokeObjectURL(link.href);
-}
-
-/**
- * Валидаторы формы для каждого поля бэкапа — раньше единственной
- * проверкой было parsed.app === "js.track", а дальше значения писались
- * в хранилище как есть, без проверки структуры. Можно было "успешно"
- * импортировать { "js-track-xp": "hello" } и получить XP=0 без единого
- * предупреждения — файл выглядел бы принятым, а часть данных тихо
- * терялась. Каждый валидатор получает УЖЕ распарсенное значение (сама
- * функция ниже сначала пробует JSON.parse строки) и возвращает true,
- * если форма похожа на настоящую.
- */
-const PROGRESS_FIELD_VALIDATORS = {
-  [STORAGE_KEY]: (v) => v !== null && typeof v === "object" && !Array.isArray(v),
-  [XP_KEY]: (v) => v !== null && typeof v === "object" && typeof v.xp === "number",
-  [ACHIEVEMENTS_KEY]: (v) => v !== null && typeof v === "object" && Array.isArray(v.unlocked),
-  [STREAK_KEY]: (v) => v !== null && typeof v === "object" && typeof v.count === "number",
-  [REVIEW_SCHEDULE_KEY]: (v) => v !== null && typeof v === "object" && !Array.isArray(v),
-};
-
-/**
- * @param {File} file
- * @throws {Error} с человекочитаемым сообщением, если файл повреждён,
- * не похож на экспорт js.track, или структура какого-то поля не
- * соответствует ожидаемой форме (см. PROGRESS_FIELD_VALIDATORS).
- * Валидирует ВСЁ целиком ДО того, как что-либо записать в хранилище —
- * частично применённый повреждённый импорт был бы хуже, чем полностью
- * отклонённый: пользователь либо получает рабочий результат, либо
- * ничего не меняется вообще, без промежуточного "наполовину".
- */
-async function importProgressData(file) {
-  const text = await file.text();
-  let parsed;
-  try {
-    parsed = JSON.parse(text);
-  } catch {
-    throw new Error("Файл повреждён или это не JSON.");
-  }
-  if (!parsed || parsed.app !== "js.track" || typeof parsed.data !== "object" || parsed.data === null) {
-    throw new Error("Это не похоже на файл прогресса js.track.");
-  }
-  if (typeof parsed.version !== "number") {
-    throw new Error("В файле нет номера версии — это не похоже на настоящий экспорт js.track.");
-  }
-
-  // Фаза 1: валидация — парсим и проверяем форму КАЖДОГО поля, ничего
-  // ещё не записывая. При первом же несоответствии — отказ целиком.
-  const toWrite = {};
-  for (const [key, rawValue] of Object.entries(parsed.data)) {
-    if (!PROGRESS_EXPORT_KEYS.includes(key)) continue; // неизвестный ключ — игнорируем, не ошибка
-    const validator = PROGRESS_FIELD_VALIDATORS[key];
-    if (!validator) {
-      // CERT_NAME_KEY/THEME_KEY/SOUND_KEY/SANDBOX_KEY/ONBOARDING_SEEN_KEY —
-      // простые строки, не JSON-объекты, достаточно проверить сам тип.
-      if (typeof rawValue !== "string") {
-        throw new Error(`Повреждённое значение "${key}" — ожидали текст.`);
-      }
-      toWrite[key] = rawValue;
-      continue;
-    }
-    let value;
-    try {
-      value = JSON.parse(rawValue);
-    } catch {
-      throw new Error(`Повреждённое значение "${key}" — не валидный JSON.`);
-    }
-    if (!validator(value)) {
-      throw new Error(`Файл повреждён: поле "${key}" имеет неожиданную структуру.`);
-    }
-    toWrite[key] = rawValue;
-  }
-
-  let historyToImport = null;
-  if (parsed.history !== undefined) {
-    if (!Array.isArray(parsed.history)) {
-      throw new Error("Файл повреждён: история должна быть списком записей.");
-    }
-    historyToImport = parsed.history;
-  } else if (typeof parsed.data["js-track-history"] === "string") {
-    // Файлы версии 1 (до переноса истории на IndexedDB) — история была
-    // ещё частью data.HISTORY_KEY как отдельная JSON-строка.
-    try {
-      const legacyHistory = JSON.parse(parsed.data["js-track-history"]);
-      if (Array.isArray(legacyHistory)) historyToImport = legacyHistory;
-      else throw new Error("Файл повреждён: история в старом формате имеет неожиданную структуру.");
-    } catch (e) {
-      if (e.message.startsWith("Файл повреждён")) throw e;
-      throw new Error("Файл повреждён: история в старом формате — не валидный JSON.");
-    }
-  }
-
-  // Фаза 2: запись — только если ВСЁ выше прошло без единой ошибки.
-  for (const [key, value] of Object.entries(toWrite)) {
-    await safeStorage.set(key, value);
-  }
-  if (historyToImport) {
-    await clearHistory();
-    for (const entry of historyToImport) {
-      const { id, ...rest } = entry;
-      await addHistoryEntry(rest);
-    }
-  }
-}
-
-/* ==========================================================================
-   История обучения — группировка по дням, календарь активности.
-   ========================================================================== */
-
-function startOfDay(ts) {
-  const d = new Date(ts);
-  d.setHours(0, 0, 0, 0);
-  return d.getTime();
-}
-
-const RU_MONTHS = ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"];
-
-function formatDayLabel(dayStartTs) {
-  const today = startOfDay(Date.now());
-  const diffDays = Math.round((today - dayStartTs) / 86400000);
-  if (diffDays === 0) return "Сегодня";
-  if (diffDays === 1) return "Вчера";
-  const d = new Date(dayStartTs);
-  const withYear = d.getFullYear() !== new Date().getFullYear() ? `, ${d.getFullYear()}` : "";
-  return `${d.getDate()} ${RU_MONTHS[d.getMonth()]}${withYear}`;
-}
-
-function groupHistoryByDay(historyLog) {
-  const byDay = {};
-  historyLog.forEach((entry) => {
-    const dayKey = startOfDay(entry.ts);
-    if (!byDay[dayKey]) byDay[dayKey] = [];
-    byDay[dayKey].push(entry);
-  });
-  return Object.keys(byDay)
-    .map(Number)
-    .sort((a, b) => b - a)
-    .map((dayKey) => ({ dayKey, label: formatDayLabel(dayKey), entries: byDay[dayKey] }));
-}
-
-const DAY_MS = 86400000;
-const CALENDAR_WEEKS = 14;
-
-function buildActivityCalendar(historyLog) {
-  const counts = {};
-  historyLog.forEach((e) => {
-    const day = startOfDay(e.ts);
-    counts[day] = (counts[day] || 0) + 1;
-  });
-  const todayStart = startOfDay(Date.now());
-  const todayDow = new Date(todayStart).getDay();
-  const gridEnd = todayStart + (6 - todayDow) * DAY_MS;
-  const gridStart = gridEnd - (CALENDAR_WEEKS * 7 - 1) * DAY_MS;
-
-  const weeks = [];
-  for (let w = 0; w < CALENDAR_WEEKS; w++) {
-    const week = [];
-    for (let d = 0; d < 7; d++) {
-      const ts = gridStart + (w * 7 + d) * DAY_MS;
-      week.push({ ts, count: counts[ts] || 0, isFuture: ts > todayStart, isToday: ts === todayStart });
-    }
-    weeks.push(week);
-  }
-  return weeks;
-}
 
 /* ==========================================================================
    «Предскажи вывод» — данные примеров и функция проверки.
@@ -365,7 +181,9 @@ const PREDICT_SNIPPETS = [
   },
 ];
 
+
 const PREDICT_SHUFFLED = shuffleValues(PREDICT_SNIPPETS, "predict-output");
+
 
 /**
  * Сверяет предсказанный пользователем вывод с заранее посчитанным
@@ -385,49 +203,22 @@ function gradePrediction(userText, expectedLines) {
   return { allCorrect, rows };
 }
 
-/**
- * Создаёт "живой" DOM-подобный объект для вопросов с liveKind (dom-3..
- * dom-6) — button.addEventListener(...), card.style, title.textContent,
- * el.classList — без реального DOM, но с тем же API, что нужен в этих
- * конкретных заданиях.
- */
-function makeLiveObject(kind) {
-  if (kind === "addEventListener") {
-    return { handlers: {}, addEventListener(event, cb) { this.handlers[event] = cb; } };
-  }
-  if (kind === "style") {
-    return { style: {} };
-  }
-  if (kind === "textContent") {
-    return { textContent: "" };
-  }
-  if (kind === "classList") {
-    return {
-      classList: {
-        list: [],
-        toggle(cls) {
-          const i = this.list.indexOf(cls);
-          if (i >= 0) this.list.splice(i, 1);
-          else this.list.push(cls);
-        },
-      },
-    };
-  }
-  return {};
-}
 
 /* ==========================================================================
    «Экзамен» — константы, подбор случайных вопросов, звук победы.
    ========================================================================== */
 
 const EXAM_QUESTION_COUNT = 30;
+
 const EXAM_DURATION_SECONDS = 20 * 60;
+
 
 function formatExamTime(sec) {
   const m = Math.floor(sec / 60);
   const s = sec % 60;
   return `${m}:${String(s).padStart(2, "0")}`;
 }
+
 
 function sampleExamQuestions(count) {
   const pool = ALL_QUESTIONS.slice();
@@ -437,6 +228,7 @@ function sampleExamQuestions(count) {
   }
   return pool.slice(0, Math.min(count, pool.length));
 }
+
 
 function playVictoryChime(soundEnabled = true) {
   if (!soundEnabled) return;
@@ -466,6 +258,7 @@ function playVictoryChime(soundEnabled = true) {
     // Web Audio недоступен — молча пропускаем звук.
   }
 }
+
 
 /* ==========================================================================
    «Мини-проект: Таймер» — стартовый код для свободной сборки без
@@ -497,6 +290,7 @@ startBtn.addEventListener("click", () => {
   }
 });
 `;
+
 
 /* ==========================================================================
    «Найди баг» — данные примеров с багом на конкретной строке.
@@ -625,7 +419,9 @@ const BUG_SNIPPETS = [
   },
 ];
 
+
 const BUG_SHUFFLED = shuffleValues(BUG_SNIPPETS, "find-the-bug");
+
 
 /* ==========================================================================
    Пошаговый отладчик — самодельный мини-парсер JS (без AST-библиотек):
@@ -691,6 +487,7 @@ const TERM_PRONUNCIATIONS = {
 let cachedEnglishVoice = null;
 let voiceSearchAttempted = false;
 
+
 /**
  * Ищет лучший доступный английский голос среди системных — сначала
  * специально помеченные "естественные"/облачные голоса (обычно куда
@@ -715,6 +512,7 @@ function pickBestEnglishVoice() {
   }
   return null;
 }
+
 
 /**
  * Проговаривает переданный текст английским голосом. Голос ищется один
@@ -745,262 +543,3 @@ function speakTerm(text) {
 }
 
 
-/**
- * Точность по дням за последние N дней (по умолчанию 14) — для графика
- * тренда в «Итогах». Дни без единой попытки просто пропускаются (не
- * добавляют точку на графике с 0%), а не искажают линию нулями.
- */
-function buildDailyAccuracy(historyLog, days = 14) {
-  const today = startOfDay(Date.now());
-  const byDay = {};
-  historyLog.forEach((e) => {
-    const day = startOfDay(e.ts);
-    if (!byDay[day]) byDay[day] = { correct: 0, total: 0 };
-    byDay[day].total += 1;
-    if (e.correct) byDay[day].correct += 1;
-  });
-  const points = [];
-  for (let i = days - 1; i >= 0; i--) {
-    const day = today - i * DAY_MS;
-    const d = byDay[day];
-    if (d) points.push({ day, pct: Math.round((d.correct / d.total) * 100), total: d.total });
-  }
-  return points;
-}
-
-/* ==========================================================================
-   Установка PWA — своя кнопка вместо системного баннера "на удачу".
-   Показывается только после реальной вовлечённости (серия ≥ 2 дней),
-   не показывается повторно, если пользователь уже отказался, и не
-   показывается, если приложение уже установлено (display-mode: standalone
-   на Android/десктопе, navigator.standalone на iOS).
-   ========================================================================== */
-
-/**
- * @param {{count: number}|null} streak
- * @returns {Promise<boolean>}
- */
-async function shouldOfferPwaInstall(streak) {
-  if (typeof window === "undefined") return false;
-  const isStandalone =
-    (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) ||
-    window.navigator.standalone === true;
-  if (isStandalone) return false;
-  if (!streak || streak.count < 2) return false;
-  try {
-    const res = await safeStorage.get(PWA_INSTALL_DISMISSED_KEY);
-    if (res && res.value === "1") return false;
-  } catch {
-    // нет данных — считаем, что ещё не отказывались
-  }
-  return true;
-}
-
-async function dismissPwaInstallOffer() {
-  await safeStorage.set(PWA_INSTALL_DISMISSED_KEY, "1");
-}
-
-/**
- * Уместный момент для предложения включить напоминания — та же
- * вовлечённость, что и для установки PWA (серия ≥ 2 дней), плюс
- * разрешение на уведомления ещё не запрошено или не отклонено, плюс
- * сам API вообще существует в этом браузере.
- * @param {{count: number}|null} streak
- */
-async function shouldOfferReminders(streak) {
-  if (typeof Notification === "undefined") return false;
-  if (Notification.permission !== "default") return false; // уже разрешено или отклонено раньше
-  if (!streak || streak.count < 2) return false;
-  try {
-    const res = await safeStorage.get(REMINDER_OFFER_DISMISSED_KEY);
-    if (res && res.value === "1") return false;
-  } catch {
-    // нет данных — считаем, что ещё не отказывались
-  }
-  return true;
-}
-
-async function dismissReminderOffer() {
-  await safeStorage.set(REMINDER_OFFER_DISMISSED_KEY, "1");
-}
-
-/* ==========================================================================
-   Напоминание о серии дней — через IndexedDB (не window.storage: он
-   недоступен внутри service worker, а IndexedDB — обычный веб-API,
-   работает из обоих контекстов). Настоящих push-уведомлений без сервера
-   не бывает — это Periodic Background Sync, лучшее, что доступно
-   статичному сайту: работает только в Chrome/Edge на Android при
-   установленном PWA, точное время не гарантировано браузером.
-   ========================================================================== */
-
-const REMINDER_DB_NAME = "js-track-reminder";
-const REMINDER_STORE = "state";
-
-function openReminderDb() {
-  return new Promise((resolve, reject) => {
-    const req = indexedDB.open(REMINDER_DB_NAME, 1);
-    req.onupgradeneeded = () => req.result.createObjectStore(REMINDER_STORE);
-    req.onsuccess = () => resolve(req.result);
-    req.onerror = () => reject(req.error);
-  });
-}
-
-async function setLastActiveToday() {
-  try {
-    const db = await openReminderDb();
-    const tx = db.transaction(REMINDER_STORE, "readwrite");
-    tx.objectStore(REMINDER_STORE).put(getLocalDateKey(), "lastActiveDate");
-    await new Promise((res) => { tx.oncomplete = res; tx.onerror = res; });
-    db.close();
-  } catch {
-    // IndexedDB недоступен (приватный режим и т.п.) — напоминания просто не сработают
-  }
-}
-
-async function getLastActiveDate() {
-  try {
-    const db = await openReminderDb();
-    const tx = db.transaction(REMINDER_STORE, "readonly");
-    const value = await new Promise((res, rej) => {
-      const r = tx.objectStore(REMINDER_STORE).get("lastActiveDate");
-      r.onsuccess = () => res(r.result);
-      r.onerror = () => rej(r.error);
-    });
-    db.close();
-    return value || null;
-  } catch {
-    return null;
-  }
-}
-
-/**
- * Запрашивает разрешение на уведомления и best-effort регистрирует
- * Periodic Background Sync. Возвращает, удалось ли реально включить
- * фоновую проверку (не только разрешение на уведомления) — используется,
- * чтобы честно сказать пользователю, сработает ли это на его устройстве.
- * @returns {Promise<{granted: boolean, periodicSyncSupported: boolean}>}
- */
-async function enableStreakReminders() {
-  if (typeof Notification === "undefined") return { granted: false, periodicSyncSupported: false };
-  const permission = await Notification.requestPermission();
-  const granted = permission === "granted";
-  let periodicSyncSupported = false;
-  if (granted && "serviceWorker" in navigator) {
-    try {
-      const reg = await navigator.serviceWorker.ready;
-      if ("periodicSync" in reg) {
-        await reg.periodicSync.register("streak-reminder-check", { minInterval: 20 * 60 * 60 * 1000 });
-        periodicSyncSupported = true;
-      }
-    } catch {
-      // Periodic Background Sync недоступен на этом устройстве/браузере
-    }
-  }
-  return { granted, periodicSyncSupported };
-}
-
-/* ==========================================================================
-   Интервальное повторение (spaced repetition) — вопрос с ошибкой
-   "всплывает" снова через день, потом через 3 дня, 7, 14, 30 — если
-   отвечен верно каждый раз. Ошибка на любом шаге сбрасывает интервал
-   обратно к 1 дню, а не просто убирает вопрос из виду насовсем.
-   ========================================================================== */
-
-const REVIEW_INTERVALS_DAYS = [1, 3, 7, 14, 30];
-
-/**
- * Обновляет расписание повторения для одного вопроса по факту ответа.
- * Вызывается СВЕРХ submitAnswer (не встроено внутрь него) — расписание
- * повторения осмысленно только для вопросов основного потока курса,
- * не для экзамена/песочницы, где submitAnswer в принципе не используется
- * для сохранения прогресса таким же образом.
- * @param {string} questionId
- * @param {boolean} isCorrect
- */
-async function updateReviewSchedule(questionId, isCorrect) {
-  const res = await safeStorage.get(REVIEW_SCHEDULE_KEY);
-  let schedule = {};
-  try { if (res && res.value) schedule = JSON.parse(res.value); } catch { /* нет данных */ }
-
-  const today = startOfDay(Date.now());
-  const current = schedule[questionId];
-
-  if (!isCorrect) {
-    // ошибка — интервал всегда сбрасывается к первому шагу, независимо
-    // от того, как далеко продвинулись раньше.
-    schedule[questionId] = { stepIdx: 0, nextReviewDay: today + REVIEW_INTERVALS_DAYS[0] * DAY_MS };
-  } else {
-    const prevStepIdx = current ? current.stepIdx : -1;
-    const nextStepIdx = Math.min(prevStepIdx + 1, REVIEW_INTERVALS_DAYS.length - 1);
-    schedule[questionId] = { stepIdx: nextStepIdx, nextReviewDay: today + REVIEW_INTERVALS_DAYS[nextStepIdx] * DAY_MS };
-  }
-
-  await safeStorage.set(REVIEW_SCHEDULE_KEY, JSON.stringify(schedule));
-}
-
-/**
- * Вопросы, которые пора повторить сегодня (nextReviewDay <= сегодня).
- * Возвращает полные объекты вопросов (из ALL_QUESTIONS), отсортированные
- * по тому, насколько давно "просрочен" повтор — самые старые сначала.
- * @returns {Promise<Array>}
- */
-async function getDueReviewQuestions() {
-  const res = await safeStorage.get(REVIEW_SCHEDULE_KEY);
-  let schedule = {};
-  try { if (res && res.value) schedule = JSON.parse(res.value); } catch { /* нет данных */ }
-
-  const today = startOfDay(Date.now());
-  const dueIds = Object.keys(schedule)
-    .filter((id) => schedule[id].nextReviewDay <= today)
-    .sort((a, b) => schedule[a].nextReviewDay - schedule[b].nextReviewDay);
-
-  return dueIds.map((id) => QUESTION_BY_ID[id]).filter(Boolean);
-}
-
-/* ==========================================================================
-   Публичная ссылка на прогресс — без сервера единственный реальный
-   способ "поделиться" состоянием это закодировать его прямо в URL
-   (сайт статичный, хранить чужие данные негде). Ссылка — это СНИМОК на
-   момент генерации, не живой профиль: если человек продолжит
-   заниматься, старая ссылка не обновится сама.
-   ========================================================================== */
-
-/**
- * @param {Object} stats - { certName, rank, xp, streakCount, overallPct, achievementsUnlocked, achievementsTotal }
- * @returns {string} относительный URL вида "share.html?d=..."
- */
-function buildShareUrl(stats) {
-  const compact = {
-    n: stats.certName || "",
-    r: stats.rank,
-    x: stats.xp,
-    s: stats.streakCount || 0,
-    p: stats.overallPct,
-    a: stats.achievementsUnlocked,
-    t: stats.achievementsTotal,
-  };
-  const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(compact))));
-  return `share.html?d=${encoded}`;
-}
-
-/**
- * @param {string} encoded - значение параметра ?d= из URL
- * @returns {Object|null} расшифрованные данные, или null если ссылка повреждена
- */
-function decodeShareData(encoded) {
-  try {
-    const json = decodeURIComponent(escape(atob(encoded)));
-    const compact = JSON.parse(json);
-    return {
-      certName: compact.n || "",
-      rank: compact.r,
-      xp: compact.x,
-      streakCount: compact.s,
-      overallPct: compact.p,
-      achievementsUnlocked: compact.a,
-      achievementsTotal: compact.t,
-    };
-  } catch {
-    return null;
-  }
-}

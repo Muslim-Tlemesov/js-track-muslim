@@ -1,14 +1,6 @@
 
 
 /* ==========================================================================
-   pages/shared/engine-core.js (продолжение) — уровни, прогресс по
-   темам, звания, реплики маскота Байта, submitAnswer (главная функция
-   записи ответа — XP, достижения, разблокировка уровня), порядок
-   вопросов (NAV_ITEMS), эмодзи тем. Использует TOPICS/ALL_QUESTIONS
-   из engine-content.js — должен загружаться после него.
-   ========================================================================== */
-
-/* ==========================================================================
    pages/shared/engine-core.js — общий "движок" данных и состояния,
    подключается на КАЖДОЙ странице через <script src="shared-engine-
    core.js">. Без React — обычные async-функции для чтения состояния
@@ -21,15 +13,16 @@
    между страницами не теряет ответы/XP/серию: следующая страница
    просто читает то же самое хранилище заново.
 
-   Этот файл — первый из шести, на которые разбит движок (раньше был
-   один engine.js на ~3700 строк). Порядок подключения в HTML важен —
-   файлы делят одну глобальную область видимости, и более поздние
-   файлы используют то, что объявлено в более ранних:
-     1. shared-engine-content.js — TOPICS/ALL_QUESTIONS (учебный контент)
-     2. shared-engine-core.js    — этот файл: состояние, прогресс, XP
-     3. shared-engine-code.js    — движок выполнения пользовательского кода
+   Второй из шести файлов, на которые разбит движок (раньше был один
+   engine.js на ~3700 строк). Порядок подключения в HTML важен — файлы
+   делят одну глобальную область видимости, и более поздние файлы
+   используют то, что объявлено в более ранних:
+     1. shared-engine-content.js  — TOPICS (учебный контент, чистые данные)
+     2. shared-engine-core.js     — этот файл: ALL_QUESTIONS/QUESTION_BY_ID
+        (производные от TOPICS), состояние, прогресс, XP, submitAnswer
+     3. shared-engine-code.js     — движок выполнения пользовательского кода
      4. shared-engine-debugger.js — парсер для пошагового отладчика
-     5. shared-engine-editor.js  — подсветка синтаксиса, автодополнение
+     5. shared-engine-editor.js   — подсветка синтаксиса, автодополнение
      6. shared-engine-features.js — резервные копии, история, предсказания,
         экзамен, мини-проект, "найди баг", PWA, напоминания, шеринг
    ========================================================================== */
@@ -330,6 +323,21 @@ async function getStreak() {
  * календарного дня — повторный вызов в тот же день серию не тронет.
  * @returns {Promise<{count: number, best: number, lastDate: string, brokenCount: number|null}>}
  */
+/**
+ * Дата в формате YYYY-MM-DD по МЕСТНОМУ времени пользователя — НЕ
+ * toISOString().slice(0, 10) (та даёт UTC). Реальный найденный баг:
+ * человек, занимающийся в 00:30 по местному времени в часовом поясе
+ * восточнее UTC (например UTC+8), формально ещё "вчера" по UTC —
+ * серия дней, календарь активности и напоминания могли посчитать это
+ * днём раньше, чем реально было у пользователя на часах.
+ */
+function getLocalDateKey(date = new Date()) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
 async function loadAndUpdateDailyStreak() {
   let record = { count: 0, best: 0, lastDate: null };
   try {
@@ -340,10 +348,10 @@ async function loadAndUpdateDailyStreak() {
   }
   const prevBest = record.best || 0;
   const today = new Date();
-  const todayStr = today.toISOString().slice(0, 10);
+  const todayStr = getLocalDateKey(today);
   const yesterday = new Date(today);
   yesterday.setDate(yesterday.getDate() - 1);
-  const yesterdayStr = yesterday.toISOString().slice(0, 10);
+  const yesterdayStr = getLocalDateKey(yesterday);
 
   let brokenCount = null;
   let nextRecord;

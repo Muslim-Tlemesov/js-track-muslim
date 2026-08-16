@@ -1,10 +1,11 @@
 // Service worker для js.track — простое кэширование "cache first" для
-// офлайн-работы. Приложение теперь МНОГОСТРАНИЧНОЕ (12 отдельных HTML-
-// страниц + общие shared/-файлы), поэтому в APP_SHELL перечислены ВСЕ
-// страницы разом, а не одна — иначе офлайн работала бы только та
-// страница, что была открыта в момент установки service worker.
+// офлайн-работы. Приложение МНОГОСТРАНИЧНОЕ (14 отдельных HTML-
+// страниц + общие shared-*-файлы в плоской структуре, без подпапки —
+// см. build.js), поэтому в APP_SHELL перечислены ВСЕ страницы разом,
+// а не одна — иначе офлайн работала бы только та страница, что была
+// открыта в момент установки service worker.
 
-const CACHE_NAME = "js-track-v7-multipage";
+const CACHE_NAME = "js-track-v10-multipage";
 
 const PAGES = [
   "index", "questions", "practice", "summary", "profile", "sandbox",
@@ -18,12 +19,24 @@ const APP_SHELL = [
   "./vendor-react.production.min.js",
   "./vendor-react-dom.production.min.js",
   "./shared-shared.css",
-  "./shared-engine-content.js",
-  "./shared-engine-core.js",
-  "./shared-engine-code.js",
-  "./shared-engine-editor.js",
-  "./shared-engine-debugger.js",
-  "./shared-engine-features.js",
+  "./shared-data-topics.js",
+  "./shared-data-questions.js",
+  "./shared-data-achievements.js",
+  "./shared-core-storage.js",
+  "./shared-core-history.js",
+  "./shared-core-streak.js",
+  "./shared-code-runner.js",
+  "./shared-code-syntax.js",
+  "./shared-code-debugger.js",
+  "./shared-code-worker.js",
+  "./shared-pwa-install.js",
+  "./shared-pwa-reminders.js",
+  "./shared-core-progress.js",
+  "./shared-core-review.js",
+  "./shared-core-xp.js",
+  "./shared-misc-backup.js",
+  "./shared-misc-quizmodes.js",
+  "./shared-misc-share.js",
   "./shared-mascot-icons.js",
   "./shared-Header.js",
   "./shared-Common.js",
@@ -113,9 +126,15 @@ self.addEventListener("periodicsync", (event) => {
   event.waitUntil(
     (async () => {
       const lastActive = await swGetLastActiveDate();
-      const today = new Date().toISOString().slice(0, 10);
+      // Локальное время пользователя, НЕ toISOString().slice(0,10)
+      // (та даёт UTC) — иначе получился бы внутренний рассинхрон с
+      // getHours() ниже (тоже локальное время): человек в 00:30 по
+      // своим часам мог бы попасть на "предыдущий" UTC-день здесь,
+      // но уже на "сегодняшний" час в проверке ниже.
+      const now = new Date();
+      const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
       if (lastActive === today) return; // уже занимался сегодня — не беспокоим
-      const hour = new Date().getHours();
+      const hour = now.getHours();
       if (hour < 17 || hour > 22) return; // напоминаем только вечером (17:00–22:00)
       await self.registration.showNotification("js.track", {
         body: "Не теряй серию — сегодня ещё не было ни одного вопроса.",
