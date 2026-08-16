@@ -1,0 +1,104 @@
+/* ==========================================================================
+   Блок: home — главный экран (первое, что видит пользователь).
+   ========================================================================== */
+
+.home {
+  padding: 36px 28px;
+  text-align: center;
+}
+
+.home__mascot-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.home__greeting {
+  font-family: 'Fraunces', serif;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.home__companion-line {
+  font-size: 14.5px;
+  color: var(--text-dim);
+  margin-bottom: 30px;
+}
+
+.home__companion-name {
+  color: var(--text);
+}
+
+.home__progress-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 28px;
+}
+
+.home__progress-label {
+  font-size: 12.5px;
+  color: var(--text-dim);
+  margin-bottom: 28px;
+}
+
+.home__stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+  max-width: 420px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.home__cta {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 13px 28px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+
+/* ==========================================================================
+   pwa-banner — своя кнопка установки вместо системного баннера.
+   ========================================================================== */
+
+.pwa-banner {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 18px;
+  background: color-mix(in srgb, var(--accent) 8%, var(--surface));
+  border: 1.5px solid color-mix(in srgb, var(--accent) 27%, transparent);
+  border-radius: 12px; padding: 14px 16px;
+}
+.pwa-banner__icon { font-size: 28px; flex-shrink: 0; }
+.pwa-banner__text { flex: 1; min-width: 0; }
+.pwa-banner__title { font-size: 13.5px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+.pwa-banner__desc { font-size: 12px; color: var(--text-dim); }
+.pwa-banner__actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.pwa-banner__install-btn {
+  background: var(--accent); color: #fff; border: none; border-radius: 8px;
+  padding: 8px 14px; font-size: 12.5px; font-weight: 600; cursor: pointer; white-space: nowrap;
+}
+.pwa-banner__dismiss-btn {
+  background: none; border: none; color: var(--text-dim); cursor: pointer;
+  width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 14px;
+}
+
+@media (max-width: 480px) {
+  .pwa-banner { flex-wrap: wrap; }
+  .pwa-banner__actions { width: 100%; justify-content: flex-end; }
+}
+
+.pwa-banner--reminder {
+  background: color-mix(in srgb, var(--accent2) 8%, var(--surface));
+  border-color: color-mix(in srgb, var(--accent2) 27%, transparent);
+}
+.pwa-banner--reminder .pwa-banner__install-btn { background: var(--accent2); }

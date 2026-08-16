@@ -1,0 +1,156 @@
+/* ==========================================================================
+   pages/viz.css — «Визуализации» (хаб + Event Loop).
+   ========================================================================== */
+
+.viz { padding: 26px; }
+
+.viz__topic-tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+.viz__topic-tab {
+  background: var(--surface-alt); color: var(--text); border: 1px solid var(--border); border-radius: 20px;
+  padding: 7px 14px; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px;
+}
+.viz__topic-tab--active { background: var(--accent); color: #fff; font-weight: 600; border-color: transparent; }
+
+.viz__intro { font-size: 13px; color: var(--text-dim); margin-bottom: 18px; max-width: 560px; }
+
+.viz__code {
+  background: var(--console); color: var(--console-text); border-radius: 9px; padding: 12px 14px;
+  font-size: 13px; line-height: 1.7; margin-bottom: 16px; overflow-x: auto;
+}
+.viz__code-line { padding: 0 8px; margin-left: -8px; border-left: 3px solid transparent; }
+.viz__code-line--active { background: color-mix(in srgb, var(--accent) 20%, transparent); border-left-color: var(--accent); }
+
+.viz__zones { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
+.viz__zone { flex: 1 1 220px; min-width: 200px; background: var(--surface-alt); border: 1.5px solid var(--border); border-radius: 10px; padding: 12px; }
+.viz__zone-title { font-size: 11px; font-weight: 700; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.04em; }
+.viz__zone-items { display: flex; flex-direction: column; gap: 6px; min-height: 34px; }
+.viz__zone-empty { font-size: 12px; color: var(--text-dim); font-style: italic; }
+.viz__zone-item {
+  background: color-mix(in srgb, var(--zone-color) 10%, transparent); border: 1px solid color-mix(in srgb, var(--zone-color) 33%, transparent);
+  border-radius: 6px; padding: 6px 10px; font-size: 12.5px; color: var(--text);
+}
+
+.viz__note {
+  background: color-mix(in srgb, var(--accent) 8%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 27%, transparent);
+  border-radius: 9px; padding: 10px 14px; font-size: 13.5px; line-height: 1.6; color: var(--text); margin-bottom: 16px;
+}
+
+.viz__console { background: var(--console); border-radius: 9px; overflow: hidden; border: 1px solid var(--border); margin-bottom: 16px; }
+.viz__console-label {
+  padding: 6px 12px; font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase;
+  color: #7A7A90; border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.viz__console-body { padding: 10px 12px; font-size: 13px; min-height: 20px; }
+.viz__console-empty { color: #7A7A90; }
+.viz__console-line { color: var(--console-text); }
+.viz__console-arrow { color: var(--accent2); }
+
+.viz__nav-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+.viz__step-count { font-size: 12px; color: var(--text-dim); }
+.viz__nav-buttons { display: flex; gap: 8px; }
+.viz__nav-btn {
+  background: var(--surface-alt); border: 1px solid var(--border); border-radius: 8px;
+  padding: 8px 14px; font-size: 12.5px; color: var(--text); cursor: pointer;
+  display: flex; align-items: center; gap: 5px;
+}
+.viz__nav-btn:disabled { opacity: 0.5; cursor: default; }
+.viz__nav-btn--primary { background: var(--accent); color: #fff; border: none; font-weight: 600; }
+.viz__nav-btn--primary:disabled { background: var(--surface-alt); color: var(--text-dim); }
+
+@media (max-width: 700px) {
+  .viz { padding: 16px; }
+}
+
+/* ==========================================================================
+   Scope — вложенные области видимости.
+   ========================================================================== */
+
+.viz__scope-wrap { margin-bottom: 16px; }
+.viz__scope-empty { font-size: 12px; color: var(--text-dim); font-style: italic; }
+.viz__scope-box {
+  border: 1.5px solid var(--border); background: var(--surface-alt); border-radius: 10px; padding: 12px;
+}
+.viz__scope-box--highlight { border-color: var(--success); background: color-mix(in srgb, var(--success) 8%, transparent); }
+.viz__scope-name {
+  font-size: 11px; font-weight: 700; color: var(--accent); margin-bottom: 8px;
+  text-transform: uppercase; letter-spacing: 0.04em;
+}
+.viz__scope-box--highlight .viz__scope-name { color: var(--success); }
+.viz__scope-vars { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
+.viz__scope-var { font-size: 12.5px; color: var(--text); }
+.viz__scope-var-value { color: var(--accent2); }
+.viz__scope-child { margin-top: 10px; }
+
+.viz__lookup-note { font-size: 12.5px; color: var(--text-dim); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.viz__lookup-var { color: var(--text); font-weight: 600; }
+.viz__lookup-found { color: var(--success); font-weight: 600; }
+.viz__lookup-notfound { color: var(--error); font-weight: 600; }
+
+/* ==========================================================================
+   Замыкания.
+   ========================================================================== */
+
+.viz__closure-wrap { margin-bottom: 16px; }
+.viz__closure-box {
+  display: inline-flex; flex-direction: column; gap: 4px;
+  border: 1.5px solid var(--accent); background: color-mix(in srgb, var(--accent) 8%, transparent);
+  border-radius: 10px; padding: 12px 18px; min-width: 160px;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+.viz__closure-box--active { border-color: var(--success); background: color-mix(in srgb, var(--success) 8%, transparent); }
+.viz__closure-box--dying { border-color: var(--error); background: color-mix(in srgb, var(--error) 8%, transparent); }
+.viz__closure-label { font-size: 11px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.04em; }
+.viz__closure-value { font-size: 20px; font-weight: 700; color: var(--text); }
+.viz__closure-dying-note { font-size: 11.5px; color: var(--error); }
+
+/* ==========================================================================
+   this — блок привязки контекста.
+   ========================================================================== */
+
+.viz__this-wrap { margin-bottom: 16px; }
+.viz__this-box {
+  display: inline-flex; flex-direction: column; gap: 4px; border-radius: 10px;
+  padding: 12px 18px; min-width: 200px; border: 1.5px solid var(--border);
+}
+.viz__this-box--bound { border-color: var(--success); background: color-mix(in srgb, var(--success) 8%, transparent); }
+.viz__this-box--unbound { border-color: var(--error); background: color-mix(in srgb, var(--error) 8%, transparent); }
+.viz__this-label { font-size: 11px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.04em; }
+.viz__this-value { font-size: 18px; font-weight: 700; }
+.viz__this-box--bound .viz__this-value { color: var(--success); }
+.viz__this-box--unbound .viz__this-value { color: var(--error); }
+.viz__this-detail { font-size: 11.5px; color: var(--text-dim); }
+
+/* ==========================================================================
+   Prototype — цепочка.
+   ========================================================================== */
+
+.viz__chain-wrap { margin-bottom: 16px; overflow-x: auto; }
+.viz__chain { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.viz__chain-arrow { color: var(--text-dim); flex-shrink: 0; }
+.viz__chain-node { border: 1.5px solid var(--border); background: var(--surface-alt); border-radius: 10px; padding: 12px; min-width: 130px; }
+.viz__chain-node--null { border-style: dashed; background: transparent; }
+.viz__chain-node--dim { background: transparent; }
+.viz__chain-node--found { border-color: var(--success); background: color-mix(in srgb, var(--success) 8%, transparent); }
+.viz__chain-node--exhausted { border-color: var(--error); background: color-mix(in srgb, var(--error) 8%, transparent); }
+.viz__chain-node-name { font-size: 11px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 8px; }
+.viz__chain-node--found .viz__chain-node-name { color: var(--success); }
+.viz__chain-node--exhausted .viz__chain-node-name { color: var(--error); }
+.viz__chain-node-vars { display: flex; flex-direction: column; gap: 4px; }
+.viz__chain-node-var { font-size: 12px; color: var(--text); }
+.viz__chain-node-var-value { color: var(--accent2); }
+
+/* ==========================================================================
+   Event Bubbling — вложенные DOM-блоки.
+   ========================================================================== */
+
+.viz__dom-wrap { margin-bottom: 16px; }
+.viz__dom-box { border: 1.5px solid var(--border); background: var(--surface-alt); border-radius: 10px; padding: 14px; }
+.viz__dom-box--active { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, transparent); }
+.viz__dom-box--fired { border-color: var(--success); background: color-mix(in srgb, var(--success) 5%, transparent); }
+.viz__dom-box-header { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; }
+.viz__dom-box-label { font-size: 11px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.04em; }
+.viz__dom-box--active .viz__dom-box-label { color: var(--accent); }
+.viz__dom-box--fired .viz__dom-box-label { color: var(--success); }
+.viz__dom-box-bubble { font-size: 14px; }
+.viz__dom-box-check { color: var(--success); font-weight: 700; }
+.viz__dom-box-child { margin-left: 14px; }

@@ -1,0 +1,556 @@
+
+
+/* ==================================================================
+   js.track — внешний CSS-файл, БЭМ-методология.
+   ==================================================================
+   Цвета темы — через CSS custom properties, переключаемые ОДНИМ
+   атрибутом data-theme на <html> (см. loadAndApplyTheme() в
+   shared/engine.js) — светлая/тёмная тема это просто разные значения
+   переменных ниже, сами БЭМ-классы темы не знают и не должны знать.
+   ================================================================== */
+
+:root[data-theme="dark"] {
+  --bg: #161310; --surface: #211C17; --surface-alt: #2C251E; --border: #3D342A;
+  --text: #F5EDE1; --text-dim: #A89684; --accent: #2BA894; --accent2: #F0794F;
+  --success: #5FB86C; --success-bg: #1A2E1B; --error: #E85D42; --error-bg: #3A1712;
+  --console: #0D0B09; --console-text: #D9CFC0;
+}
+
+:root[data-theme="light"] {
+  --bg: #FAF7F2; --surface: #FFFFFF; --surface-alt: #F3ECE4; --border: #E4D9CC;
+  --text: #2B2118; --text-dim: #6E5F50; --accent: #0F6B5C; --accent2: #CC4A24;
+  --success: #2D6B38; --success-bg: #EEF5EA; --error: #A8371F; --error-bg: #FBEDE8;
+  --console: #1B1712; --console-text: #E8DFD3;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.app-root {
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+/* ------------------------------------------------------------------
+   app-header — верхняя панель: маскот+логотип слева, статистика и
+   переключатели справа.
+   ------------------------------------------------------------------ */
+
+.app-header {
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 53%, transparent);
+  padding: 20px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 1;
+}
+
+.app-header__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.app-header__mascot {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  border: 1.5px solid color-mix(in srgb, var(--accent) 33%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.app-header__logo {
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 20px;
+  letter-spacing: -0.01em;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 2px;
+  color: var(--text);
+}
+
+.app-header__logo-accent {
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.app-header__tagline {
+  font-size: 12.5px;
+  color: var(--text-dim);
+}
+
+.app-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.app-header__stats {
+  font-size: 12.5px;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.app-header__stats-count {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* Общий вид "пилюли"-бейджа в шапке — переиспользуется и серией (стрик),
+   и званием/XP: одинаковый визуальный язык для двух разных метрик. */
+.app-header__badge {
+  font-size: 12.5px;
+  color: var(--accent2);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: color-mix(in srgb, var(--accent2) 9%, transparent);
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-weight: 600;
+  position: relative;
+}
+
+/* Бейдж достижений — та же форма, но акцентный (не accent2) цвет,
+   отличает "открытые достижения" от XP/стрика по палитре. */
+.app-header__badge--achievements {
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 9%, transparent);
+}
+
+.app-header__xp-float {
+  position: absolute;
+  top: -6px;
+  right: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent2);
+  pointer-events: none;
+  animation: xp-float-up 1.1s ease forwards;
+}
+
+/* ------------------------------------------------------------------
+   nav__btn — кнопка навигации (12 разделов + Сброс/звук/тема) в шапке.
+   ------------------------------------------------------------------ */
+
+.nav__btn {
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 7px 14px;
+  cursor: pointer;
+  color: var(--text);
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nav__btn--active {
+  background: var(--accent);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 13%, transparent),
+              0 2px 10px color-mix(in srgb, var(--accent) 33%, transparent);
+}
+
+/* Приглушённый вариант — кнопка "Сброс" (всегда) и переключатель звука,
+   когда звук выключен: сигнализирует "менее заметное" действие/состояние. */
+.nav__btn--dim {
+  color: var(--text-dim);
+}
+
+/* ==========================================================================
+   Блок: question-card — базовая "карточка" контента, переиспользуется на
+   каждом экране (вопрос, Домой, Итоги и т.д.) — раньше background/
+   border/padding/border-radius задавались инлайн-стилем НА КАЖДОМ месте
+   использования по отдельности; теперь это одно место.
+   ========================================================================== */
+
+.question-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 26px;
+  box-sizing: border-box;
+}
+
+/* ==========================================================================
+   Блок: mascot-feedback — речевой пузырь Байта с реакцией на ответ
+   (верно/неверно). Цвет аватара — через два модификатора вместо
+   произвольного цвета, потому что возможных значений ровно два.
+   ========================================================================== */
+
+.mascot-feedback {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.mascot-feedback__avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mascot-feedback__avatar--correct {
+  background: color-mix(in srgb, var(--success) 10%, transparent);
+  border: 1.5px solid color-mix(in srgb, var(--success) 33%, transparent);
+}
+
+.mascot-feedback__avatar--wrong {
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  border: 1.5px solid color-mix(in srgb, var(--accent) 33%, transparent);
+}
+
+.mascot-feedback__bubble {
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  border-top-left-radius: 4px;
+  padding: 8px 12px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text);
+  max-width: 420px;
+}
+
+.mascot-feedback__name {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-dim);
+  margin-bottom: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ==========================================================================
+   Блок: topic-card — базовая карточка "семьи" тем/показателей (список
+   тем в сайдбаре, DashboardCard на Главной/Итогах) — общая форма и тень,
+   раньше дублировались инлайн на каждом месте использования.
+   ========================================================================== */
+
+.topic-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* ==========================================================================
+   Блок: empty-state — пустое состояние с Байтом (вместо голого текста).
+   ========================================================================== */
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 28px 20px;
+  gap: 12px;
+}
+
+.empty-state__message {
+  font-size: 13.5px;
+  color: var(--text-dim);
+  max-width: 320px;
+  line-height: 1.5;
+}
+
+/* ==========================================================================
+   Блок: skeleton — заглушка с бегущим градиентом на время загрузки.
+   ========================================================================== */
+
+.skeleton {
+  background: linear-gradient(90deg, var(--border) 25%, color-mix(in srgb, var(--surface-alt) 60%, transparent) 37%, var(--border) 63%);
+  background-size: 400% 100%;
+  animation: skeleton-pulse 1.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+  }
+}
+
+/* ==========================================================================
+   Блок: stat-card — компактная карточка с одним показателем.
+   ========================================================================== */
+
+.stat-card {
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 18px;
+  min-width: 110px;
+}
+
+.stat-card__value {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.stat-card__label {
+  font-size: 11.5px;
+  color: var(--text-dim);
+}
+
+/* ==========================================================================
+   Блок: dashboard-card — карточка-показатель с эмодзи и фирменной
+   "штамп"-тенью. Цвет полоски/тени — через --stripe-color (задаётся
+   инлайн на каждом экземпляре, т.к. произвольный на каждой карточке).
+   ========================================================================== */
+
+.dashboard-card {
+  box-shadow: 3px 3px 0 0 color-mix(in srgb, var(--stripe-color) 40%, transparent);
+}
+
+.dashboard-card__stripe {
+  height: 4px;
+  background: var(--stripe-color);
+  flex-shrink: 0;
+}
+
+.dashboard-card__body {
+  padding: 16px 14px;
+  text-align: center;
+}
+
+.dashboard-card__emoji {
+  font-size: 26px;
+  margin-bottom: 8px;
+}
+
+.dashboard-card__value {
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+  line-height: 1.2;
+}
+
+.dashboard-card__label {
+  font-size: 11.5px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ==========================================================================
+   Блок: page-content — общая обёртка контента страницы (без сайдбара —
+   тот нужен только на "Вопросах"). Максимальная ширина и центрирование,
+   как раньше у .layout, но без grid-колонки под сайдбар.
+   ========================================================================== */
+
+.page-content {
+  max-width: 720px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 28px 24px 60px;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 1;
+}
+
+.page-loading {
+  padding: 40px;
+  text-align: center;
+  color: var(--text-dim);
+}
+
+@media (max-width: 700px) {
+  .page-content {
+    padding: 18px 16px 44px;
+  }
+}
+
+
+/* ==========================================================================
+   Блок: lesson-card — экран теории перед вопросами темы.
+   ========================================================================== */
+
+.lesson-card { padding: 26px; }
+.lesson-card__hero-wrap { display: flex; justify-content: center; margin-bottom: 18px; }
+.lesson-card__hero {
+  width: 84px; height: 84px; border-radius: 50%; display: flex; align-items: center;
+  justify-content: center; font-size: 40px;
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  border: 1.5px solid color-mix(in srgb, var(--accent) 27%, transparent);
+}
+.lesson-card__badge-wrap { display: flex; justify-content: center; }
+.lesson-card__badge {
+  display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 600;
+  color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent);
+  padding: 4px 10px; border-radius: 20px; margin-bottom: 14px; letter-spacing: 0.01em;
+}
+.lesson-card__title {
+  font-family: 'Fraunces', serif; font-size: 19px; font-weight: 700; margin-bottom: 12px; text-align: center;
+}
+.lesson-card__intro { font-size: 14.5px; line-height: 1.75; color: var(--text); margin-bottom: 20px; }
+.lesson-card__section-label {
+  font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-dim);
+  font-weight: 600; margin-bottom: 10px;
+}
+.lesson-card__section-label--example { margin-top: 22px; }
+.lesson-card__terms { display: flex; flex-direction: column; gap: 10px; }
+.lesson-card__term { background: var(--surface-alt); border: 1px solid var(--border); border-radius: 9px; padding: 10px 14px; }
+.lesson-card__term-name { color: var(--accent); font-weight: 700; font-size: 13.5px; margin-right: 8px; }
+.lesson-card__term-def { font-size: 13.5px; line-height: 1.6; color: var(--text-dim); }
+.lesson-card__example-code {
+  background: var(--console); color: var(--console-text); border-radius: 9px; padding: 12px 14px;
+  font-size: 13px; line-height: 1.6; overflow-x: auto; margin-bottom: 10px; white-space: pre-wrap;
+}
+.lesson-card__example-output {
+  background: var(--surface-alt); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; font-size: 12.5px;
+}
+.lesson-card__example-output-label { color: var(--text-dim); margin-right: 6px; }
+.lesson-card__example-output-line { color: var(--accent); }
+.lesson-card__example-output-arrow { color: var(--text-dim); }
+.lesson-card__start-btn {
+  margin-top: 22px; background: var(--accent); color: #fff; border: none; border-radius: 8px;
+  padding: 10px 20px; font-size: 13.5px; font-weight: 600; cursor: pointer;
+  display: flex; align-items: center; gap: 6px;
+}
+
+/* ==========================================================================
+   Блок: code-editor — редактор кода с подсветкой синтаксиса, нумерацией
+   строк, автодополнением.
+   ========================================================================== */
+
+.code-editor { position: relative; }
+.code-editor__frame {
+  display: flex; width: 100%; background: var(--surface-alt);
+  border: 1.5px solid var(--border); border-radius: 9px; overflow: hidden;
+}
+.code-editor__gutter {
+  flex-shrink: 0; padding: 8px 0; text-align: right; color: var(--text-dim);
+  opacity: 0.6; user-select: none; overflow: hidden;
+  border-right: 1px solid var(--border); background: var(--surface);
+}
+.code-editor__gutter-line { padding-right: 8px; position: relative; }
+.code-editor__gutter-dot {
+  position: absolute; left: 3px; top: 50%; transform: translateY(-50%);
+  width: 6px; height: 6px; border-radius: 50%; background: var(--error);
+}
+.code-editor__body { position: relative; flex: 1; min-width: 0; }
+.code-editor__highlight {
+  position: absolute; inset: 0; margin: 0; padding: 8px;
+  font-family: 'JetBrains Mono', monospace; color: var(--text);
+  white-space: pre; overflow: hidden; pointer-events: none;
+}
+.code-editor__textarea {
+  position: relative; width: 100%; height: 100%;
+  background: transparent; color: transparent; caret-color: var(--text);
+  border: none; padding: 8px; font-family: 'JetBrains Mono', monospace;
+  resize: vertical; white-space: pre; overflow-wrap: normal; box-sizing: border-box;
+}
+.code-editor__error {
+  margin-top: 4px; font-size: 11.5px; color: var(--error);
+  display: flex; align-items: center; gap: 5px;
+}
+.code-editor__autocomplete {
+  position: absolute; z-index: 20;
+  background: color-mix(in srgb, var(--surface) 93%, transparent);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--border); border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.25); overflow: hidden; min-width: 140px;
+}
+.code-editor__autocomplete-item { padding: 9px 12px; font-size: 13px; cursor: pointer; color: var(--text); }
+.code-editor__autocomplete-item--active {
+  background: color-mix(in srgb, var(--accent) 13%, transparent);
+  color: var(--accent);
+}
+
+/* ==========================================================================
+
+/* ==========================================================================
+   Блок: mono / question-enter — общий моноширинный шрифт (код, числа,
+   счётчики) и анимация появления карточки вопроса.
+   ========================================================================== */
+
+.mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+@keyframes question-enter {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.question-enter {
+  animation: question-enter 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .question-enter {
+    animation: none;
+  }
+}
+
+.lesson-card__speak-btn {
+  background: none; border: none; cursor: pointer; min-width: 36px; min-height: 36px;
+  margin-right: 2px; color: var(--text-dim); display: inline-flex; align-items: center;
+  justify-content: center; vertical-align: middle; font-size: 13px;
+}
+
+/* ==========================================================================
+   toast — плавающие уведомления (разблокировка уровня, достижения).
+   ========================================================================== */
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translate(-50%, -10px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+.toast {
+  position: fixed; top: 18px; left: 50%; transform: translateX(-50%); z-index: 10000;
+  background: color-mix(in srgb, var(--surface) 90%, transparent);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+  display: flex; align-items: center; gap: 10px; cursor: pointer;
+  animation: toast-in 0.3s ease;
+}
+
+.toast--level {
+  flex-direction: column; gap: 4px; text-align: center; max-width: 320px;
+  padding: 22px 30px; border: 2px solid var(--accent);
+  box-shadow: 0 20px 48px rgba(0,0,0,0.35), 0 0 0 5px color-mix(in srgb, var(--accent) 13%, transparent);
+}
+.toast--level__emoji { font-size: 42px; margin-bottom: 2px; }
+.toast--level__title { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 700; color: var(--text); }
+.toast--level__desc { font-size: 13.5px; color: var(--text-dim); }
+
+.toast--achievement {
+  padding: 12px 18px; max-width: 380px; border: 1.5px solid var(--accent2);
+  top: 90px;
+}
+.toast--achievement__avatar {
+  width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+  background: color-mix(in srgb, var(--accent2) 10%, transparent);
+  border: 1.5px solid color-mix(in srgb, var(--accent2) 33%, transparent);
+  display: flex; align-items: center; justify-content: center;
+}
+.toast--achievement__text { font-size: 13.5px; color: var(--text); }
+
+@media (prefers-reduced-motion: reduce) {
+  .toast { animation: none; }
+}

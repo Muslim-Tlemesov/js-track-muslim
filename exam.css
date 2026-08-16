@@ -1,0 +1,68 @@
+/* ==========================================================================
+   pages/exam.css — «Финальный экзамен».
+   ========================================================================== */
+
+.exam { padding: 26px; }
+.exam__title { font-family: 'Fraunces', serif; font-size: 19px; font-weight: 700; margin-bottom: 10px; }
+.exam__intro-text { font-size: 13.5px; color: var(--text-dim); line-height: 1.65; margin-bottom: 18px; max-width: 480px; }
+.exam__start-btn {
+  background: var(--accent); color: #fff; border: none; border-radius: 8px;
+  padding: 10px 20px; font-size: 13.5px; font-weight: 600; cursor: pointer;
+  display: flex; align-items: center; gap: 6px;
+}
+
+.exam__progress-row {
+  display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;
+  font-size: 12px; color: var(--text-dim); flex-wrap: wrap; gap: 8px;
+}
+.exam__timer { font-weight: 700; font-size: 13px; color: var(--text-dim); }
+.exam__timer--low { color: var(--error); }
+
+.exam__prompt { font-family: 'Fraunces', serif; font-size: 17px; font-weight: 600; line-height: 1.5; margin-bottom: 18px; word-break: break-word; }
+
+.exam__code-hint { font-size: 11px; color: var(--text-dim); margin-top: 6px; }
+.exam__submit-code-btn {
+  margin-top: 10px; background: var(--accent); color: #fff; border: none; border-radius: 8px;
+  padding: 9px 18px; font-size: 13.5px; font-weight: 600; cursor: pointer;
+  display: flex; align-items: center; gap: 6px;
+}
+.exam__submit-code-btn:disabled { opacity: 0.75; cursor: default; }
+.exam__code-error { margin-top: 10px; font-size: 12.5px; color: var(--error); }
+
+.exam__feedback { margin-top: 16px; padding: 16px; border-radius: 10px; }
+.exam__feedback--correct { background: var(--success-bg); border: 1px solid color-mix(in srgb, var(--success) 33%, transparent); }
+.exam__feedback--wrong { background: var(--error-bg); border: 1px solid color-mix(in srgb, var(--error) 33%, transparent); }
+.exam__feedback-title { font-weight: 700; font-size: 13.5px; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+.exam__feedback--correct .exam__feedback-title { color: var(--success); }
+.exam__feedback--wrong .exam__feedback-title { color: var(--error); }
+.exam__feedback-text { font-size: 13.5px; line-height: 1.6; color: var(--text); }
+
+.exam__next-btn {
+  margin-top: 16px; background: var(--accent); color: #fff; border: none; border-radius: 8px;
+  padding: 9px 18px; font-size: 13.5px; font-weight: 600; cursor: pointer;
+  display: flex; align-items: center; gap: 6px;
+}
+
+/* ------------------------------------------------------------------
+   exam--done — экран результата.
+   ------------------------------------------------------------------ */
+
+.exam--done { text-align: center; padding: 36px 28px; }
+.exam__done-emoji { font-size: 56px; margin-bottom: 8px; line-height: 1; }
+.exam__done-title { font-family: 'Fraunces', serif; font-weight: 700; margin-bottom: 8px; font-size: 19px; }
+.exam__done-title--strong { font-size: 24px; }
+.exam__done-pct { font-weight: 700; margin-bottom: 6px; font-size: 34px; }
+.exam__done-pct--strong { font-size: 44px; color: var(--success); }
+.exam__done-pct--mid { color: var(--accent); }
+.exam__done-pct--low { color: var(--error); }
+.exam__done-detail { font-size: 13.5px; color: var(--text-dim); margin-bottom: 22px; }
+.exam__done-mascot-wrap { max-width: 420px; margin: 0 auto 22px; text-align: left; display: flex; gap: 10px; align-items: flex-start; }
+.exam__restart-btn {
+  background: var(--accent); color: #fff; border: none; border-radius: 8px;
+  padding: 10px 20px; font-size: 13.5px; font-weight: 600; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+
+@media (max-width: 700px) {
+  .exam { padding: 16px; }
+}

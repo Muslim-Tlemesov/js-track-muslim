@@ -1,0 +1,119 @@
+/* ==========================================================================
+   pages/questions.css — сайдбар с темами, карточка вопроса-квиза,
+   навигация "Назад/Далее". Общее (шапка, .question-card, .mascot-feedback,
+   .lesson-card) — в shared/shared.css.
+   ========================================================================== */
+
+.layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  max-width: 1180px;
+  width: 100%;
+  margin: 0 auto;
+  gap: 28px;
+  padding: 28px 24px 60px;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 1;
+}
+
+.layout__main { min-width: 0; }
+
+/* ------------------------------------------------------------------
+   sidebar — список тем курса с прогрессом.
+   ------------------------------------------------------------------ */
+
+.sidebar { min-width: 0; }
+.sidebar__title { margin-bottom: 10px; }
+.sidebar__topic-list { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+
+.sidebar__topic-btn {
+  display: flex; align-items: center; gap: 8px; width: 100%; text-align: left;
+  background: none; border: none; border-radius: 8px; padding: 8px 10px;
+  cursor: pointer; color: var(--text); font-size: 13px;
+}
+.sidebar__topic-btn:hover { background: var(--surface-alt); }
+.sidebar__topic-btn--active { background: var(--surface-alt); font-weight: 600; }
+.sidebar__topic-emoji { flex-shrink: 0; }
+.sidebar__topic-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sidebar__topic-progress { color: var(--text-dim); font-size: 11.5px; flex-shrink: 0; }
+
+.sidebar__locked-level {
+  text-align: center; background: var(--surface-alt); border: 1.5px dashed var(--border);
+  border-radius: 10px; padding: 16px 12px; margin-bottom: 10px;
+}
+.sidebar__locked-icon {
+  display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px;
+  border-radius: 50%; background: var(--surface); margin-bottom: 8px; font-size: 15px;
+}
+.sidebar__locked-title { font-size: 13.5px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+.sidebar__locked-desc { font-size: 12px; color: var(--text-dim); line-height: 1.55; }
+
+/* ------------------------------------------------------------------
+   quiz-question — карточка вопроса с вариантами ответа.
+   ------------------------------------------------------------------ */
+
+.quiz-question__prompt { font-size: 15px; line-height: 1.6; color: var(--text); margin-bottom: 18px; }
+.quiz-question__options { display: flex; flex-direction: column; gap: 10px; }
+
+.quiz-question__option {
+  text-align: left; padding: 14px 16px; border-radius: 14px; width: 100%;
+  border: 1.5px solid var(--border); background: var(--surface); color: var(--text);
+  cursor: pointer; font-size: 14px; font-family: 'JetBrains Mono', monospace;
+  box-sizing: border-box; white-space: normal; word-break: break-word;
+}
+.quiz-question__option:disabled { cursor: default; }
+.quiz-question__option--correct { border-color: var(--success); background: var(--success-bg); }
+.quiz-question__option--wrong { border-color: var(--error); background: var(--error-bg); }
+
+.quiz-question__why {
+  margin-top: 16px; padding: 12px 14px; background: var(--surface-alt); border: 1px solid var(--border);
+  border-radius: 10px; font-size: 13.5px; line-height: 1.6; color: var(--text);
+}
+
+/* ------------------------------------------------------------------
+   Навигация между вопросами / временная заглушка для code-вопросов.
+   ------------------------------------------------------------------ */
+
+.questions-page__nav { display: flex; justify-content: space-between; margin-top: 18px; }
+.questions-page__coming-soon {
+  padding: 40px 26px; text-align: center; color: var(--text-dim); font-size: 14px; line-height: 1.6;
+}
+.questions-page__coming-soon-actions { display: flex; justify-content: center; gap: 10px; margin-top: 18px; }
+
+@media (max-width: 860px) {
+  .layout { grid-template-columns: 1fr; gap: 16px; }
+  .sidebar { order: -1; }
+}
+@media (min-width: 701px) and (max-width: 860px) {
+  .layout { padding: 24px 22px 50px; }
+}
+@media (max-width: 700px) {
+  .layout { padding: 18px 16px 44px; }
+}
+@media (max-width: 480px) {
+  .layout { padding: 14px 12px 36px; }
+}
+
+/* ------------------------------------------------------------------
+   code-question — карточка code-вопроса (редактор + консоль вывода).
+   ------------------------------------------------------------------ */
+
+.code-question__console {
+  margin-top: 14px; background: var(--console); border-radius: 9px; padding: 12px 14px; font-size: 13px;
+}
+.code-question__console-label { color: var(--text-dim); font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+.code-question__console-line { color: var(--console-text); }
+.code-question__console-error { color: var(--error); }
+.code-question__console-empty { color: var(--text-dim); font-style: italic; }
+
+.code-question__actions { display: flex; gap: 10px; margin-top: 14px; }
+.code-question__run-btn {
+  background: var(--accent); color: #fff; border: none; border-radius: 8px;
+  padding: 10px 20px; font-size: 13.5px; font-weight: 600; cursor: pointer;
+}
+.code-question__run-btn:disabled { opacity: 0.6; cursor: default; }
+.code-question__hint {
+  margin-top: 12px; padding: 10px 14px; background: var(--surface-alt); border: 1px dashed var(--border);
+  border-radius: 8px; font-size: 13px; color: var(--text-dim); line-height: 1.55;
+}

@@ -3,21 +3,18 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>js.track — интерактивный курс JavaScript с практикой в браузере</title>
-<meta name="description" content="Изучай JavaScript через практику: 54 вопроса, редактор кода прямо в браузере, визуализации Event Loop и замыканий. Бесплатно, без регистрации." />
+<title>Карта знаний JavaScript — прогресс по темам | js.track</title>
+<meta name="description" content="Интерактивное дерево тем JavaScript: от основ до async/await, с наглядным прогрессом по каждой ветке." />
 
 <meta property="og:type" content="website" />
-<meta property="og:title" content="js.track — интерактивный курс JavaScript с практикой в браузере" />
-<meta property="og:description" content="Изучай JavaScript через практику: 54 вопроса, редактор кода прямо в браузере, визуализации Event Loop и замыканий. Бесплатно, без регистрации." />
+<meta property="og:title" content="Карта знаний JavaScript — прогресс по темам | js.track" />
+<meta property="og:description" content="Интерактивное дерево тем JavaScript: от основ до async/await, с наглядным прогрессом по каждой ветке." />
 <meta property="og:image" content="icon-512.png" />
 <meta property="og:locale" content="ru_RU" />
 <meta name="twitter:card" content="summary" />
 
-<!-- Многостраничная версия: каждая страница подключает общий
-     shared/shared.css (тема, шапка, навигация) + свой собственный
-     CSS с тем же именем, что и у HTML-файла (index.css). -->
 <link rel="stylesheet" href="shared-shared.css" />
-<link rel="stylesheet" href="index.css" />
+<link rel="stylesheet" href="tree.css" />
 
 <link rel="manifest" href="manifest.json" />
 <meta name="theme-color" content="#0F6B5C" />
@@ -39,13 +36,11 @@
 
 <div id="app-mount"></div>
 
-<!-- Общий "движок" (данные + чтение состояния) — подключается ОДИНАКОВО
-     на каждой странице, до компонентов, которые его используют. -->
 <script src="shared-engine.js"></script>
 <script src="shared-mascot-icons.js"></script>
 <script src="shared-Common.js"></script>
 <script src="shared-Header.js"></script>
-<script src="index.js"></script>
+<script src="tree.js"></script>
 
 <script>
 if ("serviceWorker" in navigator) {

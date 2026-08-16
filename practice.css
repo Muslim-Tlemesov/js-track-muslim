@@ -1,0 +1,40 @@
+/* ==========================================================================
+   pages/practice.css — «Практика».
+   ========================================================================== */
+
+.practice { padding: 26px; }
+.practice__header-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; gap: 12px; flex-wrap: wrap; }
+.practice__title { font-family: 'Fraunces', serif; font-size: 19px; font-weight: 700; margin-bottom: 4px; }
+.practice__subtitle { font-size: 13px; color: var(--text-dim); max-width: 460px; line-height: 1.5; }
+.practice__score { font-size: 12.5px; color: var(--text-dim); white-space: nowrap; flex-shrink: 0; }
+
+.practice__topic-badge {
+  display: inline-block; background: color-mix(in srgb, var(--accent) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 27%, transparent); border-radius: 20px;
+  padding: 3px 10px; font-size: 11.5px; color: var(--accent); font-weight: 600; margin-bottom: 16px;
+}
+
+.practice__submit-code-btn {
+  margin-top: 10px; background: var(--accent); color: #fff; border: none; border-radius: 8px;
+  padding: 9px 18px; font-size: 13.5px; font-weight: 600; cursor: pointer;
+  display: flex; align-items: center; gap: 6px;
+}
+.practice__submit-code-btn:disabled { opacity: 0.75; cursor: default; }
+.practice__code-error { margin-top: 10px; font-size: 12.5px; color: var(--error); }
+
+.practice__why {
+  margin-top: 16px; padding: 12px 14px; background: var(--success-bg);
+  border: 1px solid color-mix(in srgb, var(--success) 33%, transparent);
+  border-radius: 10px; font-size: 13.5px; line-height: 1.6; color: var(--text);
+}
+.practice__why--wrong { background: var(--error-bg); border-color: color-mix(in srgb, var(--error) 33%, transparent); }
+
+.practice__next-btn {
+  margin-top: 16px; background: var(--accent); color: #fff; border: none; border-radius: 8px;
+  padding: 9px 18px; font-size: 13.5px; font-weight: 600; cursor: pointer;
+  display: flex; align-items: center; gap: 6px;
+}
+
+@media (max-width: 700px) {
+  .practice { padding: 16px; }
+}

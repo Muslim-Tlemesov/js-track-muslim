@@ -1,0 +1,56 @@
+/* ==========================================================================
+   pages/profile.css — «Профиль»: имя, карточки, прогресс по темам,
+   резервное копирование.
+   ========================================================================== */
+
+.profile { padding: 26px; }
+
+.profile__header { display: flex; align-items: center; gap: 16px; margin-bottom: 26px; }
+.profile__avatar {
+  width: 64px; height: 64px; border-radius: 50%; flex-shrink: 0;
+  background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--accent) 20%, transparent), color-mix(in srgb, var(--accent) 8%, transparent) 60%, transparent 75%);
+  border: 1.5px solid color-mix(in srgb, var(--accent) 27%, transparent);
+  display: flex; align-items: center; justify-content: center;
+}
+.profile__header-text { flex: 1; min-width: 0; }
+.profile__name-input {
+  display: block; width: 100%; margin-bottom: 4px; font-family: 'Fraunces', serif;
+  font-size: 20px; font-weight: 700; color: var(--text); background: transparent; border: none;
+  padding: 0; box-sizing: border-box; outline: none;
+}
+.profile__member-since { font-size: 12.5px; color: var(--text-dim); }
+
+.profile__cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 16px; margin-bottom: 26px; }
+
+.profile__section-label {
+  font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-dim);
+  font-weight: 600; margin-bottom: 10px;
+}
+
+.profile__topic-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 24px; }
+.profile__topic-row { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px; background: var(--surface-alt); }
+.profile__topic-emoji { font-size: 13px; flex-shrink: 0; }
+.profile__topic-name { font-size: 13px; color: var(--text); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.profile__topic-bar-track { width: 80px; height: 6px; border-radius: 3px; background: var(--border); overflow: hidden; flex-shrink: 0; }
+.profile__topic-bar-fill { height: 100%; border-radius: 3px; transition: width 0.3s ease; }
+.profile__topic-stats { font-size: 11.5px; color: var(--text-dim); width: 76px; text-align: right; flex-shrink: 0; }
+
+.profile__backup-desc { font-size: 12.5px; color: var(--text-dim); line-height: 1.5; margin-bottom: 12px; }
+.profile__backup-actions { display: flex; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
+.profile__backup-btn {
+  flex: 1; min-width: 160px; background: var(--surface-alt); border: 1px solid var(--border); border-radius: 8px;
+  padding: 9px 14px; font-size: 12.5px; color: var(--text); cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.profile__import-error { font-size: 12px; color: var(--error); display: flex; align-items: center; gap: 5px; margin-bottom: 12px; }
+
+.profile__summary-link {
+  width: 100%; box-sizing: border-box; background: transparent; border: 1px solid var(--border); border-radius: 8px;
+  padding: 10px 16px; font-size: 13px; color: var(--accent); cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 8px;
+  text-decoration: none;
+}
+
+@media (max-width: 700px) {
+  .profile { padding: 16px; }
+}
