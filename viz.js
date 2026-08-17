@@ -13,32 +13,26 @@
 const VIZ_TOPICS = [{
   id: "eventloop",
   label: "Event Loop",
-  emoji: "🔁",
   ready: true
 }, {
   id: "scope",
   label: "Scope",
-  emoji: "🪆",
   ready: true
 }, {
   id: "closures",
   label: "Замыкания",
-  emoji: "🧠",
   ready: true
 }, {
   id: "this",
   label: "this",
-  emoji: "🎯",
   ready: true
 }, {
   id: "prototype",
   label: "Prototype",
-  emoji: "🧬",
   ready: true
 }, {
   id: "bubbling",
   label: "Event Bubbling",
-  emoji: "🫧",
   ready: true
 }];
 const EVENT_LOOP_CODE = ["console.log('1');", "", "setTimeout(() => {", "  console.log('2');", "}, 0);", "", "Promise.resolve().then(() => {", "  console.log('3');", "});", "", "console.log('4');"];
@@ -211,22 +205,22 @@ function EventLoopViz() {
   }, line || "\u00A0"))), /*#__PURE__*/React.createElement("div", {
     className: "viz__zones"
   }, /*#__PURE__*/React.createElement(EventLoopZone, {
-    title: "\uD83D\uDCDA Call Stack",
+    title: "Call Stack",
     items: step.callStack,
     colorVar: "--accent",
     emptyHint: "\u043F\u0443\u0441\u0442\u043E"
   }), /*#__PURE__*/React.createElement(EventLoopZone, {
-    title: "\uD83C\uDF10 Web APIs",
+    title: "Web APIs",
     items: step.webApis,
     colorVar: "--accent2",
     emptyHint: "\u043F\u0443\u0441\u0442\u043E"
   }), /*#__PURE__*/React.createElement(EventLoopZone, {
-    title: "\u26A1 Microtask Queue",
+    title: "Microtask Queue",
     items: step.microtasks,
     colorVar: "--success",
     emptyHint: "\u043F\u0443\u0441\u0442\u043E"
   }), /*#__PURE__*/React.createElement(EventLoopZone, {
-    title: "\uD83D\uDCCB Callback Queue",
+    title: "Callback Queue",
     items: step.macrotasks,
     colorVar: "--text-dim",
     emptyHint: "\u043F\u0443\u0441\u0442\u043E"
@@ -461,7 +455,7 @@ function ScopeViz() {
     lookup: step.lookup
   })), step.lookup && /*#__PURE__*/React.createElement("div", {
     className: "viz__lookup-note"
-  }, "\uD83D\uDD0D \u0438\u0449\u0435\u043C ", /*#__PURE__*/React.createElement("span", {
+  }, "\u0438\u0449\u0435\u043C ", /*#__PURE__*/React.createElement("span", {
     className: "mono viz__lookup-var"
   }, step.lookup.variable), " \u2192 \u043D\u0430\u0448\u043B\u0438 \u0432 ", /*#__PURE__*/React.createElement("span", {
     className: "mono viz__lookup-found"
@@ -636,7 +630,7 @@ function ClosureViz() {
     className: `viz__closure-box${boxState}`
   }, /*#__PURE__*/React.createElement("div", {
     className: "mono viz__closure-label"
-  }, "\uD83D\uDD12 \u0437\u0430\u043C\u044B\u043A\u0430\u043D\u0438\u0435 makeCounter()"), /*#__PURE__*/React.createElement("div", {
+  }, "\u0437\u0430\u043C\u044B\u043A\u0430\u043D\u0438\u0435 makeCounter()"), /*#__PURE__*/React.createElement("div", {
     className: "mono viz__closure-value"
   }, "count = ", step.box.count), step.box.dying && /*#__PURE__*/React.createElement("div", {
     className: "viz__closure-dying-note"
@@ -995,7 +989,7 @@ function PrototypeViz() {
     lookup: step.lookup
   })), step.lookup && /*#__PURE__*/React.createElement("div", {
     className: "viz__lookup-note"
-  }, "\uD83D\uDD0D \u0438\u0449\u0435\u043C ", /*#__PURE__*/React.createElement("span", {
+  }, "\u0438\u0449\u0435\u043C ", /*#__PURE__*/React.createElement("span", {
     className: "mono viz__lookup-var"
   }, step.lookup.variable), step.lookup.foundIn ? /*#__PURE__*/React.createElement(React.Fragment, null, " \u2192 \u043D\u0430\u0448\u043B\u0438 \u0432 ", /*#__PURE__*/React.createElement("span", {
     className: "mono viz__lookup-found"
@@ -1125,9 +1119,7 @@ function DomBox({
     className: "viz__dom-box-header"
   }, /*#__PURE__*/React.createElement("span", {
     className: "mono viz__dom-box-label"
-  }, label), isActive && /*#__PURE__*/React.createElement("span", {
-    className: "viz__dom-box-bubble"
-  }, "\uD83E\uDEE7"), hasFired && /*#__PURE__*/React.createElement("span", {
+  }, label), hasFired && /*#__PURE__*/React.createElement("span", {
     className: "viz__dom-box-check"
   }, "\u2713")), children);
 }
@@ -1161,7 +1153,7 @@ function BubblingViz() {
     className: "viz__dom-box-child"
   }, /*#__PURE__*/React.createElement(DomBox, {
     id: "inner",
-    label: "\uD83D\uDD18 #inner (button)",
+    label: "#inner (button)",
     active: step.active,
     fired: step.fired
   })))))), /*#__PURE__*/React.createElement("div", {
@@ -1275,7 +1267,7 @@ function PageRoot() {
     key: t.id,
     onClick: () => setTopic(t.id),
     className: `viz__topic-tab${topic === t.id ? " viz__topic-tab--active" : ""}`
-  }, t.emoji, " ", t.label, !t.ready && " · скоро"))), topic === "eventloop" ? /*#__PURE__*/React.createElement(EventLoopViz, null) : topic === "scope" ? /*#__PURE__*/React.createElement(ScopeViz, null) : topic === "closures" ? /*#__PURE__*/React.createElement(ClosureViz, null) : topic === "this" ? /*#__PURE__*/React.createElement(ThisViz, null) : topic === "prototype" ? /*#__PURE__*/React.createElement(PrototypeViz, null) : topic === "bubbling" ? /*#__PURE__*/React.createElement(BubblingViz, null) : /*#__PURE__*/React.createElement(ComingSoonViz, {
+  }, t.label, !t.ready && " · скоро"))), topic === "eventloop" ? /*#__PURE__*/React.createElement(EventLoopViz, null) : topic === "scope" ? /*#__PURE__*/React.createElement(ScopeViz, null) : topic === "closures" ? /*#__PURE__*/React.createElement(ClosureViz, null) : topic === "this" ? /*#__PURE__*/React.createElement(ThisViz, null) : topic === "prototype" ? /*#__PURE__*/React.createElement(PrototypeViz, null) : topic === "bubbling" ? /*#__PURE__*/React.createElement(BubblingViz, null) : /*#__PURE__*/React.createElement(ComingSoonViz, {
     label: activeTopic.label
   }))));
 }

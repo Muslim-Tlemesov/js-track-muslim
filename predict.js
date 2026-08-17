@@ -108,7 +108,7 @@ function PageRoot() {
     className: "predict__header-row"
   }, /*#__PURE__*/React.createElement("div", {
     className: "predict__title"
-  }, "\uD83D\uDD2E \u041F\u0440\u0435\u0434\u0441\u043A\u0430\u0436\u0438 \u0432\u044B\u0432\u043E\u0434"), /*#__PURE__*/React.createElement("button", {
+  }, "\u041F\u0440\u0435\u0434\u0441\u043A\u0430\u0436\u0438 \u0432\u044B\u0432\u043E\u0434"), /*#__PURE__*/React.createElement("button", {
     onClick: restart,
     className: "predict__restart-btn"
   }, "\u21BA \u041D\u0430\u0447\u0430\u0442\u044C \u0437\u0430\u043D\u043E\u0432\u043E")), /*#__PURE__*/React.createElement("div", {

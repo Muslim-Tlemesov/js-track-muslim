@@ -8,14 +8,9 @@ function LessonCard({
   topicTitle,
   onStart
 }) {
-  const heroEmoji = TOPIC_EMOJI[topicId] || "📘";
   return /*#__PURE__*/React.createElement("div", {
     className: "question-card question-enter lesson-card"
   }, /*#__PURE__*/React.createElement("div", {
-    className: "lesson-card__hero-wrap"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "lesson-card__hero"
-  }, heroEmoji)), /*#__PURE__*/React.createElement("div", {
     className: "lesson-card__badge-wrap"
   }, /*#__PURE__*/React.createElement("div", {
     className: "mono lesson-card__badge"
@@ -37,7 +32,7 @@ function LessonCard({
     "aria-label": `Прослушать произношение: ${TERM_PRONUNCIATIONS[t.term]}`,
     title: "\u041F\u0440\u043E\u0441\u043B\u0443\u0448\u0430\u0442\u044C \u043F\u0440\u043E\u0438\u0437\u043D\u043E\u0448\u0435\u043D\u0438\u0435",
     className: "lesson-card__speak-btn"
-  }, "\uD83D\uDD0A"), /*#__PURE__*/React.createElement("span", {
+  }, "\u25B6"), /*#__PURE__*/React.createElement("span", {
     className: "lesson-card__term-def"
   }, t.def)))), lesson.example && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "lesson-card__section-label lesson-card__section-label--example"

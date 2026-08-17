@@ -7,20 +7,30 @@
    атрибутом data-theme на <html> (см. loadAndApplyTheme() в
    shared/engine.js) — светлая/тёмная тема это просто разные значения
    переменных ниже, сами БЭМ-классы темы не знают и не должны знать.
+
+   РЕДИЗАЙН — найденная проблема визуальной идентичности: раньше в
+   одном продукте одновременно жили редакционный/журнальный стиль
+   (Fraunces, тёплый коричнево-бежевый фон), EdTech-игривость (зелёный
+   + оранжевый, эмодзи в навигации) и developer tool (JetBrains Mono,
+   code-editor) — каждый элемент сам по себе нормальный, но вместе не
+   дают одного сильного бренда. Выбранное направление — developer
+   tool (VS Code/Linear/GitHub): нейтральная нетёплая палитра, один
+   синий акцент вместо зелёного+оранжевого, Fraunces убран в пользу
+   Inter везде.
    ================================================================== */
 
 :root[data-theme="dark"] {
-  --bg: #161310; --surface: #211C17; --surface-alt: #2C251E; --border: #3D342A;
-  --text: #F5EDE1; --text-dim: #A89684; --accent: #2BA894; --accent2: #F0794F;
-  --success: #5FB86C; --success-bg: #1A2E1B; --error: #E85D42; --error-bg: #3A1712;
-  --console: #0D0B09; --console-text: #D9CFC0;
+  --bg: #0D1117; --surface: #161B22; --surface-alt: #1C2129; --border: #30363D;
+  --text: #E6EDF3; --text-dim: #8B949E; --accent: #4C8EFF; --accent2: #A78BFA;
+  --success: #3FB950; --success-bg: #1C2B1E; --error: #F85149; --error-bg: #2D1618;
+  --console: #010409; --console-text: #C9D1D9;
 }
 
 :root[data-theme="light"] {
-  --bg: #FAF7F2; --surface: #FFFFFF; --surface-alt: #F3ECE4; --border: #E4D9CC;
-  --text: #2B2118; --text-dim: #6E5F50; --accent: #0F6B5C; --accent2: #CC4A24;
-  --success: #2D6B38; --success-bg: #EEF5EA; --error: #A8371F; --error-bg: #FBEDE8;
-  --console: #1B1712; --console-text: #E8DFD3;
+  --bg: #FFFFFF; --surface: #FFFFFF; --surface-alt: #F6F8FA; --border: #D0D7DE;
+  --text: #1F2328; --text-dim: #656D76; --accent: #0969DA; --accent2: #6639BA;
+  --success: #1A7F37; --success-bg: #DAFBE1; --error: #CF222E; --error-bg: #FFEBE9;
+  --console: #F6F8FA; --console-text: #24292F;
 }
 
 html, body {
@@ -109,7 +119,7 @@ html, body {
 }
 
 .app-header__logo {
-  font-family: 'Fraunces', serif;
+  font-family: 'Inter', system-ui, sans-serif;
   font-weight: 700;
   font-size: 20px;
   letter-spacing: -0.01em;
@@ -134,6 +144,16 @@ html, body {
   align-items: center;
   gap: 16px;
   flex-wrap: wrap;
+  /* Реальный найденный баг: подложка (app-header__menu-backdrop,
+     z-index: 40) полностью перекрывала inset:0, включая саму шапку —
+     нельзя было переключиться с одного выпадающего меню на другое
+     прямым кликом по другой кнопке-режиму, только через два действия
+     (сначала закрыть текущее кликом по подложке, потом открыть
+     новое). position:relative + z-index выше подложки держит кнопки
+     кликабельными поверх неё.
+   */
+  position: relative;
+  z-index: 41;
 }
 
 .app-header__stats {
@@ -220,17 +240,24 @@ html, body {
    Реальная найденная проблема архитектуры: раньше ВСЕ 13 разделов +
    сброс/звук/тема лежали одним рядом из 16 кнопок — список без
    иерархии, "вот тебе всё, разбирайся сам", а не "вот что дальше".
-   Теперь на виду только 2 самых частых действия (Домой/Вопросы),
-   остальное — за одной кнопкой, сгруппированное по смыслу.
+   ВТОРАЯ итерация редизайна (эта): вместо 2 "часто используемых"
+   кнопок + одного общего меню — 4 РАВНОЗНАЧНЫХ режима (Главная/
+   Учёба/Практика/Прогресс), у каждого своя кнопка со своим
+   выпадающим списком (кроме Главной — прямая ссылка).
    ------------------------------------------------------------------ */
 
-.app-header__menu-trigger {
+.app-header__mode-trigger {
   position: relative;
 }
 
-.app-header__menu-trigger--open {
+.app-header__mode-trigger--open {
   background: var(--surface);
   border-color: var(--accent);
+}
+
+.app-header__mode-caret {
+  font-size: 10px;
+  opacity: 0.7;
 }
 
 .app-header__menu-backdrop {
@@ -516,13 +543,6 @@ html, body {
    ========================================================================== */
 
 .lesson-card { padding: 26px; }
-.lesson-card__hero-wrap { display: flex; justify-content: center; margin-bottom: 18px; }
-.lesson-card__hero {
-  width: 84px; height: 84px; border-radius: 50%; display: flex; align-items: center;
-  justify-content: center; font-size: 40px;
-  background: color-mix(in srgb, var(--accent) 15%, transparent);
-  border: 1.5px solid color-mix(in srgb, var(--accent) 27%, transparent);
-}
 .lesson-card__badge-wrap { display: flex; justify-content: center; }
 .lesson-card__badge {
   display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 600;
@@ -530,7 +550,7 @@ html, body {
   padding: 4px 10px; border-radius: 20px; margin-bottom: 14px; letter-spacing: 0.01em;
 }
 .lesson-card__title {
-  font-family: 'Fraunces', serif; font-size: 19px; font-weight: 700; margin-bottom: 12px; text-align: center;
+  font-family: 'Inter', system-ui, sans-serif; font-size: 19px; font-weight: 700; margin-bottom: 12px; text-align: center;
 }
 .lesson-card__intro { font-size: 14.5px; line-height: 1.75; color: var(--text); margin-bottom: 20px; }
 .lesson-card__section-label {
@@ -663,7 +683,7 @@ html, body {
   box-shadow: 0 20px 48px rgba(0,0,0,0.35), 0 0 0 5px color-mix(in srgb, var(--accent) 13%, transparent);
 }
 .toast--level__emoji { font-size: 42px; margin-bottom: 2px; }
-.toast--level__title { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 700; color: var(--text); }
+.toast--level__title { font-family: 'Inter', system-ui, sans-serif; font-size: 18px; font-weight: 700; color: var(--text); }
 .toast--level__desc { font-size: 13.5px; color: var(--text-dim); }
 
 .toast--achievement {

@@ -151,6 +151,5 @@
 .viz__dom-box-label { font-size: 11px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.04em; }
 .viz__dom-box--active .viz__dom-box-label { color: var(--accent); }
 .viz__dom-box--fired .viz__dom-box-label { color: var(--success); }
-.viz__dom-box-bubble { font-size: 14px; }
 .viz__dom-box-check { color: var(--success); font-weight: 700; }
 .viz__dom-box-child { margin-left: 14px; }

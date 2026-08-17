@@ -148,7 +148,7 @@ function PageRoot() {
     className: "question-card question-enter history-page"
   }, /*#__PURE__*/React.createElement("div", {
     className: "history-page__title"
-  }, "\uD83D\uDCC5 \u0418\u0441\u0442\u043E\u0440\u0438\u044F \u043E\u0431\u0443\u0447\u0435\u043D\u0438\u044F"), /*#__PURE__*/React.createElement("div", {
+  }, "\u0418\u0441\u0442\u043E\u0440\u0438\u044F \u043E\u0431\u0443\u0447\u0435\u043D\u0438\u044F"), /*#__PURE__*/React.createElement("div", {
     className: "history-page__subtitle"
   }, "\u0427\u0442\u043E \u0438 \u043A\u043E\u0433\u0434\u0430 \u0431\u044B\u043B\u043E \u043E\u0442\u0432\u0435\u0447\u0435\u043D\u043E \u2014 \u043F\u043E \u0434\u043D\u044F\u043C. \u041E\u0441\u043E\u0431\u0435\u043D\u043D\u043E \u0438\u043D\u0442\u0435\u0440\u0435\u0441\u043D\u043E \u0441\u043C\u043E\u0442\u0440\u0435\u0442\u044C \u0441\u043F\u0443\u0441\u0442\u044F \u043C\u0435\u0441\u044F\u0446."), /*#__PURE__*/React.createElement("div", {
     className: "history-page__section-label"

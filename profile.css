@@ -14,7 +14,7 @@
 }
 .profile__header-text { flex: 1; min-width: 0; }
 .profile__name-input {
-  display: block; width: 100%; margin-bottom: 4px; font-family: 'Fraunces', serif;
+  display: block; width: 100%; margin-bottom: 4px; font-family: 'Inter', system-ui, sans-serif;
   font-size: 20px; font-weight: 700; color: var(--text); background: transparent; border: none;
   padding: 0; box-sizing: border-box; outline: none;
 }

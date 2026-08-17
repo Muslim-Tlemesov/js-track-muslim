@@ -28,8 +28,6 @@ function Sidebar({
         key: lvl.level,
         className: "sidebar__locked-level"
       }, /*#__PURE__*/React.createElement("div", {
-        className: "sidebar__locked-icon"
-      }, "\uD83D\uDD12"), /*#__PURE__*/React.createElement("div", {
         className: "sidebar__locked-title"
       }, lvl.emoji, " ", lvl.label), /*#__PURE__*/React.createElement("div", {
         className: "sidebar__locked-desc"
@@ -43,8 +41,6 @@ function Sidebar({
         className: `topic-btn sidebar__topic-btn${isActive ? " sidebar__topic-btn--active" : ""}`,
         onClick: () => onJumpToTopic(t.id)
       }, /*#__PURE__*/React.createElement("span", {
-        className: "sidebar__topic-emoji"
-      }, TOPIC_EMOJI[t.id] || "📘"), /*#__PURE__*/React.createElement("span", {
         className: "sidebar__topic-name"
       }, t.title), /*#__PURE__*/React.createElement("span", {
         className: "mono sidebar__topic-progress"
@@ -150,7 +146,7 @@ function CodeQuestion({
   }, isRunning ? "Выполняется…" : "▶ Выполнить"), !checked && question.hint && /*#__PURE__*/React.createElement("button", {
     className: "nav-btn nav__btn",
     onClick: () => setShowHint(v => !v)
-  }, "\uD83D\uDCA1 ", showHint ? "Скрыть подсказку" : "Подсказка")), showHint && !checked && /*#__PURE__*/React.createElement("div", {
+  }, showHint ? "Скрыть подсказку" : "Подсказка")), showHint && !checked && /*#__PURE__*/React.createElement("div", {
     className: "code-question__hint"
   }, question.hint), checked && /*#__PURE__*/React.createElement("div", {
     className: "quiz-question__why"
@@ -408,7 +404,7 @@ function PageRoot() {
     mood: "celebrate"
   })), /*#__PURE__*/React.createElement("span", {
     className: "toast--achievement__text"
-  }, /*#__PURE__*/React.createElement("strong", null, MASCOT_NAME, ":"), " ", MASCOT_ACHIEVEMENT[hashStr(achievementToast.id) % MASCOT_ACHIEVEMENT.length], " ", achievementToast.emoji, " ", /*#__PURE__*/React.createElement("strong", null, achievementToast.title), " \u2014 ", achievementToast.description)));
+  }, /*#__PURE__*/React.createElement("strong", null, MASCOT_NAME, ":"), " ", MASCOT_ACHIEVEMENT[hashStr(achievementToast.id) % MASCOT_ACHIEVEMENT.length], " ", /*#__PURE__*/React.createElement("strong", null, achievementToast.title), " \u2014 ", achievementToast.description)));
 }
 const mainRoot = ReactDOM.createRoot(document.getElementById("app-mount"));
 mainRoot.render(/*#__PURE__*/React.createElement(PageRoot, null));

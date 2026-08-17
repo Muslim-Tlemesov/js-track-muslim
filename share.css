@@ -30,7 +30,7 @@
 }
 
 .share-card__title {
-  font-family: 'Fraunces', serif;
+  font-family: 'Inter', system-ui, sans-serif;
   font-size: 19px;
   font-weight: 700;
   color: var(--text);
@@ -96,9 +96,4 @@
   font-size: 14px;
   font-weight: 600;
   text-decoration: none;
-}
-
-.share-card__broken-emoji {
-  font-size: 40px;
-  margin-bottom: 10px;
 }

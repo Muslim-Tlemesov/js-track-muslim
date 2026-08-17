@@ -11,32 +11,27 @@
 const KNOWLEDGE_TREE = [{
   id: "basics",
   label: "Основы",
-  emoji: "🌱",
   color: "#6BCB77",
   topicIds: ["vars", "naming", "strings", "destructuring"]
 }, {
   id: "data",
   label: "Работа с данными",
-  emoji: "📦",
   color: "#FFD93D",
   topicIds: ["arrays", "array-mutability", "objects", "object-methods", "loops"]
 }, {
   id: "advanced",
   label: "Продвинутое",
-  emoji: "🔺",
   color: "#FF6B6B",
   topicIds: ["async", "classes", "dom"]
 }, {
   id: "typescript",
   label: "TypeScript",
-  emoji: "🔷",
   color: "#3178C6",
   topicIds: [],
   comingSoon: true
 }, {
   id: "angular",
   label: "Angular",
-  emoji: "🅰️",
   color: "#DD0031",
   topicIds: [],
   comingSoon: true
@@ -73,7 +68,6 @@ function TreeNode({
   pct,
   color,
   label,
-  emoji,
   locked,
   clickable,
   onClick,
@@ -131,13 +125,15 @@ function TreeNode({
     d: "M7 11V7a5 5 0 0 1 10 0v4"
   })) : /*#__PURE__*/React.createElement("text", {
     x: cx,
-    y: cy + (emoji ? 6 : 5),
+    y: cy + 5,
     textAnchor: "middle",
-    fontSize: r,
+    fontSize: r * 0.7,
+    fontWeight: 700,
+    fill: color,
     style: {
       userSelect: "none"
     }
-  }, emoji), isDone && !locked && /*#__PURE__*/React.createElement("circle", {
+  }, (label || "").slice(0, 2).toUpperCase()), isDone && !locked && /*#__PURE__*/React.createElement("circle", {
     cx: cx + r * 0.72,
     cy: cy - r * 0.72,
     r: r * 0.32,
@@ -214,7 +210,7 @@ function KnowledgeTreeContent({
     className: "question-card question-enter tree-page"
   }, /*#__PURE__*/React.createElement("div", {
     className: "tree-page__title"
-  }, "\uD83C\uDF33 \u041A\u0430\u0440\u0442\u0430 \u0437\u043D\u0430\u043D\u0438\u0439"), /*#__PURE__*/React.createElement("div", {
+  }, "\u041A\u0430\u0440\u0442\u0430 \u0437\u043D\u0430\u043D\u0438\u0439"), /*#__PURE__*/React.createElement("div", {
     className: "tree-page__subtitle"
   }, "\u0422\u043E \u0436\u0435 \u0441\u0430\u043C\u043E\u0435 \u0434\u0435\u0440\u0435\u0432\u043E \u0442\u0435\u043C, \u0447\u0442\u043E \u0438 \u0432 \u043F\u0440\u043E\u0433\u0440\u0430\u043C\u043C\u0435 \u043A\u0443\u0440\u0441\u0430, \u0442\u043E\u043B\u044C\u043A\u043E \u0446\u0435\u043B\u0438\u043A\u043E\u043C. \u041A\u0430\u0436\u0434\u0430\u044F \u0432\u0435\u0440\u0448\u0438\u043D\u0430 \u0437\u0430\u043F\u043E\u043B\u043D\u044F\u0435\u0442\u0441\u044F \u043F\u043E \u043C\u0435\u0440\u0435 \u0440\u0435\u0448\u0435\u043D\u0438\u044F \u0432\u043E\u043F\u0440\u043E\u0441\u043E\u0432 \u0442\u0435\u043C\u044B \u2014 \u043D\u0430\u0436\u043C\u0438 \u043D\u0430 \u043B\u0438\u0441\u0442, \u0447\u0442\u043E\u0431\u044B \u043F\u0435\u0440\u0435\u0439\u0442\u0438 \u043A \u0442\u0435\u043C\u0435."), /*#__PURE__*/React.createElement("div", {
     className: "tree-page__svg-wrap"
@@ -245,7 +241,6 @@ function KnowledgeTreeContent({
     r: 32,
     pct: overallPct,
     color: "var(--accent)",
-    emoji: "\uD83D\uDFE3",
     label: "JavaScript"
   }), KNOWLEDGE_TREE.map((branch, bi) => {
     const pct = branch.comingSoon ? 0 : weightedPct(topicProgress, branch.topicIds);
@@ -256,7 +251,6 @@ function KnowledgeTreeContent({
       r: 26,
       pct: pct,
       color: branch.color,
-      emoji: branch.emoji,
       label: branch.label,
       locked: branch.comingSoon
     });
@@ -276,7 +270,6 @@ function KnowledgeTreeContent({
       r: 20,
       pct: pct,
       color: branch.color,
-      emoji: "\uD83D\uDCC4",
       label: TREE_LEAF_LABEL[topicId] || topicId,
       locked: locked,
       labelWidth: LEAF_LABEL_WIDTH,
@@ -288,7 +281,7 @@ function KnowledgeTreeContent({
     });
   })))), /*#__PURE__*/React.createElement("div", {
     className: "tree-page__legend"
-  }, /*#__PURE__*/React.createElement("span", null, "\u2713 \u0442\u0435\u043C\u0430 \u043F\u0440\u043E\u0439\u0434\u0435\u043D\u0430 \u043D\u0430 100%"), /*#__PURE__*/React.createElement("span", null, "\uD83D\uDD12 \u0437\u0430\u043A\u0440\u044B\u0442\u043E (\u043D\u0443\u0436\u043D\u043E \u043F\u043E\u0434\u043D\u044F\u0442\u044C \u0443\u0440\u043E\u0432\u0435\u043D\u044C) \u0438\u043B\u0438 \u0435\u0449\u0451 \u043D\u0435 \u0432 \u043A\u0443\u0440\u0441\u0435")));
+  }, /*#__PURE__*/React.createElement("span", null, "\u2713 \u0442\u0435\u043C\u0430 \u043F\u0440\u043E\u0439\u0434\u0435\u043D\u0430 \u043D\u0430 100%"), /*#__PURE__*/React.createElement("span", null, "\u0437\u0430\u043A\u0440\u044B\u0442\u043E (\u043D\u0443\u0436\u043D\u043E \u043F\u043E\u0434\u043D\u044F\u0442\u044C \u0443\u0440\u043E\u0432\u0435\u043D\u044C) \u0438\u043B\u0438 \u0435\u0449\u0451 \u043D\u0435 \u0432 \u043A\u0443\u0440\u0441\u0435")));
 }
 function PageRoot() {
   const [themeMode, setThemeMode] = React.useState("dark");

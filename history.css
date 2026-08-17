@@ -4,7 +4,7 @@
    ========================================================================== */
 
 .history-page { padding: 26px; }
-.history-page__title { font-family: 'Fraunces', serif; font-size: 19px; font-weight: 700; margin-bottom: 6px; }
+.history-page__title { font-family: 'Inter', system-ui, sans-serif; font-size: 19px; font-weight: 700; margin-bottom: 6px; }
 .history-page__subtitle { font-size: 13px; color: var(--text-dim); margin-bottom: 20px; max-width: 560px; }
 .history-page__section-label {
   font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-dim);

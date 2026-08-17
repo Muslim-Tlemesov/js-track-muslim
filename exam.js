@@ -158,7 +158,7 @@ function PageRoot() {
       className: "question-card question-enter exam"
     }, /*#__PURE__*/React.createElement("div", {
       className: "exam__title"
-    }, "\uD83C\uDF19 \u0424\u0438\u043D\u0430\u043B\u044C\u043D\u044B\u0439 \u044D\u043A\u0437\u0430\u043C\u0435\u043D"), /*#__PURE__*/React.createElement("div", {
+    }, "\u0424\u0438\u043D\u0430\u043B\u044C\u043D\u044B\u0439 \u044D\u043A\u0437\u0430\u043C\u0435\u043D"), /*#__PURE__*/React.createElement("div", {
       className: "exam__intro-text"
     }, EXAM_QUESTION_COUNT, " \u0432\u043E\u043F\u0440\u043E\u0441\u043E\u0432 \u0432\u043F\u0435\u0440\u0435\u043C\u0435\u0448\u043A\u0443 \u0438\u0437 \u0432\u0441\u0435\u0445 \u0442\u0435\u043C \u043A\u0443\u0440\u0441\u0430 \u2014 \u0438 quiz, \u0438 \u043A\u043E\u0434. \u041D\u0430 \u0432\u0441\u0451 \u0434\u0430\u0451\u0442\u0441\u044F ", formatExamTime(EXAM_DURATION_SECONDS), " \u2014 \u0442\u0430\u0439\u043C\u0435\u0440 \u043E\u0431\u0449\u0438\u0439 \u043D\u0430 \u0432\u0435\u0441\u044C \u044D\u043A\u0437\u0430\u043C\u0435\u043D, \u043D\u0435 \u0441\u0442\u0430\u0432\u0438\u0442\u0441\u044F \u043D\u0430 \u043F\u0430\u0443\u0437\u0443 \u043C\u0435\u0436\u0434\u0443 \u0432\u043E\u043F\u0440\u043E\u0441\u0430\u043C\u0438; \u043A\u043E\u0433\u0434\u0430 \u0432\u0440\u0435\u043C\u044F \u0432\u044B\u0439\u0434\u0435\u0442, \u044D\u043A\u0437\u0430\u043C\u0435\u043D \u0437\u0430\u0432\u0435\u0440\u0448\u0438\u0442\u0441\u044F \u0430\u0432\u0442\u043E\u043C\u0430\u0442\u0438\u0447\u0435\u0441\u043A\u0438 \u0441 \u0442\u0435\u043C \u0440\u0435\u0437\u0443\u043B\u044C\u0442\u0430\u0442\u043E\u043C, \u0447\u0442\u043E \u0443\u0441\u043F\u0435\u043B \u043D\u0430\u0431\u0440\u0430\u0442\u044C. \u0420\u0435\u0437\u0443\u043B\u044C\u0442\u0430\u0442 \u043D\u0435 \u0432\u043B\u0438\u044F\u0435\u0442 \u043D\u0430 \u043F\u0440\u043E\u0433\u0440\u0435\u0441\u0441 \u043A\u0443\u0440\u0441\u0430, XP \u0438\u043B\u0438 \u0434\u043E\u0441\u0442\u0438\u0436\u0435\u043D\u0438\u044F \u2014 \u044D\u0442\u043E \u043E\u0442\u0434\u0435\u043B\u044C\u043D\u0430\u044F \u043F\u0440\u043E\u0432\u0435\u0440\u043A\u0430 \u0441\u0435\u0431\u044F, \u043C\u043E\u0436\u043D\u043E \u043F\u0440\u043E\u0445\u043E\u0434\u0438\u0442\u044C \u0441\u043A\u043E\u043B\u044C\u043A\u043E \u0443\u0433\u043E\u0434\u043D\u043E \u0440\u0430\u0437."), /*#__PURE__*/React.createElement("button", {
       onClick: startExam,
@@ -170,10 +170,8 @@ function PageRoot() {
     body = /*#__PURE__*/React.createElement("div", {
       className: "question-card question-enter exam exam--done"
     }, /*#__PURE__*/React.createElement("div", {
-      className: "exam__done-emoji"
-    }, tier === "strong" ? "🏆" : tier === "mid" ? "📘" : "💪"), /*#__PURE__*/React.createElement("div", {
       className: `exam__done-title exam__done-title--${tier}`
-    }, timeUp ? "⏱ Время вышло" : tier === "strong" ? "Экзамен пройден отлично!" : tier === "mid" ? "Экзамен завершён" : "Экзамен завершён — есть куда расти"), /*#__PURE__*/React.createElement("div", {
+    }, timeUp ? "Время вышло" : tier === "strong" ? "Экзамен пройден отлично!" : tier === "mid" ? "Экзамен завершён" : "Экзамен завершён — есть куда расти"), /*#__PURE__*/React.createElement("div", {
       className: `exam__done-pct exam__done-pct--${tier}`
     }, pct, "%"), /*#__PURE__*/React.createElement("div", {
       className: "exam__done-detail"
@@ -201,7 +199,7 @@ function PageRoot() {
       className: "exam__progress-row"
     }, /*#__PURE__*/React.createElement("span", null, "\u0412\u043E\u043F\u0440\u043E\u0441 ", idx + 1, " \u0438\u0437 ", questions.length), /*#__PURE__*/React.createElement("span", {
       className: `mono exam__timer${timeLeftSec <= 60 ? " exam__timer--low" : ""}`
-    }, "\u23F1 ", formatExamTime(timeLeftSec)), /*#__PURE__*/React.createElement("span", null, current.topicTitle)), /*#__PURE__*/React.createElement("div", {
+    }, formatExamTime(timeLeftSec)), /*#__PURE__*/React.createElement("span", null, current.topicTitle)), /*#__PURE__*/React.createElement("div", {
       className: "exam__prompt"
     }, current.prompt), !isCode && /*#__PURE__*/React.createElement("div", {
       className: "quiz-question__options"

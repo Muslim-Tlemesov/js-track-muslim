@@ -118,7 +118,7 @@ function PageRoot() {
     className: "findbug__header-row"
   }, /*#__PURE__*/React.createElement("div", {
     className: "findbug__title"
-  }, "\uD83D\uDC1B \u041D\u0430\u0439\u0434\u0438 \u0431\u0430\u0433"), /*#__PURE__*/React.createElement("button", {
+  }, "\u041D\u0430\u0439\u0434\u0438 \u0431\u0430\u0433"), /*#__PURE__*/React.createElement("button", {
     onClick: restart,
     className: "findbug__restart-btn"
   }, "\u21BA \u041D\u0430\u0447\u0430\u0442\u044C \u0437\u0430\u043D\u043E\u0432\u043E")), /*#__PURE__*/React.createElement("div", {

@@ -5,7 +5,7 @@
 .page-content--wide { max-width: 980px; }
 
 .tree-page { padding: 26px; }
-.tree-page__title { font-family: 'Fraunces', serif; font-size: 19px; font-weight: 700; margin-bottom: 6px; }
+.tree-page__title { font-family: 'Inter', system-ui, sans-serif; font-size: 19px; font-weight: 700; margin-bottom: 6px; }
 .tree-page__subtitle { font-size: 13px; color: var(--text-dim); margin-bottom: 18px; max-width: 560px; }
 .tree-page__svg-wrap { overflow-x: auto; }
 .tree-page__legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 10px; font-size: 12px; color: var(--text-dim); }

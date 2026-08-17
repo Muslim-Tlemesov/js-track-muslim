@@ -3,7 +3,7 @@
    ========================================================================== */
 
 .exam { padding: 26px; }
-.exam__title { font-family: 'Fraunces', serif; font-size: 19px; font-weight: 700; margin-bottom: 10px; }
+.exam__title { font-family: 'Inter', system-ui, sans-serif; font-size: 19px; font-weight: 700; margin-bottom: 10px; }
 .exam__intro-text { font-size: 13.5px; color: var(--text-dim); line-height: 1.65; margin-bottom: 18px; max-width: 480px; }
 .exam__start-btn {
   background: var(--accent); color: #fff; border: none; border-radius: 8px;
@@ -18,7 +18,7 @@
 .exam__timer { font-weight: 700; font-size: 13px; color: var(--text-dim); }
 .exam__timer--low { color: var(--error); }
 
-.exam__prompt { font-family: 'Fraunces', serif; font-size: 17px; font-weight: 600; line-height: 1.5; margin-bottom: 18px; word-break: break-word; }
+.exam__prompt { font-family: 'Inter', system-ui, sans-serif; font-size: 17px; font-weight: 600; line-height: 1.5; margin-bottom: 18px; word-break: break-word; }
 
 .exam__code-hint { font-size: 11px; color: var(--text-dim); margin-top: 6px; }
 .exam__submit-code-btn {
@@ -48,8 +48,7 @@
    ------------------------------------------------------------------ */
 
 .exam--done { text-align: center; padding: 36px 28px; }
-.exam__done-emoji { font-size: 56px; margin-bottom: 8px; line-height: 1; }
-.exam__done-title { font-family: 'Fraunces', serif; font-weight: 700; margin-bottom: 8px; font-size: 19px; }
+.exam__done-title { font-family: 'Inter', system-ui, sans-serif; font-weight: 700; margin-bottom: 8px; font-size: 19px; }
 .exam__done-title--strong { font-size: 24px; }
 .exam__done-pct { font-weight: 700; margin-bottom: 6px; font-size: 34px; }
 .exam__done-pct--strong { font-size: 44px; color: var(--success); }

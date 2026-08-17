@@ -4,7 +4,7 @@
 
 .practice { padding: 26px; }
 .practice__header-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; gap: 12px; flex-wrap: wrap; }
-.practice__title { font-family: 'Fraunces', serif; font-size: 19px; font-weight: 700; margin-bottom: 4px; }
+.practice__title { font-family: 'Inter', system-ui, sans-serif; font-size: 19px; font-weight: 700; margin-bottom: 4px; }
 .practice__subtitle { font-size: 13px; color: var(--text-dim); max-width: 460px; line-height: 1.5; }
 .practice__score { font-size: 12.5px; color: var(--text-dim); white-space: nowrap; flex-shrink: 0; }
 

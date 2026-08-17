@@ -39,28 +39,24 @@ const LEVEL_UNLOCK_THRESHOLD = 0.8;
 const ACHIEVEMENTS = [
   {
     id: "first_correct",
-    emoji: "🥇",
     title: "Первый шаг",
     description: "Первый правильный ответ",
     check: (ctx) => ctx.totalCorrect >= 1,
   },
   {
     id: "streak_7",
-    emoji: "✨",
     title: "Разогрелся",
     description: "7 правильных ответов подряд",
     check: (ctx) => ctx.bestStreak >= 7,
   },
   {
     id: "streak_10",
-    emoji: "🔥",
     title: "В ударе",
     description: "10 правильных ответов подряд",
     check: (ctx) => ctx.bestStreak >= 10,
   },
   {
     id: "first_topic",
-    emoji: "📚",
     title: "Тема закрыта",
     description: "Завершена первая тема",
     check: (ctx) =>
@@ -68,21 +64,18 @@ const ACHIEVEMENTS = [
   },
   {
     id: "level_2",
-    emoji: "🎓",
     title: "Новый уровень",
     description: "Открыт второй уровень",
     check: (ctx) => ctx.isLevelUnlocked(2),
   },
   {
     id: "speed_10s",
-    emoji: "⚡",
     title: "Молниеносно",
     description: "Ответил на вопрос быстрее чем за 10 секунд",
     check: (ctx) => ctx.fastestAnswerMs != null && ctx.fastestAnswerMs <= 10000,
   },
   {
     id: "level_complete",
-    emoji: "💯",
     title: "Полная зачистка",
     description: "Пройдены все темы уровня",
     check: (ctx) =>
@@ -95,7 +88,6 @@ const ACHIEVEMENTS = [
   },
   {
     id: "course_complete",
-    emoji: "🏆",
     title: "Курс пройден",
     description: "Пройден весь курс целиком",
     check: (ctx) => {

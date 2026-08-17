@@ -4,7 +4,7 @@
 
 .project { padding: 26px; }
 .project__header-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; gap: 12px; flex-wrap: wrap; }
-.project__title { font-family: 'Fraunces', serif; font-size: 19px; font-weight: 700; margin-bottom: 4px; }
+.project__title { font-family: 'Inter', system-ui, sans-serif; font-size: 19px; font-weight: 700; margin-bottom: 4px; }
 .project__subtitle { font-size: 13px; color: var(--text-dim); max-width: 480px; line-height: 1.55; }
 .project__reset-btn {
   background: transparent; border: 1px solid var(--border); border-radius: 8px;

@@ -143,17 +143,14 @@ function PageRoot() {
   }, memberSince ? `С нами с ${memberSince}` : "Только начинаешь путь — добро пожаловать"))), /*#__PURE__*/React.createElement("div", {
     className: "profile__cards-grid"
   }, /*#__PURE__*/React.createElement(DashboardCard, {
-    emoji: "\u2B50",
     label: "\u041E\u043F\u044B\u0442",
     stripeColor: "var(--accent)",
     value: `${state.xp} XP`
   }), /*#__PURE__*/React.createElement(DashboardCard, {
-    emoji: "\uD83C\uDFC6",
     label: "\u0417\u0432\u0430\u043D\u0438\u0435",
     stripeColor: "var(--error)",
     value: rankTitle(state.rank)
   }), /*#__PURE__*/React.createElement(DashboardCard, {
-    emoji: "\uD83D\uDD25",
     label: "\u0421\u0435\u0440\u0438\u044F",
     stripeColor: "var(--accent2)",
     value: state.streak && state.streak.count > 0 ? `${state.streak.count} ${pluralizeRu(state.streak.count, "день", "дня", "дней")}` : "—"
@@ -218,7 +215,7 @@ function PageRoot() {
   }, "\u26A0 ", importStatus.message), /*#__PURE__*/React.createElement("a", {
     href: "summary.html",
     className: "profile__summary-link"
-  }, "\uD83C\uDFC5 \u0414\u043E\u0441\u0442\u0438\u0436\u0435\u043D\u0438\u044F \u0438 \u0441\u0435\u0440\u0442\u0438\u0444\u0438\u043A\u0430\u0442 \u2014 \u0432 \xAB\u0418\u0442\u043E\u0433\u0430\u0445\xBB"))));
+  }, "\u0414\u043E\u0441\u0442\u0438\u0436\u0435\u043D\u0438\u044F \u0438 \u0441\u0435\u0440\u0442\u0438\u0444\u0438\u043A\u0430\u0442 \u2014 \u0432 \xAB\u0418\u0442\u043E\u0433\u0430\u0445\xBB"))));
 }
 const mainRoot = ReactDOM.createRoot(document.getElementById("app-mount"));
 mainRoot.render(/*#__PURE__*/React.createElement(PageRoot, null));

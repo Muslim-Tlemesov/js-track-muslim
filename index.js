@@ -23,8 +23,6 @@ function PwaInstallBanner({
   return /*#__PURE__*/React.createElement("div", {
     className: "pwa-banner"
   }, /*#__PURE__*/React.createElement("div", {
-    className: "pwa-banner__icon"
-  }, "\uD83D\uDCF2"), /*#__PURE__*/React.createElement("div", {
     className: "pwa-banner__text"
   }, /*#__PURE__*/React.createElement("div", {
     className: "pwa-banner__title"
@@ -48,8 +46,6 @@ function ReminderBanner({
   return /*#__PURE__*/React.createElement("div", {
     className: "pwa-banner pwa-banner--reminder"
   }, /*#__PURE__*/React.createElement("div", {
-    className: "pwa-banner__icon"
-  }, "\uD83D\uDD14"), /*#__PURE__*/React.createElement("div", {
     className: "pwa-banner__text"
   }, /*#__PURE__*/React.createElement("div", {
     className: "pwa-banner__title"
@@ -145,11 +141,11 @@ function HomeContent({
     className: "home__stats-row"
   }, /*#__PURE__*/React.createElement("div", {
     className: "home__stats-chip"
-  }, "\uD83D\uDD25 ", streak && streak.count > 0 ? `${streak.count} ${streak.count === 1 ? "день" : streak.count < 5 ? "дня" : "дней"}` : "—"), /*#__PURE__*/React.createElement("div", {
+  }, streak && streak.count > 0 ? `${streak.count} ${streak.count === 1 ? "день" : streak.count < 5 ? "дня" : "дней"} подряд` : "Нет серии"), /*#__PURE__*/React.createElement("div", {
     className: "home__stats-chip"
-  }, "\u2B50 ", xp, " XP"), /*#__PURE__*/React.createElement("div", {
+  }, xp, " XP"), /*#__PURE__*/React.createElement("div", {
     className: "home__stats-chip"
-  }, "\uD83C\uDFC6 ", rankTitle(rank))), /*#__PURE__*/React.createElement("div", {
+  }, rankTitle(rank))), /*#__PURE__*/React.createElement("div", {
     className: "home__progress-section"
   }, /*#__PURE__*/React.createElement("div", {
     className: "home__progress-section-title"

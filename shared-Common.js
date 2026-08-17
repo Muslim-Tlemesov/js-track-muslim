@@ -69,7 +69,7 @@ function DashboardCard({
     className: "dashboard-card__stripe"
   }), /*#__PURE__*/React.createElement("div", {
     className: "dashboard-card__body"
-  }, /*#__PURE__*/React.createElement("div", {
+  }, emoji && /*#__PURE__*/React.createElement("div", {
     className: "dashboard-card__emoji"
   }, emoji), /*#__PURE__*/React.createElement("div", {
     className: "mono dashboard-card__value"

@@ -24,8 +24,6 @@ function CelebrationView({
   return /*#__PURE__*/React.createElement("div", {
     className: "question-card question-enter summary-celebration"
   }, /*#__PURE__*/React.createElement("div", {
-    className: "summary-celebration__emoji"
-  }, "\uD83C\uDFC6"), /*#__PURE__*/React.createElement("div", {
     className: "summary-celebration__title"
   }, "\u041F\u043E\u0437\u0434\u0440\u0430\u0432\u043B\u044F\u0435\u043C!"), /*#__PURE__*/React.createElement("div", {
     className: "summary-celebration__subtitle"
@@ -34,17 +32,14 @@ function CelebrationView({
   }, "\u041F\u043E\u043B\u0443\u0447\u0435\u043D\u043E"), /*#__PURE__*/React.createElement("div", {
     className: "summary__cards-grid summary__cards-grid--celebration"
   }, /*#__PURE__*/React.createElement(DashboardCard, {
-    emoji: "\u2B50",
     label: "\u041E\u043F\u044B\u0442\u0430 \u043F\u043E\u043B\u0443\u0447\u0435\u043D\u043E",
     stripeColor: "var(--accent)",
     value: `${state.xp} XP`
   }), /*#__PURE__*/React.createElement(DashboardCard, {
-    emoji: "\uD83D\uDD25",
     label: "\u0421\u0435\u0440\u0438\u044F",
     stripeColor: "var(--accent2)",
     value: state.streak && state.streak.count > 0 ? `${state.streak.count} ${pluralizeRu(state.streak.count, "день", "дня", "дней")}` : "—"
   }), /*#__PURE__*/React.createElement(DashboardCard, {
-    emoji: "\uD83E\uDD47",
     label: "\u0417\u0432\u0430\u043D\u0438\u0435 \u0441\u0435\u0440\u0442\u0438\u0444\u0438\u043A\u0430\u0442\u0430",
     stripeColor: "var(--success)",
     value: rankTitle(state.rank)
@@ -61,10 +56,10 @@ function CelebrationView({
   }), /*#__PURE__*/React.createElement("button", {
     onClick: onDownloadCertificate,
     className: "summary-celebration__cert-btn"
-  }, "\uD83C\uDFC5 \u0421\u043A\u0430\u0447\u0430\u0442\u044C \u0441\u0435\u0440\u0442\u0438\u0444\u0438\u043A\u0430\u0442 (PNG)"), /*#__PURE__*/React.createElement("button", {
+  }, "\u0421\u043A\u0430\u0447\u0430\u0442\u044C \u0441\u0435\u0440\u0442\u0438\u0444\u0438\u043A\u0430\u0442 (PNG)"), /*#__PURE__*/React.createElement("button", {
     onClick: onShare,
     className: "summary-celebration__share-btn"
-  }, shareStatus === "copied" ? "✓ Ссылка скопирована" : shareStatus === "failed" ? "Не вышло" : "🔗 Поделиться ссылкой"), /*#__PURE__*/React.createElement("button", {
+  }, shareStatus === "copied" ? "✓ Ссылка скопирована" : shareStatus === "failed" ? "Не вышло" : "Поделиться ссылкой"), /*#__PURE__*/React.createElement("button", {
     onClick: onResetProgress,
     className: "summary-celebration__repeat-btn"
   }, "\u21BA \u041F\u043E\u0432\u0442\u043E\u0440\u0438\u0442\u044C \u043A\u0443\u0440\u0441"), /*#__PURE__*/React.createElement("button", {
@@ -344,13 +339,13 @@ function PageRoot() {
   }, "\u0418\u0442\u043E\u0433\u0438"), isComplete && /*#__PURE__*/React.createElement("button", {
     onClick: () => setShowDetails(false),
     className: "summary__back-to-celebration"
-  }, "\uD83C\uDFC6 \u041D\u0430\u0437\u0430\u0434 \u043A \u043F\u0440\u0430\u0437\u0434\u043D\u0438\u043A\u0443")), /*#__PURE__*/React.createElement("div", {
+  }, "\u041D\u0430\u0437\u0430\u0434 \u043A \u043F\u0440\u0430\u0437\u0434\u043D\u0438\u043A\u0443")), /*#__PURE__*/React.createElement("div", {
     className: "summary__subtitle"
   }, "\u041F\u0440\u043E\u0439\u0434\u0435\u043D\u043E ", state.totalAnswered, " \u0438\u0437 ", state.totalQuestions, " \u0432\u043E\u043F\u0440\u043E\u0441\u043E\u0432"), isComplete && /*#__PURE__*/React.createElement("div", {
     className: "summary__complete-banner"
   }, /*#__PURE__*/React.createElement("div", {
     className: "summary__complete-banner-title"
-  }, "\uD83C\uDF93 \u041A\u0443\u0440\u0441 \u043F\u0440\u043E\u0439\u0434\u0435\u043D \u043F\u043E\u043B\u043D\u043E\u0441\u0442\u044C\u044E!"), /*#__PURE__*/React.createElement("div", {
+  }, "\u041A\u0443\u0440\u0441 \u043F\u0440\u043E\u0439\u0434\u0435\u043D \u043F\u043E\u043B\u043D\u043E\u0441\u0442\u044C\u044E!"), /*#__PURE__*/React.createElement("div", {
     className: "summary__complete-banner-desc"
   }, pct, "% \u043F\u0440\u0430\u0432\u0438\u043B\u044C\u043D\u044B\u0445 \u043E\u0442\u0432\u0435\u0442\u043E\u0432 \u0438\u0437 ", state.totalQuestions, " \u0432\u043E\u043F\u0440\u043E\u0441\u043E\u0432. \u041C\u043E\u0436\u043D\u043E \u0441\u043A\u0430\u0447\u0430\u0442\u044C \u0441\u0435\u0440\u0442\u0438\u0444\u0438\u043A\u0430\u0442 \u043D\u0430 \u043F\u0430\u043C\u044F\u0442\u044C."), /*#__PURE__*/React.createElement("input", {
     type: "text",
@@ -363,23 +358,20 @@ function PageRoot() {
   }), /*#__PURE__*/React.createElement("button", {
     onClick: downloadCertificate,
     className: "summary__complete-banner-btn"
-  }, "\uD83C\uDFC5 \u0421\u043A\u0430\u0447\u0430\u0442\u044C \u0441\u0435\u0440\u0442\u0438\u0444\u0438\u043A\u0430\u0442 (PNG)")), /*#__PURE__*/React.createElement("button", {
+  }, "\u0421\u043A\u0430\u0447\u0430\u0442\u044C \u0441\u0435\u0440\u0442\u0438\u0444\u0438\u043A\u0430\u0442 (PNG)")), /*#__PURE__*/React.createElement("button", {
     onClick: copyShareLink,
     className: "summary__share-btn"
-  }, shareStatus === "copied" ? "✓ Ссылка скопирована" : shareStatus === "failed" ? "Не вышло" : "🔗 Поделиться прогрессом"), /*#__PURE__*/React.createElement("div", {
+  }, shareStatus === "copied" ? "✓ Ссылка скопирована" : shareStatus === "failed" ? "Не вышло" : "Поделиться прогрессом"), /*#__PURE__*/React.createElement("div", {
     className: "summary__cards-grid"
   }, /*#__PURE__*/React.createElement(DashboardCard, {
-    emoji: "\uD83D\uDD25",
     label: "\u0421\u0435\u0440\u0438\u044F",
     stripeColor: "var(--accent2)",
     value: state.streak && state.streak.count > 0 ? `${state.streak.count} ${pluralizeRu(state.streak.count, "день", "дня", "дней")}` : "—"
   }), /*#__PURE__*/React.createElement(DashboardCard, {
-    emoji: "\u2B50",
     label: "\u0412\u0435\u0440\u043D\u044B\u0445 \u043E\u0442\u0432\u0435\u0442\u043E\u0432",
     stripeColor: "var(--accent)",
     value: `${pct}%`
   }), /*#__PURE__*/React.createElement(DashboardCard, {
-    emoji: "\uD83D\uDCDA",
     label: "\u0422\u0435\u043C \u0438\u0437\u0443\u0447\u0435\u043D\u043E",
     stripeColor: "var(--success)",
     value: `${TOPICS.filter(t => {
@@ -387,7 +379,6 @@ function PageRoot() {
       return p && p.total > 0 && p.done === p.total;
     }).length}/${TOPICS.length}`
   }), /*#__PURE__*/React.createElement(DashboardCard, {
-    emoji: "\uD83C\uDFC6",
     label: "\u0417\u0432\u0430\u043D\u0438\u0435",
     stripeColor: "var(--error)",
     value: rankTitle(state.rank)
@@ -402,7 +393,7 @@ function PageRoot() {
     label: "\u0441 \u043E\u0448\u0438\u0431\u043A\u043E\u0439",
     color: "var(--error)"
   }), state.fastestAnswerMs != null && /*#__PURE__*/React.createElement(StatCard, {
-    value: `⚡ ${(state.fastestAnswerMs / 1000).toFixed(1)}с`,
+    value: `${(state.fastestAnswerMs / 1000).toFixed(1)}с`,
     label: "\u0441\u0430\u043C\u044B\u0439 \u0431\u044B\u0441\u0442\u0440\u044B\u0439 \u0432\u0435\u0440\u043D\u044B\u0439 \u043E\u0442\u0432\u0435\u0442",
     color: "var(--accent2)"
   }), /*#__PURE__*/React.createElement(StatCard, {
@@ -420,8 +411,6 @@ function PageRoot() {
       title: a.description,
       className: `summary__achievement${unlocked ? " summary__achievement--unlocked" : ""}`
     }, /*#__PURE__*/React.createElement("div", {
-      className: "summary__achievement-emoji"
-    }, a.emoji), /*#__PURE__*/React.createElement("div", {
       className: "summary__achievement-title"
     }, a.title), /*#__PURE__*/React.createElement("div", {
       className: "summary__achievement-desc"
@@ -497,8 +486,6 @@ function PageRoot() {
     }), /*#__PURE__*/React.createElement("div", {
       className: "summary__topic-card-body"
     }, /*#__PURE__*/React.createElement("div", {
-      className: "summary__topic-card-emoji"
-    }, TOPIC_EMOJI[t.id] || "📘"), /*#__PURE__*/React.createElement("div", {
       className: "summary__topic-card-title"
     }, t.title), /*#__PURE__*/React.createElement(CircularProgress, {
       pct: started ? pctT : 0,

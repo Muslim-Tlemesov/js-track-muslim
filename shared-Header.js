@@ -10,90 +10,82 @@
    навигация, а мгновенное локальное действие) — у них остаётся React
    state и onClick, как раньше.
 
-   РЕДИЗАЙН: раньше все 13 разделов + сброс/звук/тема лежали одним
-   рядом из 16 кнопок в app-header — реальная проблема, найденная при
-   разборе: такой ряд не говорит пользователю "вот что делать дальше",
-   а вываливает весь список сразу, без иерархии важности. Теперь два
-   уровня: НА ВИДУ — только "Домой" и "Вопросы" (два самых частых
-   действия), ОСТАЛЬНОЕ — за одной кнопкой-меню, сгруппированное по
-   смыслу (Обучение / Инструменты / Прогресс), плюс настройки внизу
-   того же меню.
+   РЕДИЗАЙН (2 итерации): сначала все 13 разделов + сброс/звук/тема
+   лежали одним рядом из 16 кнопок — список без иерархии, "вот тебе
+   всё, разбирайся сам". Первая итерация свела это к 2 кнопкам на виду
+   + одному общему меню. Вторая (эта) — 4 РАВНОЗНАЧНЫХ режима вместо
+   произвольных "часто/редко используемых": Главная (прямая ссылка),
+   Учёба/Практика/Прогресс (каждый — своя кнопка со своим выпадающим
+   списком, не общий список из 3 групп сразу). "Темы"/"Достижения"/
+   "Повторение" — не отдельные страницы, а уже встроенные функции
+   внутри Карты знаний и Итогов соответственно, поэтому ссылаются на
+   существующие разделы, а не дублируются новыми пунктами.
    ========================================================================== */
 
-const HEADER_PRIMARY_ITEMS = [{
+const HEADER_MAIN_NAV = [{
+  key: "home",
+  label: "Главная",
   page: "index",
-  href: "index.html",
-  icon: "🏠",
-  label: "Домой"
+  href: "index.html"
 }, {
-  page: "questions",
-  href: "questions.html",
-  icon: "📘",
-  label: "Вопросы"
-}];
-const HEADER_MENU_GROUPS = [{
-  title: "Обучение",
+  key: "learn",
+  label: "Учёба",
+  items: [{
+    page: "questions",
+    href: "questions.html",
+    label: "Вопросы"
+  }, {
+    page: "tree",
+    href: "tree.html",
+    label: "Карта знаний"
+  }]
+}, {
+  key: "practice",
+  label: "Практика",
   items: [{
     page: "practice",
     href: "practice.html",
-    icon: "🎲",
     label: "Практика"
-  }, {
-    page: "exam",
-    href: "exam.html",
-    icon: "🌙",
-    label: "Экзамен"
-  }, {
-    page: "viz",
-    href: "viz.html",
-    icon: "🎬",
-    label: "Визуализации"
   }, {
     page: "predict",
     href: "predict.html",
-    icon: "🔮",
     label: "Предскажи вывод"
   }, {
     page: "findbug",
     href: "findbug.html",
-    icon: "🐛",
     label: "Найди баг"
-  }]
-}, {
-  title: "Инструменты",
-  items: [{
+  }, {
+    page: "viz",
+    href: "viz.html",
+    label: "Визуализации"
+  }, {
     page: "sandbox",
     href: "sandbox.html",
-    icon: "💻",
     label: "Консоль"
   }, {
     page: "project",
     href: "project.html",
-    icon: "🎯",
     label: "Мини-проект"
   }]
 }, {
-  title: "Прогресс",
+  key: "progress",
+  label: "Прогресс",
   items: [{
     page: "summary",
     href: "summary.html",
-    icon: "📊",
     label: "Итоги"
   }, {
     page: "history",
     href: "history.html",
-    icon: "📅",
     label: "История"
-  }, {
-    page: "tree",
-    href: "tree.html",
-    icon: "🌳",
-    label: "Карта знаний"
   }, {
     page: "profile",
     href: "profile.html",
-    icon: "👤",
     label: "Профиль"
+  }, {
+    page: "exam",
+    href: "exam.html",
+    label: "Экзамен"
   }]
 }];
 
@@ -134,11 +126,12 @@ function Header({
   onToggleSound,
   onResetProgress
 }) {
-  const [menuOpen, setMenuOpen] = React.useState(false);
-  // Активный раздел меню подсвечивает саму кнопку-триггер — так видно,
-  // что "текущая страница где-то там", даже когда меню закрыто.
-  const isPrimaryPage = HEADER_PRIMARY_ITEMS.some(item => item.page === currentPage);
-  const activeGroupTitle = !isPrimaryPage ? HEADER_MENU_GROUPS.find(g => g.items.some(item => item.page === currentPage))?.title : null;
+  // Какое из выпадающих меню сейчас открыто — null, "learn"/"practice"/
+  // "progress" (одно из HEADER_MAIN_NAV) или "settings". Только одно
+  // одновременно — открытие другого закрывает предыдущее само собой,
+  // раз это всё одна и та же переменная состояния.
+  const [openMenu, setOpenMenu] = React.useState(null);
+  const toggleMenu = key => setOpenMenu(cur => cur === key ? null : key);
   return /*#__PURE__*/React.createElement("header", {
     className: "app-header"
   }, /*#__PURE__*/React.createElement("div", {
@@ -173,41 +166,45 @@ function Header({
   }, totalCorrect, "/", totalQuestions), "\u0432\u0435\u0440\u043D\u043E \xB7 ", overallPct, "% \u043F\u0440\u043E\u0439\u0434\u0435\u043D\u043E"), streak && streak.count > 0 && /*#__PURE__*/React.createElement("div", {
     className: "app-header__badge",
     title: `Дней подряд с занятиями${streak.best > streak.count ? ` · лучшая серия: ${streak.best}` : ""}`
-  }, "\uD83D\uDD25 ", streak.count, " ", streak.count === 1 ? "день" : streak.count < 5 ? "дня" : "дней"), /*#__PURE__*/React.createElement("div", {
+  }, streak.count, " ", streak.count === 1 ? "день" : streak.count < 5 ? "дня" : "дней", " \u043F\u043E\u0434\u0440\u044F\u0434"), /*#__PURE__*/React.createElement("div", {
     className: "app-header__badge",
     title: `${xp} XP всего · до следующего звания осталось ${Math.max(0, rankXpForNext - rankXpIntoRank)} XP`
-  }, "\u2B50 ", rankTitle(rank), " \xB7 ", xp, " XP"), /*#__PURE__*/React.createElement("div", {
+  }, rankTitle(rank), " \xB7 ", xp, " XP"), /*#__PURE__*/React.createElement("div", {
     className: "app-header__badge app-header__badge--achievements",
     title: "\u041E\u0442\u043A\u0440\u044B\u0442\u044B\u0435 \u0434\u043E\u0441\u0442\u0438\u0436\u0435\u043D\u0438\u044F"
-  }, "\uD83C\uDFC6 ", achievementsCount, "/", achievementsTotal), HEADER_PRIMARY_ITEMS.map(item => /*#__PURE__*/React.createElement("a", {
-    key: item.page,
-    href: item.href,
-    className: `nav-btn nav__btn${currentPage === item.page ? " nav__btn--active" : ""}`,
-    "aria-current": currentPage === item.page ? "page" : undefined
-  }, item.icon, " ", item.label)), /*#__PURE__*/React.createElement("button", {
-    className: `nav-btn nav__btn app-header__menu-trigger${activeGroupTitle ? " nav__btn--active" : ""}${menuOpen ? " app-header__menu-trigger--open" : ""}`,
-    onClick: () => setMenuOpen(v => !v),
-    "aria-expanded": menuOpen,
-    "aria-haspopup": "true"
-  }, "\u2630 ", activeGroupTitle || "Меню")), menuOpen && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+  }, achievementsCount, "/", achievementsTotal), HEADER_MAIN_NAV.map(mode => {
+    if (!mode.items) {
+      // "Главная" — прямая ссылка, без выпадающего списка.
+      return /*#__PURE__*/React.createElement("a", {
+        key: mode.key,
+        href: mode.href,
+        className: `nav-btn nav__btn${currentPage === mode.page ? " nav__btn--active" : ""}`,
+        "aria-current": currentPage === mode.page ? "page" : undefined
+      }, mode.label);
+    }
+    const isActive = mode.items.some(item => item.page === currentPage);
+    return /*#__PURE__*/React.createElement("button", {
+      key: mode.key,
+      className: `nav-btn nav__btn app-header__mode-trigger${isActive ? " nav__btn--active" : ""}${openMenu === mode.key ? " app-header__mode-trigger--open" : ""}`,
+      onClick: () => toggleMenu(mode.key),
+      "aria-expanded": openMenu === mode.key,
+      "aria-haspopup": "true"
+    }, mode.label, " ", /*#__PURE__*/React.createElement("span", {
+      className: "app-header__mode-caret"
+    }, "\u25BE"));
+  }), /*#__PURE__*/React.createElement("button", {
+    className: `nav-btn nav__btn app-header__mode-trigger${openMenu === "settings" ? " app-header__mode-trigger--open" : ""}`,
+    onClick: () => toggleMenu("settings"),
+    "aria-expanded": openMenu === "settings",
+    "aria-haspopup": "true",
+    "aria-label": "\u041D\u0430\u0441\u0442\u0440\u043E\u0439\u043A\u0438"
+  }, "\u2699")), openMenu && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "app-header__menu-backdrop",
-    onClick: () => setMenuOpen(false)
+    onClick: () => setOpenMenu(null)
   }), /*#__PURE__*/React.createElement("div", {
     className: "app-header__menu-panel",
     role: "menu"
-  }, HEADER_MENU_GROUPS.map(group => /*#__PURE__*/React.createElement("div", {
-    key: group.title,
-    className: "app-header__menu-group"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "app-header__menu-group-title"
-  }, group.title), /*#__PURE__*/React.createElement("div", {
-    className: "app-header__menu-group-items"
-  }, group.items.map(item => /*#__PURE__*/React.createElement("a", {
-    key: item.page,
-    href: item.href,
-    className: `nav-btn nav__btn${currentPage === item.page ? " nav__btn--active" : ""}`,
-    "aria-current": currentPage === item.page ? "page" : undefined
-  }, item.icon, " ", item.label))))), /*#__PURE__*/React.createElement("div", {
+  }, openMenu === "settings" ? /*#__PURE__*/React.createElement("div", {
     className: "app-header__menu-group"
   }, /*#__PURE__*/React.createElement("div", {
     className: "app-header__menu-group-title"
@@ -221,9 +218,18 @@ function Header({
     className: `nav-btn nav__btn${soundEnabled ? "" : " nav__btn--dim"}`,
     onClick: onToggleSound,
     "aria-label": soundEnabled ? "Выключить звук" : "Включить звук"
-  }, soundEnabled ? "🔊 Звук вкл" : "🔇 Звук выкл"), /*#__PURE__*/React.createElement("button", {
+  }, soundEnabled ? "Звук вкл" : "Звук выкл"), /*#__PURE__*/React.createElement("button", {
     className: "nav-btn nav__btn",
     onClick: onToggleTheme,
     "aria-label": "\u041F\u0435\u0440\u0435\u043A\u043B\u044E\u0447\u0438\u0442\u044C \u0442\u0435\u043C\u0443"
-  }, themeMode === "dark" ? "☀️ Светлая" : "🌙 Тёмная"))))));
+  }, themeMode === "dark" ? "Светлая тема" : "Тёмная тема"))) : /*#__PURE__*/React.createElement("div", {
+    className: "app-header__menu-group"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "app-header__menu-group-items"
+  }, HEADER_MAIN_NAV.find(m => m.key === openMenu)?.items.map(item => /*#__PURE__*/React.createElement("a", {
+    key: item.page,
+    href: item.href,
+    className: `nav-btn nav__btn${currentPage === item.page ? " nav__btn--active" : ""}`,
+    "aria-current": currentPage === item.page ? "page" : undefined
+  }, item.label)))))));
 }

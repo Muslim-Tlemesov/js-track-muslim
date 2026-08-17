@@ -8,8 +8,7 @@
    ------------------------------------------------------------------ */
 
 .summary-celebration { padding: 36px 28px; text-align: center; }
-.summary-celebration__emoji { font-size: 64px; margin-bottom: 6px; line-height: 1; }
-.summary-celebration__title { font-family: 'Fraunces', serif; font-size: 26px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+.summary-celebration__title { font-family: 'Inter', system-ui, sans-serif; font-size: 26px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
 .summary-celebration__subtitle { font-size: 15px; color: var(--text-dim); margin-bottom: 28px; }
 .summary-celebration__label {
   font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-dim);
@@ -39,7 +38,7 @@
 
 .summary { padding: 26px; }
 .summary__title-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
-.summary__title { font-family: 'Fraunces', serif; font-size: 19px; font-weight: 700; }
+.summary__title { font-family: 'Inter', system-ui, sans-serif; font-size: 19px; font-weight: 700; }
 .summary__back-to-celebration { background: transparent; border: none; color: var(--accent); font-size: 12.5px; cursor: pointer; }
 .summary__subtitle { font-size: 13px; color: var(--text-dim); margin-bottom: 20px; }
 
@@ -80,8 +79,6 @@
   opacity: 1;
   box-shadow: 2.5px 2.5px 0 0 color-mix(in srgb, var(--accent) 33%, transparent);
 }
-.summary__achievement-emoji { font-size: 22px; margin-bottom: 4px; filter: grayscale(1); }
-.summary__achievement--unlocked .summary__achievement-emoji { filter: none; }
 .summary__achievement-title { font-size: 12.5px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
 .summary__achievement-desc { font-size: 11px; color: var(--text-dim); line-height: 1.4; }
 
@@ -100,7 +97,6 @@
 .summary__topic-card { display: flex; flex-direction: column; }
 .summary__topic-card-stripe { height: 4px; background: var(--stripe-color); flex-shrink: 0; }
 .summary__topic-card-body { padding: 16px 14px; display: flex; flex-direction: column; align-items: center; flex: 1; }
-.summary__topic-card-emoji { font-size: 30px; margin-bottom: 10px; }
 .summary__topic-card-title { font-size: 13px; font-weight: 600; color: var(--text); text-align: center; margin-bottom: 12px; line-height: 1.3; }
 .summary__topic-card-count { font-size: 11px; color: var(--text-dim); margin-top: 8px; }
 

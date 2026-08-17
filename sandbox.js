@@ -35,10 +35,10 @@ function DebugPanel({
     className: "debug-panel__header-row"
   }, /*#__PURE__*/React.createElement("div", {
     className: "debug-panel__label"
-  }, "\uD83D\uDC1E \u041F\u043E\u0448\u0430\u0433\u043E\u0432\u044B\u0439 \u043E\u0442\u043B\u0430\u0434\u0447\u0438\u043A \u2014 \u0432\u044B\u0437\u043E\u0432\u044B \u0444\u0443\u043D\u043A\u0446\u0438\u0439 \u0432\u044B\u043F\u043E\u043B\u043D\u044F\u044E\u0442\u0441\u044F \u0446\u0435\u043B\u0438\u043A\u043E\u043C, \u0431\u0435\u0437 \u0437\u0430\u0445\u043E\u0434\u0430 \u0432\u043D\u0443\u0442\u0440\u044C"), /*#__PURE__*/React.createElement("button", {
+  }, "\u041F\u043E\u0448\u0430\u0433\u043E\u0432\u044B\u0439 \u043E\u0442\u043B\u0430\u0434\u0447\u0438\u043A \u2014 \u0432\u044B\u0437\u043E\u0432\u044B \u0444\u0443\u043D\u043A\u0446\u0438\u0439 \u0432\u044B\u043F\u043E\u043B\u043D\u044F\u044E\u0442\u0441\u044F \u0446\u0435\u043B\u0438\u043A\u043E\u043C, \u0431\u0435\u0437 \u0437\u0430\u0445\u043E\u0434\u0430 \u0432\u043D\u0443\u0442\u0440\u044C"), /*#__PURE__*/React.createElement("button", {
     onClick: onExit,
     className: "debug-panel__exit-btn"
-  }, "\u270F\uFE0F \u0418\u0437\u043C\u0435\u043D\u0438\u0442\u044C \u043A\u043E\u0434")), /*#__PURE__*/React.createElement("div", {
+  }, "\u0418\u0437\u043C\u0435\u043D\u0438\u0442\u044C \u043A\u043E\u0434")), /*#__PURE__*/React.createElement("div", {
     className: "ide-split"
   }, /*#__PURE__*/React.createElement("div", {
     className: "ide-split-left"
@@ -268,7 +268,7 @@ function PageRoot() {
   }, isRunning ? "Выполняется…" : "▶ Выполнить"), /*#__PURE__*/React.createElement("button", {
     onClick: startDebug,
     className: "sandbox__debug-btn"
-  }, "\uD83D\uDC1E \u041E\u0442\u043B\u0430\u0434\u0447\u0438\u043A"), runResult && /*#__PURE__*/React.createElement("button", {
+  }, "\u041E\u0442\u043B\u0430\u0434\u0447\u0438\u043A"), runResult && /*#__PURE__*/React.createElement("button", {
     onClick: copyCode,
     className: "sandbox__copy-btn"
   }, copyStatus === "copied" ? "✓ Скопировано" : copyStatus === "failed" ? "Не вышло" : "⧉ Копировать код")), runResult && /*#__PURE__*/React.createElement("div", {
