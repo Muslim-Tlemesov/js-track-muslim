@@ -247,10 +247,14 @@ function PageRoot() {
     session: debugSession,
     setSession: setDebugSession,
     onExit: stopDebug
-  }) : /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(CodeEditor, {
+  }) : /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(CodeEditorPanel, {
     value: code,
     onChange: updateCode,
     minHeight: 220,
+    onRun: run,
+    running: isRunning,
+    output: runResult ? runResult.logs : undefined,
+    outputError: runResult ? runResult.error : null,
     onKeyDown: e => {
       if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
         e.preventDefault();
@@ -262,31 +266,12 @@ function PageRoot() {
   }, "Ctrl+Enter (\u2318+Enter \u043D\u0430 Mac) \u2014 \u0431\u044B\u0441\u0442\u0440\u044B\u0439 \u0437\u0430\u043F\u0443\u0441\u043A \u043A\u043E\u0434\u0430"), /*#__PURE__*/React.createElement("div", {
     className: "sandbox__actions"
   }, /*#__PURE__*/React.createElement("button", {
-    onClick: run,
-    disabled: isRunning,
-    className: "sandbox__run-btn"
-  }, isRunning ? "Выполняется…" : "▶ Выполнить"), /*#__PURE__*/React.createElement("button", {
     onClick: startDebug,
     className: "sandbox__debug-btn"
   }, "\u041E\u0442\u043B\u0430\u0434\u0447\u0438\u043A"), runResult && /*#__PURE__*/React.createElement("button", {
     onClick: copyCode,
     className: "sandbox__copy-btn"
-  }, copyStatus === "copied" ? "✓ Скопировано" : copyStatus === "failed" ? "Не вышло" : "⧉ Копировать код")), runResult && /*#__PURE__*/React.createElement("div", {
-    className: "sandbox__console"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "sandbox__console-label"
-  }, "\u25B7 console"), /*#__PURE__*/React.createElement("div", {
-    className: "mono sandbox__console-body"
-  }, runResult.error && /*#__PURE__*/React.createElement("div", {
-    className: "sandbox__console-error"
-  }, "\u2297 Error: ", runResult.error), !runResult.error && runResult.logs.length === 0 && /*#__PURE__*/React.createElement("div", {
-    className: "sandbox__console-empty"
-  }, "// \u043D\u0435\u0442 \u0432\u044B\u0432\u043E\u0434\u0430 \u2014 \u0434\u043E\u0431\u0430\u0432\u044C console.log(...)"), runResult.logs.map((l, i) => /*#__PURE__*/React.createElement("div", {
-    key: i,
-    className: "sandbox__console-line"
-  }, /*#__PURE__*/React.createElement("span", {
-    className: "sandbox__console-arrow"
-  }, "\u276F "), l))))))));
+  }, copyStatus === "copied" ? "✓ Скопировано" : copyStatus === "failed" ? "Не вышло" : "⧉ Копировать код"))))));
 }
 const mainRoot = ReactDOM.createRoot(document.getElementById("app-mount"));
 mainRoot.render(/*#__PURE__*/React.createElement(PageRoot, null));

@@ -129,41 +129,45 @@ html, body {
 }
 
 /* ------------------------------------------------------------------
-   app-header — верхняя панель: маскот+логотип слева, статистика,
-   "Домой"/"Вопросы" и кнопка выпадающего меню справа.
+   app-header — теперь ТОЛЬКО бренд + компактная статистика +
+   настройки. Вся навигация переехала в app-sidebar (десктоп) и
+   app-bottombar (мобильный) — см. ниже. НЕ просто @media на одной и
+   той же разметке ("mobile просто ужимается"), а разные UX-паттерны
+   под форм-фактор, как в современных mobile-first EdTech-продуктах:
+   боковая панель слева на десктопе, нижняя таб-панель на мобильном.
    ------------------------------------------------------------------ */
 
+:root {
+  --app-header-h: 56px;
+  --app-sidebar-w: 208px;
+  --app-bottombar-h: 60px;
+}
+
 .app-header {
+  height: var(--app-header-h);
   border-bottom: 1px solid color-mix(in srgb, var(--border) 53%, transparent);
-  padding: 20px 28px;
+  padding: 0 16px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 14px 0;
+  gap: 12px;
   box-sizing: border-box;
-  position: relative;
-  /* z-index: 30 (было 1) — реальный найденный баг: выпадающее меню
-     (app-header__menu-panel, z-index: 41) технически рендерилось с
-     правильной геометрией/непрозрачностью, но визуально пряталось ПОД
-     <main>. Причина — контекст наложения: z-index дочернего элемента
-     значим только ВНУТРИ стека родителя, а сам .app-header со старым
-     z-index: 1 недостаточно приподнимал этот стек целиком над <main>
-     (соседний элемент того же уровня). Подтверждено скриншотом
-     конкретно DOM-узла панели — HTML внутри был правильный, но на
-     экране поверх рисовался контент страницы. */
+  position: sticky;
+  top: 0;
+  background: var(--bg);
   z-index: 30;
 }
 
 .app-header__brand {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+  text-decoration: none;
+  flex-shrink: 0;
 }
 
 .app-header__mascot {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   flex-shrink: 0;
   background: color-mix(in srgb, var(--accent) 10%, transparent);
@@ -176,7 +180,7 @@ html, body {
 .app-header__logo {
   font-family: 'Inter', system-ui, sans-serif;
   font-weight: 700;
-  font-size: 20px;
+  font-size: 17px;
   letter-spacing: -0.01em;
   display: inline-flex;
   align-items: baseline;
@@ -189,32 +193,10 @@ html, body {
   font-weight: 500;
 }
 
-.app-header__tagline {
-  font-size: 12.5px;
-  color: var(--text-dim);
-}
-
-.app-header__actions {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
-  /* Реальный найденный баг: подложка (app-header__menu-backdrop,
-     z-index: 40) полностью перекрывала inset:0, включая саму шапку —
-     нельзя было переключиться с одного выпадающего меню на другое
-     прямым кликом по другой кнопке-режиму, только через два действия
-     (сначала закрыть текущее кликом по подложке, потом открыть
-     новое). position:relative + z-index выше подложки держит кнопки
-     кликабельными поверх неё.
-   */
-  position: relative;
-  z-index: 41;
-}
-
 .app-header__stats {
   font-size: 12.5px;
   color: var(--text-dim);
-  display: flex;
+  display: none;
   align-items: center;
   gap: 8px;
 }
@@ -222,6 +204,13 @@ html, body {
 .app-header__stats-count {
   color: var(--accent);
   font-weight: 600;
+}
+
+.app-header__badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
 }
 
 /* Общий вид "пилюли"-бейджа в шапке — переиспользуется и серией (стрик),
@@ -237,6 +226,7 @@ html, body {
   border-radius: 20px;
   font-weight: 600;
   position: relative;
+  white-space: nowrap;
 }
 
 /* Бейдж достижений — та же форма, но акцентный (не accent2) цвет,
@@ -255,6 +245,178 @@ html, body {
   color: var(--accent2);
   pointer-events: none;
   animation: xp-float-up 1.1s ease forwards;
+}
+
+.app-header__mode-trigger {
+  position: relative;
+  flex-shrink: 0;
+}
+.app-header__mode-trigger--open {
+  background: var(--surface);
+  border-color: var(--accent);
+}
+
+.app-header__menu-panel--settings {
+  left: auto;
+  right: 16px;
+  max-width: 260px;
+}
+
+/* ------------------------------------------------------------------
+   app-sidebar — навигация на ДЕСКТОПЕ: фиксированная колонка слева,
+   аккордеон (группы раскрываются прямо внутри колонки, без всплытия
+   поверх контента). Скрыта по умолчанию (мобильный первичен) —
+   появляется только от --app-sidebar-breakpoint и шире.
+   ------------------------------------------------------------------ */
+
+.app-sidebar {
+  display: none;
+}
+
+.app-sidebar__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  color: var(--text);
+  text-decoration: none;
+  font-size: 13.5px;
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+.app-sidebar__item--active {
+  background: color-mix(in srgb, var(--accent) 13%, transparent);
+  color: var(--accent);
+  font-weight: 600;
+}
+.app-sidebar__group {
+  display: flex;
+  flex-direction: column;
+}
+.app-sidebar__item--group {
+  position: relative;
+}
+.app-sidebar__caret {
+  margin-left: auto;
+  font-size: 10px;
+  opacity: 0.6;
+  transition: transform 0.15s ease;
+}
+.app-sidebar__caret--open {
+  transform: rotate(-180deg);
+}
+.app-sidebar__subitems {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 2px 0 6px 33px;
+}
+.app-sidebar__subitem {
+  padding: 6px 10px;
+  border-radius: 6px;
+  color: var(--text-dim);
+  text-decoration: none;
+  font-size: 12.5px;
+}
+.app-sidebar__subitem--active {
+  color: var(--accent);
+  font-weight: 600;
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+}
+
+/* ------------------------------------------------------------------
+   app-bottombar — навигация на МОБИЛЬНОМ: нижняя таб-панель,
+   зафиксирована к низу вьюпорта. Группы с подпунктами открывают лист
+   СНИЗУ ВВЕРХ (app-bottombar__sheet), а не выпадающее меню сверху —
+   учитывая, где физически находится триггер.
+   ------------------------------------------------------------------ */
+
+.app-bottombar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: var(--app-bottombar-h);
+  display: flex;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  z-index: 30;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+.app-bottombar__tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  text-decoration: none;
+  cursor: pointer;
+  padding: 6px 2px;
+}
+.app-bottombar__tab--active {
+  color: var(--accent);
+}
+.app-bottombar__tab-label {
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.app-bottombar__sheet {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: calc(var(--app-bottombar-h) + 8px);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: 0 -16px 40px rgba(0, 0, 0, 0.25);
+  padding: 14px;
+  z-index: 41;
+  max-height: 60vh;
+  overflow-y: auto;
+  animation: bottombar-sheet-in 0.15s ease;
+}
+
+@keyframes bottombar-sheet-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ------------------------------------------------------------------
+   Переключение между двумя UX-архитектурами: breakpoint один на все
+   правила ниже (880px) — сайдбар десктопа, таб-бар мобильного, и
+   отступы контента переключаются синхронно, одним и тем же условием.
+   ------------------------------------------------------------------ */
+
+@media (min-width: 880px) {
+  .app-header__stats { display: flex; }
+  .app-bottombar { display: none; }
+  .app-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    position: fixed;
+    left: 0;
+    top: var(--app-header-h);
+    width: var(--app-sidebar-w);
+    height: calc(100vh - var(--app-header-h));
+    padding: 12px 10px;
+    box-sizing: border-box;
+    border-right: 1px solid var(--border);
+    background: var(--bg);
+    overflow-y: auto;
+    z-index: 20;
+  }
 }
 
 /* ------------------------------------------------------------------
@@ -574,10 +736,21 @@ html, body {
   max-width: 720px;
   width: 100%;
   margin: 0 auto;
-  padding: 28px 24px 60px;
+  padding: 20px 20px calc(var(--app-bottombar-h) + 24px);
   box-sizing: border-box;
   position: relative;
   z-index: 1;
+}
+
+/* Тот же breakpoint, что и у app-sidebar/app-bottombar (880px) — на
+   десктопе контент больше не проваливается под нижнюю таб-панель
+   (её там просто нет), но должен уступать место боковой панели
+   слева, у которой position:fixed и она не "толкает" соседей сама. */
+@media (min-width: 880px) {
+  .page-content {
+    padding: 28px 24px 60px;
+    margin-left: calc(var(--app-sidebar-w) + max(24px, (100% - var(--app-sidebar-w) - 720px) / 2));
+  }
 }
 
 .page-loading {
@@ -680,6 +853,106 @@ html, body {
 .code-editor__autocomplete-item--active {
   background: color-mix(in srgb, var(--accent) 13%, transparent);
   color: var(--accent);
+}
+
+/* ------------------------------------------------------------------
+   code-editor-panel — визуальное обрамление в духе настоящего
+   developer tool: заголовок (язык · статус · запуск) сверху, редактор
+   внутри без своей отдельной рамки (border-radius только у панели
+   целиком), опциональная секция консоли снизу. Сам код выполнения —
+   на стороне страницы, эта обёртка чисто про то, как это выглядит.
+   ------------------------------------------------------------------ */
+
+.code-editor-panel {
+  border: 1.5px solid var(--border);
+  border-radius: 9px;
+  overflow: hidden;
+  background: var(--surface-alt);
+}
+.code-editor-panel .code-editor__frame {
+  border: none;
+  border-radius: 0;
+}
+.code-editor-panel__titlebar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+.code-editor-panel__lang {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-dim);
+  letter-spacing: 0.04em;
+}
+.code-editor-panel__status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  color: var(--text-dim);
+  margin-right: auto;
+}
+.code-editor-panel__status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--success);
+}
+.code-editor-panel__status--error .code-editor-panel__status-dot {
+  background: var(--error);
+}
+.code-editor-panel__run-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--accent);
+  color: #fff;
+  font-size: 11px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.code-editor-panel__run-btn:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.code-editor-panel__console {
+  border-top: 1px solid var(--border);
+  background: var(--console);
+}
+.code-editor-panel__console-label {
+  padding: 7px 12px 4px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+}
+.code-editor-panel__console-body {
+  padding: 0 12px 10px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--console-text);
+  max-height: 160px;
+  overflow-y: auto;
+}
+.code-editor-panel__console-line {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.code-editor-panel__console-error {
+  color: var(--error);
+  white-space: pre-wrap;
+}
+.code-editor-panel__console-empty {
+  color: var(--text-dim);
+  opacity: 0.6;
+  font-style: italic;
 }
 
 /* ==========================================================================

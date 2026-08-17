@@ -1,3 +1,4 @@
+function _extends() { return _extends = Object.assign ? Object.assign.bind() : function (n) { for (var e = 1; e < arguments.length; e++) { var t = arguments[e]; for (var r in t) ({}).hasOwnProperty.call(t, r) && (n[r] = t[r]); } return n; }, _extends.apply(null, arguments); }
 /* ==========================================================================
    pages/shared/CodeEditor.jsx — редактор кода с подсветкой синтаксиса,
    автодополнением, нумерацией строк и живой проверкой синтаксиса.
@@ -276,4 +277,77 @@ function CodeEditor({
       acceptSuggestion(i);
     }
   }, opt))));
+}
+
+/**
+ * CodeEditorPanel — оборачивает CodeEditor заголовком в духе настоящего
+ * developer tool (язык · статус · кнопка запуска) и опциональной
+ * секцией консоли снизу. Найденная возможность при разборе: у
+ * приложения уже есть полноценный редактор со своей подсветкой,
+ * автодополнением, gutter'ом, воркером и отладчиком — визуально это
+ * не читалось как единое целое, а как textarea с приделанной кнопкой
+ * где-то рядом. Сам CodeEditor не переписан внутри — это чисто
+ * визуальное обрамление, вся логика запуска/результата остаётся на
+ * стороне страницы (через пропы), чтобы не трогать риск в уже рабочем
+ * движке выполнения кода.
+ *
+ * @param {Object} props
+ * @param {string} props.value
+ * @param {Function} props.onChange
+ * @param {Function} [props.onRun] - если не передан, кнопка запуска не показывается
+ * @param {boolean} [props.running]
+ * @param {"ready"|"error"} [props.status]
+ * @param {string[]} [props.output] - строки вывода консоли; undefined = секция консоли не рендерится вовсе
+ * @param {string} [props.outputError]
+ * @param {string} [props.language]
+ * @param {string} [props.runLabel]
+ */
+function CodeEditorPanel({
+  value,
+  onChange,
+  onRun,
+  running,
+  status = "ready",
+  output,
+  outputError,
+  language = "JS",
+  runLabel = "Выполнить",
+  ...editorProps
+}) {
+  const effectiveStatus = outputError ? "error" : status;
+  return /*#__PURE__*/React.createElement("div", {
+    className: "code-editor-panel"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "code-editor-panel__titlebar"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "mono code-editor-panel__lang"
+  }, language), /*#__PURE__*/React.createElement("span", {
+    className: `code-editor-panel__status code-editor-panel__status--${effectiveStatus}`
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "code-editor-panel__status-dot",
+    "aria-hidden": "true"
+  }), running ? "Running" : effectiveStatus === "error" ? "Error" : "Ready"), onRun && /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    className: "code-editor-panel__run-btn",
+    onClick: onRun,
+    disabled: running,
+    "aria-label": runLabel,
+    title: runLabel
+  }, running ? "…" : "▶")), /*#__PURE__*/React.createElement(CodeEditor, _extends({
+    value: value,
+    onChange: onChange
+  }, editorProps)), output !== undefined && /*#__PURE__*/React.createElement("div", {
+    className: "code-editor-panel__console"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "mono code-editor-panel__console-label"
+  }, "CONSOLE"), /*#__PURE__*/React.createElement("div", {
+    className: "mono code-editor-panel__console-body"
+  }, outputError ? /*#__PURE__*/React.createElement("div", {
+    className: "code-editor-panel__console-error"
+  }, outputError) : output && output.length > 0 ? output.map((line, i) => /*#__PURE__*/React.createElement("div", {
+    key: i,
+    className: "code-editor-panel__console-line"
+  }, line)) : /*#__PURE__*/React.createElement("div", {
+    className: "code-editor-panel__console-empty"
+  }, "// \u0432\u044B\u0432\u043E\u0434\u0430 \u043F\u043E\u043A\u0430 \u043D\u0435\u0442"))));
 }
