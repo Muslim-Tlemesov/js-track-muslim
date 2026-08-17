@@ -179,7 +179,7 @@ async function resetAllProgress() {
   await clearHistory(); // история — отдельная IndexedDB, не safeStorage, чистится своим механизмом
   // IndexedDB-след для напоминаний ("последняя активная дата") — тоже
   // часть прогресса, но хранится отдельно от safeStorage (см.
-  // engine-features.js), поэтому чистится своим механизмом.
+  // pwa-reminders.js), поэтому чистится своим механизмом.
   try {
     if (typeof indexedDB !== "undefined") {
       await new Promise((resolve) => {

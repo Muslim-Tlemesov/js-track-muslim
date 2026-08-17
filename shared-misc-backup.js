@@ -40,7 +40,7 @@ const PROGRESS_EXPORT_KEYS = [
 
 /**
  * История обучения хранится отдельно от остального прогресса — в
- * IndexedDB (см. addHistoryEntry/getHistoryEntries в engine-core.js),
+ * IndexedDB (см. addHistoryEntry/getHistoryEntries в core-history.js),
  * не в safeStorage — поэтому не проходит через обычный перебор
  * PROGRESS_EXPORT_KEYS и упаковывается отдельным полем payload.history.
  */
