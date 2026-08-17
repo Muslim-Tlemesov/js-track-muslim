@@ -64,8 +64,8 @@ html, body {
 }
 
 /* ------------------------------------------------------------------
-   app-header — верхняя панель: маскот+логотип слева, статистика и
-   переключатели справа.
+   app-header — верхняя панель: маскот+логотип слева, статистика,
+   "Домой"/"Вопросы" и кнопка выпадающего меню справа.
    ------------------------------------------------------------------ */
 
 .app-header {
@@ -78,7 +78,16 @@ html, body {
   gap: 14px 0;
   box-sizing: border-box;
   position: relative;
-  z-index: 1;
+  /* z-index: 30 (было 1) — реальный найденный баг: выпадающее меню
+     (app-header__menu-panel, z-index: 41) технически рендерилось с
+     правильной геометрией/непрозрачностью, но визуально пряталось ПОД
+     <main>. Причина — контекст наложения: z-index дочернего элемента
+     значим только ВНУТРИ стека родителя, а сам .app-header со старым
+     z-index: 1 недостаточно приподнимал этот стек целиком над <main>
+     (соседний элемент того же уровня). Подтверждено скриншотом
+     конкретно DOM-узла панели — HTML внутри был правильный, но на
+     экране поверх рисовался контент страницы. */
+  z-index: 30;
 }
 
 .app-header__brand {
@@ -174,7 +183,9 @@ html, body {
 }
 
 /* ------------------------------------------------------------------
-   nav__btn — кнопка навигации (12 разделов + Сброс/звук/тема) в шапке.
+   nav__btn — кнопка навигации: "Домой"/"Вопросы" в шапке напрямую,
+   остальные 11 разделов + настройки — внутри выпадающего меню (см.
+   app-header__menu-* ниже).
    ------------------------------------------------------------------ */
 
 .nav__btn {
@@ -202,6 +213,91 @@ html, body {
    когда звук выключен: сигнализирует "менее заметное" действие/состояние. */
 .nav__btn--dim {
   color: var(--text-dim);
+}
+
+/* ------------------------------------------------------------------
+   app-header__menu-* — выпадающее меню с 11 разделами + настройками.
+   Реальная найденная проблема архитектуры: раньше ВСЕ 13 разделов +
+   сброс/звук/тема лежали одним рядом из 16 кнопок — список без
+   иерархии, "вот тебе всё, разбирайся сам", а не "вот что дальше".
+   Теперь на виду только 2 самых частых действия (Домой/Вопросы),
+   остальное — за одной кнопкой, сгруппированное по смыслу.
+   ------------------------------------------------------------------ */
+
+.app-header__menu-trigger {
+  position: relative;
+}
+
+.app-header__menu-trigger--open {
+  background: var(--surface);
+  border-color: var(--accent);
+}
+
+.app-header__menu-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  z-index: 40;
+  animation: menu-backdrop-in 0.15s ease;
+}
+
+@keyframes menu-backdrop-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.app-header__menu-panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 20px;
+  left: 20px;
+  max-width: 420px;
+  margin-left: auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
+  padding: 16px;
+  z-index: 41;
+  max-height: min(70vh, 560px);
+  overflow-y: auto;
+  animation: menu-panel-in 0.15s ease;
+}
+
+@keyframes menu-panel-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.app-header__menu-group {
+  margin-bottom: 16px;
+}
+
+.app-header__menu-group:last-child {
+  margin-bottom: 0;
+}
+
+.app-header__menu-group-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+}
+
+.app-header__menu-group-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+@media (max-width: 480px) {
+  .app-header__menu-panel {
+    left: 12px;
+    right: 12px;
+    max-width: none;
+  }
 }
 
 /* ==========================================================================

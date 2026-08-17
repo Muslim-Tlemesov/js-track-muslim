@@ -1,70 +1,228 @@
 /* ==========================================================================
-   Блок: home — главный экран (первое, что видит пользователь).
+   Блок: home — главный экран. РЕДИЗАЙН — раньше самое ценное место
+   экрана занимал CircularProgress ("вот процент"), теперь на первом
+   месте карточка "Продолжить" с конкретным следующим действием, а
+   прогресс — во вторичном блоке "Твой прогресс" ниже.
    ========================================================================== */
 
 .home {
-  padding: 36px 28px;
+  padding: 32px 24px;
   text-align: center;
+}
+
+.home__greeting {
+  font-family: 'Fraunces', serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 6px;
 }
 
 .home__mascot-wrap {
   display: flex;
   justify-content: center;
-  margin-bottom: 8px;
-}
-
-.home__greeting {
-  font-family: 'Fraunces', serif;
-  font-size: 26px;
-  font-weight: 700;
-  color: var(--text);
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 
 .home__companion-line {
-  font-size: 14.5px;
+  font-size: 14px;
   color: var(--text-dim);
-  margin-bottom: 30px;
+  margin-bottom: 22px;
+  line-height: 1.5;
 }
 
 .home__companion-name {
   color: var(--text);
 }
 
-.home__progress-wrap {
+/* ------------------------------------------------------------------
+   home__continue-* — главная карточка действия ("вот что делать
+   сейчас"), а не статистика. Самый заметный элемент экрана.
+   ------------------------------------------------------------------ */
+
+.home__continue-card {
+  display: block;
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto 20px;
+  background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 75%, var(--accent2)));
+  border: none;
+  border-radius: 16px;
+  padding: 20px 22px;
+  text-align: left;
+  cursor: pointer;
+  color: #fff;
+  box-shadow: 0 12px 32px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+.home__continue-label {
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.85;
+  margin-bottom: 6px;
+}
+
+.home__continue-topic {
+  font-family: 'Fraunces', serif;
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.home__continue-sub {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-bottom: 10px;
+}
+
+.home__continue-bar {
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.25);
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+
+.home__continue-bar-fill {
+  height: 100%;
+  background: #fff;
+  border-radius: 3px;
+}
+
+.home__continue-arrow {
+  font-size: 14px;
+  font-weight: 600;
+  text-align: right;
+}
+
+/* ------------------------------------------------------------------
+   home__stats-row — компактная строка бейджей (серия/XP/звание),
+   рядом с карточкой действия, а не главным блоком экрана.
+   ------------------------------------------------------------------ */
+
+.home__stats-row {
   display: flex;
   justify-content: center;
-  margin-bottom: 28px;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 26px;
 }
 
-.home__progress-label {
+.home__stats-chip {
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 12.5px;
+  color: var(--text);
+}
+
+/* ------------------------------------------------------------------
+   home__progress-* — "Твой прогресс": вторичный информационный блок,
+   раньше был главным элементом экрана (CircularProgress по центру).
+   ------------------------------------------------------------------ */
+
+.home__progress-section {
+  max-width: 420px;
+  margin: 0 auto;
+  padding-top: 22px;
+  border-top: 1px solid var(--border);
+  text-align: left;
+}
+
+.home__progress-section-title {
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+  margin-bottom: 14px;
+}
+
+.home__progress-section-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.home__progress-section-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.home__progress-pct {
+  font-family: 'Fraunces', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.home__progress-detail {
   font-size: 12.5px;
   color: var(--text-dim);
-  margin-bottom: 28px;
 }
 
-.home__stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 16px;
-  margin-bottom: 28px;
-  max-width: 420px;
-  margin-left: auto;
-  margin-right: auto;
+.home__progress-topics {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 12px;
 }
 
-.home__cta {
-  background: var(--accent);
-  color: #fff;
-  border: none;
-  border-radius: 10px;
-  padding: 13px 28px;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  display: inline-flex;
+.home__progress-topic-row {
+  display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+}
+
+.home__progress-topic-name {
+  font-size: 12.5px;
+  color: var(--text);
+  flex-shrink: 0;
+  width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.home__progress-topic-bar {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--surface-alt);
+  overflow: hidden;
+}
+
+.home__progress-topic-bar-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 3px;
+}
+
+.home__progress-topic-pct {
+  font-size: 11.5px;
+  color: var(--text-dim);
+  width: 32px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.home__progress-more-link {
+  display: inline-block;
+  font-size: 12.5px;
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.home__progress-empty {
+  font-size: 12.5px;
+  color: var(--text-dim);
+  font-style: italic;
 }
 
 

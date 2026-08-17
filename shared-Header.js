@@ -9,9 +9,18 @@
    Тема/звук по-прежнему переключаются БЕЗ перезагрузки страницы (это не
    навигация, а мгновенное локальное действие) — у них остаётся React
    state и onClick, как раньше.
+
+   РЕДИЗАЙН: раньше все 13 разделов + сброс/звук/тема лежали одним
+   рядом из 16 кнопок в app-header — реальная проблема, найденная при
+   разборе: такой ряд не говорит пользователю "вот что делать дальше",
+   а вываливает весь список сразу, без иерархии важности. Теперь два
+   уровня: НА ВИДУ — только "Домой" и "Вопросы" (два самых частых
+   действия), ОСТАЛЬНОЕ — за одной кнопкой-меню, сгруппированное по
+   смыслу (Обучение / Инструменты / Прогресс), плюс настройки внизу
+   того же меню.
    ========================================================================== */
 
-const HEADER_NAV_ITEMS = [{
+const HEADER_PRIMARY_ITEMS = [{
   page: "index",
   href: "index.html",
   icon: "🏠",
@@ -21,61 +30,71 @@ const HEADER_NAV_ITEMS = [{
   href: "questions.html",
   icon: "📘",
   label: "Вопросы"
+}];
+const HEADER_MENU_GROUPS = [{
+  title: "Обучение",
+  items: [{
+    page: "practice",
+    href: "practice.html",
+    icon: "🎲",
+    label: "Практика"
+  }, {
+    page: "exam",
+    href: "exam.html",
+    icon: "🌙",
+    label: "Экзамен"
+  }, {
+    page: "viz",
+    href: "viz.html",
+    icon: "🎬",
+    label: "Визуализации"
+  }, {
+    page: "predict",
+    href: "predict.html",
+    icon: "🔮",
+    label: "Предскажи вывод"
+  }, {
+    page: "findbug",
+    href: "findbug.html",
+    icon: "🐛",
+    label: "Найди баг"
+  }]
 }, {
-  page: "practice",
-  href: "practice.html",
-  icon: "🎲",
-  label: "Практика"
+  title: "Инструменты",
+  items: [{
+    page: "sandbox",
+    href: "sandbox.html",
+    icon: "💻",
+    label: "Консоль"
+  }, {
+    page: "project",
+    href: "project.html",
+    icon: "🎯",
+    label: "Мини-проект"
+  }]
 }, {
-  page: "summary",
-  href: "summary.html",
-  icon: "📊",
-  label: "Итоги"
-}, {
-  page: "profile",
-  href: "profile.html",
-  icon: "👤",
-  label: "Профиль"
-}, {
-  page: "sandbox",
-  href: "sandbox.html",
-  icon: "💻",
-  label: "Консоль"
-}, {
-  page: "project",
-  href: "project.html",
-  icon: "🎯",
-  label: "Мини-проект"
-}, {
-  page: "exam",
-  href: "exam.html",
-  icon: "🌙",
-  label: "Экзамен"
-}, {
-  page: "viz",
-  href: "viz.html",
-  icon: "🎬",
-  label: "Визуализации"
-}, {
-  page: "tree",
-  href: "tree.html",
-  icon: "🌳",
-  label: "Карта знаний"
-}, {
-  page: "predict",
-  href: "predict.html",
-  icon: "🔮",
-  label: "Предскажи вывод"
-}, {
-  page: "history",
-  href: "history.html",
-  icon: "📅",
-  label: "История"
-}, {
-  page: "findbug",
-  href: "findbug.html",
-  icon: "🐛",
-  label: "Найди баг"
+  title: "Прогресс",
+  items: [{
+    page: "summary",
+    href: "summary.html",
+    icon: "📊",
+    label: "Итоги"
+  }, {
+    page: "history",
+    href: "history.html",
+    icon: "📅",
+    label: "История"
+  }, {
+    page: "tree",
+    href: "tree.html",
+    icon: "🌳",
+    label: "Карта знаний"
+  }, {
+    page: "profile",
+    href: "profile.html",
+    icon: "👤",
+    label: "Профиль"
+  }]
 }];
 
 /**
@@ -115,6 +134,11 @@ function Header({
   onToggleSound,
   onResetProgress
 }) {
+  const [menuOpen, setMenuOpen] = React.useState(false);
+  // Активный раздел меню подсвечивает саму кнопку-триггер — так видно,
+  // что "текущая страница где-то там", даже когда меню закрыто.
+  const isPrimaryPage = HEADER_PRIMARY_ITEMS.some(item => item.page === currentPage);
+  const activeGroupTitle = !isPrimaryPage ? HEADER_MENU_GROUPS.find(g => g.items.some(item => item.page === currentPage))?.title : null;
   return /*#__PURE__*/React.createElement("header", {
     className: "app-header"
   }, /*#__PURE__*/React.createElement("div", {
@@ -155,12 +179,41 @@ function Header({
   }, "\u2B50 ", rankTitle(rank), " \xB7 ", xp, " XP"), /*#__PURE__*/React.createElement("div", {
     className: "app-header__badge app-header__badge--achievements",
     title: "\u041E\u0442\u043A\u0440\u044B\u0442\u044B\u0435 \u0434\u043E\u0441\u0442\u0438\u0436\u0435\u043D\u0438\u044F"
-  }, "\uD83C\uDFC6 ", achievementsCount, "/", achievementsTotal), HEADER_NAV_ITEMS.map(item => /*#__PURE__*/React.createElement("a", {
+  }, "\uD83C\uDFC6 ", achievementsCount, "/", achievementsTotal), HEADER_PRIMARY_ITEMS.map(item => /*#__PURE__*/React.createElement("a", {
     key: item.page,
     href: item.href,
     className: `nav-btn nav__btn${currentPage === item.page ? " nav__btn--active" : ""}`,
     "aria-current": currentPage === item.page ? "page" : undefined
   }, item.icon, " ", item.label)), /*#__PURE__*/React.createElement("button", {
+    className: `nav-btn nav__btn app-header__menu-trigger${activeGroupTitle ? " nav__btn--active" : ""}${menuOpen ? " app-header__menu-trigger--open" : ""}`,
+    onClick: () => setMenuOpen(v => !v),
+    "aria-expanded": menuOpen,
+    "aria-haspopup": "true"
+  }, "\u2630 ", activeGroupTitle || "Меню")), menuOpen && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    className: "app-header__menu-backdrop",
+    onClick: () => setMenuOpen(false)
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "app-header__menu-panel",
+    role: "menu"
+  }, HEADER_MENU_GROUPS.map(group => /*#__PURE__*/React.createElement("div", {
+    key: group.title,
+    className: "app-header__menu-group"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "app-header__menu-group-title"
+  }, group.title), /*#__PURE__*/React.createElement("div", {
+    className: "app-header__menu-group-items"
+  }, group.items.map(item => /*#__PURE__*/React.createElement("a", {
+    key: item.page,
+    href: item.href,
+    className: `nav-btn nav__btn${currentPage === item.page ? " nav__btn--active" : ""}`,
+    "aria-current": currentPage === item.page ? "page" : undefined
+  }, item.icon, " ", item.label))))), /*#__PURE__*/React.createElement("div", {
+    className: "app-header__menu-group"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "app-header__menu-group-title"
+  }, "\u041D\u0430\u0441\u0442\u0440\u043E\u0439\u043A\u0438"), /*#__PURE__*/React.createElement("div", {
+    className: "app-header__menu-group-items"
+  }, /*#__PURE__*/React.createElement("button", {
     className: "nav-btn nav__btn nav__btn--dim",
     onClick: onResetProgress,
     "aria-label": "\u0421\u0431\u0440\u043E\u0441\u0438\u0442\u044C \u043F\u0440\u043E\u0433\u0440\u0435\u0441\u0441"
@@ -168,9 +221,9 @@ function Header({
     className: `nav-btn nav__btn${soundEnabled ? "" : " nav__btn--dim"}`,
     onClick: onToggleSound,
     "aria-label": soundEnabled ? "Выключить звук" : "Включить звук"
-  }, soundEnabled ? "🔊" : "🔇"), /*#__PURE__*/React.createElement("button", {
+  }, soundEnabled ? "🔊 Звук вкл" : "🔇 Звук выкл"), /*#__PURE__*/React.createElement("button", {
     className: "nav-btn nav__btn",
     onClick: onToggleTheme,
     "aria-label": "\u041F\u0435\u0440\u0435\u043A\u043B\u044E\u0447\u0438\u0442\u044C \u0442\u0435\u043C\u0443"
-  }, themeMode === "dark" ? "☀️ Светлая" : "🌙 Тёмная")));
+  }, themeMode === "dark" ? "☀️ Светлая" : "🌙 Тёмная"))))));
 }
