@@ -139,11 +139,11 @@ function HomeContent({
   }, "\u041F\u0435\u0440\u0435\u0439\u0442\u0438 \u2192")), /*#__PURE__*/React.createElement("div", {
     className: "home__stats-row"
   }, /*#__PURE__*/React.createElement("div", {
-    className: "home__stats-chip"
+    className: `home__stats-chip${streak && streak.count > 0 ? " home__stats-chip--streak" : ""}`
   }, streak && streak.count > 0 ? `${streak.count} ${streak.count === 1 ? "день" : streak.count < 5 ? "дня" : "дней"} подряд` : "Нет серии"), /*#__PURE__*/React.createElement("div", {
-    className: "home__stats-chip"
+    className: "home__stats-chip home__stats-chip--xp"
   }, xp, " XP"), /*#__PURE__*/React.createElement("div", {
-    className: "home__stats-chip"
+    className: "home__stats-chip home__stats-chip--xp"
   }, rankTitle(rank))), /*#__PURE__*/React.createElement("div", {
     className: "home__progress-section"
   }, /*#__PURE__*/React.createElement("div", {

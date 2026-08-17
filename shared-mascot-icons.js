@@ -46,27 +46,39 @@ function MascotIllustration({
   const isWrong = m === "wrong";
   const isStreak = m === "streak";
   const isLaunch = m === "launch";
+  // Глаза-кружки (не закрытые/счастливые) есть у idle/wave/think/
+  // streak/wrong — только там уместен блик "жизни" в зрачке.
+  const hasOpenEyes = !isCelebrate && m !== "correct" && !isWrong;
   return /*#__PURE__*/React.createElement("svg", {
     width: size,
     height: size * 1.3,
     viewBox: "0 0 100 130",
     fill: "none",
     style: {
-      flexShrink: 0
+      flexShrink: 0,
+      overflow: "visible"
     },
     className: animated ? `mascot-illustration mascot-illustration--${m}` : undefined
-  }, isCelebrate && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("path", {
+  }, /*#__PURE__*/React.createElement("ellipse", {
+    cx: "50",
+    cy: "122",
+    rx: "26",
+    ry: "4",
+    fill: c,
+    opacity: "0.12"
+  }), isCelebrate && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("path", {
+    className: "mascot-illustration__sparkle--1",
     d: "M12 20l2 5 5 2-5 2-2 5-2-5-5-2 5-2z",
-    fill: c,
-    opacity: "0.85"
+    fill: c
   }), /*#__PURE__*/React.createElement("path", {
+    className: "mascot-illustration__sparkle--2",
     d: "M85 14l1.6 3.6L90 19l-3.4 1.4L85 24l-1.6-3.6L80 19l3.4-1.4z",
-    fill: c,
-    opacity: "0.85"
+    fill: c
   })), isThink &&
   /*#__PURE__*/
   // Лампочка-аксессуар — "учим новую тему, смотри внимательно".
   React.createElement("g", {
+    className: "mascot-illustration__bulb",
     opacity: "0.9"
   }, /*#__PURE__*/React.createElement("circle", {
     cx: "82",
@@ -84,6 +96,7 @@ function MascotIllustration({
   /*#__PURE__*/
   // Огонёк-аксессуар — серия дней подряд.
   React.createElement("path", {
+    className: "mascot-illustration__flame",
     d: "M80 16c0 5-4 6-4 10a4 4 0 0 0 8 0c0-1-1-2-1-3 2 1 3 3 3 5a6 6 0 0 1-12 0c0-6 6-8 6-12z",
     fill: c
   }), isLaunch &&
@@ -107,72 +120,85 @@ function MascotIllustration({
     stroke: c,
     strokeWidth: "5",
     strokeLinecap: "round",
+    strokeLinejoin: "round",
     fill: "none"
   }), /*#__PURE__*/React.createElement("path", {
+    className: "mascot-illustration__wave-arm",
     d: "M74 82c10-6 20-4 24-22",
     stroke: c,
     strokeWidth: "5",
     strokeLinecap: "round",
+    strokeLinejoin: "round",
     fill: "none"
   })) : isCelebrate ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("path", {
     d: "M26 82c-10-8-14-20-10-34",
     stroke: c,
     strokeWidth: "5",
     strokeLinecap: "round",
+    strokeLinejoin: "round",
     fill: "none"
   }), /*#__PURE__*/React.createElement("path", {
     d: "M74 82c10-8 14-20 10-34",
     stroke: c,
     strokeWidth: "5",
     strokeLinecap: "round",
+    strokeLinejoin: "round",
     fill: "none"
   })) : isThink ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("path", {
     d: "M26 82c-8 2-12 10-12 20",
     stroke: c,
     strokeWidth: "5",
     strokeLinecap: "round",
+    strokeLinejoin: "round",
     fill: "none"
   }), /*#__PURE__*/React.createElement("path", {
     d: "M74 82c6-14 2-20-8-24",
     stroke: c,
     strokeWidth: "5",
     strokeLinecap: "round",
+    strokeLinejoin: "round",
     fill: "none"
   })) : isWrong ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("path", {
     d: "M26 82c-8 2-12 10-12 20",
     stroke: c,
     strokeWidth: "5",
     strokeLinecap: "round",
+    strokeLinejoin: "round",
     fill: "none"
   }), /*#__PURE__*/React.createElement("path", {
     d: "M74 82c8-2 4-16-6-20",
     stroke: c,
     strokeWidth: "5",
     strokeLinecap: "round",
+    strokeLinejoin: "round",
     fill: "none"
   })) : m === "correct" ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("path", {
     d: "M26 82c-10-4-16-12-14-24",
     stroke: c,
     strokeWidth: "5",
     strokeLinecap: "round",
+    strokeLinejoin: "round",
     fill: "none"
   }), /*#__PURE__*/React.createElement("path", {
     d: "M74 82c10-4 16-12 14-24",
     stroke: c,
     strokeWidth: "5",
     strokeLinecap: "round",
+    strokeLinejoin: "round",
     fill: "none"
   })) : isStreak ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("path", {
     d: "M26 82c-8 2-12 10-12 20",
     stroke: c,
     strokeWidth: "5",
     strokeLinecap: "round",
+    strokeLinejoin: "round",
     fill: "none"
   }), /*#__PURE__*/React.createElement("path", {
     d: "M74 82c12-2 18 2 20-16",
     stroke: c,
     strokeWidth: "5",
     strokeLinecap: "round",
+    strokeLinejoin: "round",
     fill: "none"
   })) :
   /*#__PURE__*/
@@ -182,12 +208,14 @@ function MascotIllustration({
     stroke: c,
     strokeWidth: "5",
     strokeLinecap: "round",
+    strokeLinejoin: "round",
     fill: "none"
   }), /*#__PURE__*/React.createElement("path", {
     d: "M74 82c6 4 9 12 8 22",
     stroke: c,
     strokeWidth: "5",
     strokeLinecap: "round",
+    strokeLinejoin: "round",
     fill: "none"
   })), /*#__PURE__*/React.createElement("line", {
     x1: "50",
@@ -204,7 +232,8 @@ function MascotIllustration({
     height: "50",
     rx: "18",
     stroke: c,
-    strokeWidth: "4"
+    strokeWidth: "4",
+    strokeLinejoin: "round"
   }), /*#__PURE__*/React.createElement("line", {
     x1: "50",
     y1: "12",
@@ -214,6 +243,7 @@ function MascotIllustration({
     strokeWidth: "4",
     strokeLinecap: "round"
   }), /*#__PURE__*/React.createElement("circle", {
+    className: "mascot-illustration__antenna-dot",
     cx: "50",
     cy: "8",
     r: "4.2",
@@ -225,7 +255,8 @@ function MascotIllustration({
     height: "38",
     rx: "14",
     stroke: c,
-    strokeWidth: "4"
+    strokeWidth: "4",
+    strokeLinejoin: "round"
   }), isCelebrate ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("path", {
     d: "M35 39.5c1.6-3 6.2-3 7.8 0",
     stroke: c,
@@ -284,16 +315,30 @@ function MascotIllustration({
     strokeLinecap: "round",
     fill: "none"
   })) : /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("circle", {
+    className: "mascot-illustration__eye",
     cx: "41",
     cy: "41",
     r: "4.2",
     fill: c
   }), /*#__PURE__*/React.createElement("circle", {
+    className: "mascot-illustration__eye",
     cx: "59",
     cy: "41",
     r: "4.2",
     fill: c
-  }), isThink ? /*#__PURE__*/React.createElement("path", {
+  }), hasOpenEyes && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("circle", {
+    cx: "42.3",
+    cy: "39.7",
+    r: "1.1",
+    fill: "var(--bg)",
+    opacity: "0.9"
+  }), /*#__PURE__*/React.createElement("circle", {
+    cx: "60.3",
+    cy: "39.7",
+    r: "1.1",
+    fill: "var(--bg)",
+    opacity: "0.9"
+  })), isThink ? /*#__PURE__*/React.createElement("path", {
     d: "M41 49.5c2.2 1.1 4.6 1.6 9 1.6s6.8-.5 9-1.6",
     stroke: c,
     strokeWidth: "4.5",

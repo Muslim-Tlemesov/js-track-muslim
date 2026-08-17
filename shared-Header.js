@@ -219,7 +219,7 @@ function Header({
     className: "app-header__badge",
     title: `Дней подряд с занятиями${streak.best > streak.count ? ` · лучшая серия: ${streak.best}` : ""}`
   }, "\uD83D\uDD25 ", streak.count), /*#__PURE__*/React.createElement("div", {
-    className: "app-header__badge",
+    className: "app-header__badge app-header__badge--xp",
     title: `${xp} XP всего · до следующего звания осталось ${Math.max(0, rankXpForNext - rankXpIntoRank)} XP`
   }, "\u2B50 ", xp, " XP"), /*#__PURE__*/React.createElement("div", {
     className: "app-header__badge app-header__badge--achievements",

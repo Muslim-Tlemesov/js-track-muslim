@@ -15,7 +15,7 @@
 
 .findbug__topic-badge {
   display: inline-block; background: color-mix(in srgb, var(--accent) 8%, transparent);
-  border: 1px solid color-mix(in srgb, var(--accent) 27%, transparent); border-radius: 20px;
+  border: 1px solid color-mix(in srgb, var(--accent) 27%, transparent); border-radius: 8px;
   padding: 3px 10px; font-size: 11.5px; color: var(--accent); font-weight: 600; margin-bottom: 12px;
 }
 
