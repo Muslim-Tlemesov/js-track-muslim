@@ -266,8 +266,7 @@ function ComingSoonViz({
     className: "empty-state"
   }, /*#__PURE__*/React.createElement(MascotIllustration, {
     size: 72,
-    color: "var(--accent)",
-    pose: "think"
+    mood: "think"
   }), /*#__PURE__*/React.createElement("div", {
     className: "empty-state__message"
   }, "\u0412\u0438\u0437\u0443\u0430\u043B\u0438\u0437\u0430\u0446\u0438\u044F \xAB", label, "\xBB \u0441\u043A\u043E\u0440\u043E \u043F\u043E\u044F\u0432\u0438\u0442\u0441\u044F \u0437\u0434\u0435\u0441\u044C."));

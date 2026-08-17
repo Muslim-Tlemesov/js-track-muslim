@@ -181,7 +181,6 @@ function PageRoot() {
       className: `mascot-feedback__avatar mascot-feedback__avatar--${tier === "low" ? "wrong" : "correct"}`
     }, /*#__PURE__*/React.createElement(MascotIcon, {
       size: 20,
-      color: tier === "low" ? "var(--accent)" : "var(--success)",
       mood: tier === "low" ? "wrong" : "correct"
     })), /*#__PURE__*/React.createElement("div", {
       className: "mascot-feedback__bubble"

@@ -160,8 +160,7 @@ function PageRoot() {
     className: "empty-state"
   }, /*#__PURE__*/React.createElement(MascotIllustration, {
     size: 72,
-    color: "var(--accent)",
-    pose: "think"
+    mood: "think"
   }), /*#__PURE__*/React.createElement("div", {
     className: "empty-state__message"
   }, "\u041F\u043E\u043A\u0430 \u043F\u0443\u0441\u0442\u043E \u2014 \u043E\u0442\u0432\u0435\u0442\u044C \u043D\u0430 \u043D\u0435\u0441\u043A\u043E\u043B\u044C\u043A\u043E \u0432\u043E\u043F\u0440\u043E\u0441\u043E\u0432, \u0438 \u0437\u0434\u0435\u0441\u044C \u043F\u043E\u044F\u0432\u0438\u0442\u0441\u044F \u0438\u0441\u0442\u043E\u0440\u0438\u044F.")) : /*#__PURE__*/React.createElement("div", {

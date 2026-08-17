@@ -107,8 +107,7 @@ function HomeContent({
     className: "home__mascot-wrap"
   }, /*#__PURE__*/React.createElement(MascotIllustration, {
     size: 72,
-    color: "var(--accent)",
-    pose: overallPct >= 100 ? "celebrate" : "wave"
+    mood: overallPct >= 100 ? "launch" : streak && streak.count >= 3 ? "streak" : "wave"
   })), /*#__PURE__*/React.createElement("div", {
     className: "home__companion-line"
   }, /*#__PURE__*/React.createElement("strong", {

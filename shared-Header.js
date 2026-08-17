@@ -141,8 +141,7 @@ function Header({
     className: "app-header__mascot",
     title: "\u0411\u0430\u0439\u0442 \u2014 \u043C\u0430\u0441\u043A\u043E\u0442 js.track"
   }, /*#__PURE__*/React.createElement(MascotIcon, {
-    size: 18,
-    color: "var(--accent)"
+    size: 18
   })), /*#__PURE__*/React.createElement("a", {
     href: "index.html",
     className: "app-header__logo",

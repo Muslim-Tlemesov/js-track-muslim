@@ -126,8 +126,7 @@ function PageRoot() {
   }, /*#__PURE__*/React.createElement("div", {
     className: "profile__avatar"
   }, /*#__PURE__*/React.createElement(MascotIcon, {
-    size: 30,
-    color: "var(--accent)"
+    size: 30
   })), /*#__PURE__*/React.createElement("div", {
     className: "profile__header-text"
   }, /*#__PURE__*/React.createElement("input", {

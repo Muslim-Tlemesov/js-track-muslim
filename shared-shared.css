@@ -20,17 +20,33 @@
    ================================================================== */
 
 :root[data-theme="dark"] {
-  --bg: #0D1117; --surface: #161B22; --surface-alt: #1C2129; --border: #30363D;
-  --text: #E6EDF3; --text-dim: #8B949E; --accent: #4C8EFF; --accent2: #A78BFA;
-  --success: #3FB950; --success-bg: #1C2B1E; --error: #F85149; --error-bg: #2D1618;
+  --bg: #0B0D10; --surface: #11151A; --surface-alt: #181D23; --border: #262C33;
+  --text: #E8EAED; --text-dim: #8891A0; --accent: #22D3A0; --accent2: #FF9D4D;
+  --success: #22D3A0; --success-bg: #0F2A22; --error: #F85149; --error-bg: #2D1618;
   --console: #010409; --console-text: #C9D1D9;
+  /* Цвета настроений Байта — НЕ общие статусные цвета UI (--success/
+     --error и т.д. остаются для интерфейса), отдельная, чуть более
+     тёплая палитра именно под личность маскота. --mascot-wrong
+     нарочно оранжевый, не переиспользует резкий --error — Байт
+     указывает на ошибку по-доброму, не тревожит. --mascot-streak
+     сознательно = --accent2 (тёплый оранжевый закреплён именно за
+     серией/XP/достижениями по всему интерфейсу, не только у Байта).
+  */
+  --mascot-think: #6C8EF5;
+  --mascot-wrong: #E8804A;
+  --mascot-celebrate: #E3B341;
+  --mascot-streak: var(--accent2);
 }
 
 :root[data-theme="light"] {
-  --bg: #FFFFFF; --surface: #FFFFFF; --surface-alt: #F6F8FA; --border: #D0D7DE;
-  --text: #1F2328; --text-dim: #656D76; --accent: #0969DA; --accent2: #6639BA;
-  --success: #1A7F37; --success-bg: #DAFBE1; --error: #CF222E; --error-bg: #FFEBE9;
+  --bg: #F7F8F6; --surface: #FFFFFF; --surface-alt: #EEF1EE; --border: #D8DDD7;
+  --text: #16191C; --text-dim: #5C6560; --accent: #0F9D6E; --accent2: #C2560C;
+  --success: #0F9D6E; --success-bg: #DDF5EA; --error: #CF222E; --error-bg: #FFEBE9;
   --console: #F6F8FA; --console-text: #24292F;
+  --mascot-think: #3B5FE0;
+  --mascot-wrong: #BC4C00;
+  --mascot-celebrate: #9A6700;
+  --mascot-streak: var(--accent2);
 }
 
 html, body {
@@ -71,6 +87,45 @@ html, body {
 
 .app-shell__skip-link:focus {
   top: 12px;
+}
+
+/* ------------------------------------------------------------------
+   mascot-illustration — лёгкие анимации по настроению. Едва заметные
+   (короткая амплитуда, не бесконечно навязчивые для idle) — Байт
+   живой, но не отвлекает от контента.
+   ------------------------------------------------------------------ */
+
+@keyframes mascot-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+@keyframes mascot-wave-arm {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-6deg); }
+  75% { transform: rotate(6deg); }
+}
+@keyframes mascot-bounce {
+  0%, 100% { transform: translateY(0) scale(1); }
+  40% { transform: translateY(-6px) scale(1.03); }
+}
+@keyframes mascot-flicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.mascot-illustration--idle { animation: mascot-bob 3.2s ease-in-out infinite; }
+.mascot-illustration--wave { animation: mascot-wave-arm 1.4s ease-in-out 2; transform-origin: 50px 90px; }
+.mascot-illustration--correct,
+.mascot-illustration--celebrate,
+.mascot-illustration--launch { animation: mascot-bounce 0.6s ease-out; }
+.mascot-illustration--streak { animation: mascot-bob 2.4s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .mascot-illustration--idle, .mascot-illustration--wave,
+  .mascot-illustration--correct, .mascot-illustration--celebrate,
+  .mascot-illustration--launch, .mascot-illustration--streak {
+    animation: none;
+  }
 }
 
 /* ------------------------------------------------------------------

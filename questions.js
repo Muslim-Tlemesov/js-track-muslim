@@ -338,7 +338,6 @@ function PageRoot() {
     className: `mascot-feedback__avatar mascot-feedback__avatar--${feedback.isCorrect ? "correct" : "wrong"}`
   }, /*#__PURE__*/React.createElement(MascotIcon, {
     size: 20,
-    color: feedback.isCorrect ? "var(--success)" : "var(--accent)",
     mood: feedback.isCorrect ? "correct" : "wrong"
   })), /*#__PURE__*/React.createElement("div", {
     className: "mascot-feedback__bubble"
@@ -364,7 +363,6 @@ function PageRoot() {
     className: `mascot-feedback__avatar mascot-feedback__avatar--${feedback.isCorrect ? "correct" : "wrong"}`
   }, /*#__PURE__*/React.createElement(MascotIcon, {
     size: 20,
-    color: feedback.isCorrect ? "var(--success)" : "var(--accent)",
     mood: feedback.isCorrect ? "correct" : "wrong"
   })), /*#__PURE__*/React.createElement("div", {
     className: "mascot-feedback__bubble"
@@ -400,7 +398,6 @@ function PageRoot() {
     className: "toast--achievement__avatar"
   }, /*#__PURE__*/React.createElement(MascotIcon, {
     size: 18,
-    color: "var(--accent2)",
     mood: "celebrate"
   })), /*#__PURE__*/React.createElement("span", {
     className: "toast--achievement__text"
