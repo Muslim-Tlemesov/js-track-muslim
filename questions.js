@@ -121,29 +121,18 @@ function CodeQuestion({
     className: "question-card question-enter"
   }, /*#__PURE__*/React.createElement("div", {
     className: "quiz-question__prompt"
-  }, question.prompt), /*#__PURE__*/React.createElement(CodeEditor, {
+  }, question.prompt), /*#__PURE__*/React.createElement(CodeEditorPanel, {
     value: code,
     onChange: setCode,
     disabled: checked,
-    minHeight: 140
-  }), runResult && /*#__PURE__*/React.createElement("div", {
-    className: "code-question__console"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "code-question__console-label"
-  }, "\u25B8 CONSOLE"), runResult.error ? /*#__PURE__*/React.createElement("div", {
-    className: "code-question__console-error"
-  }, "\u2715 Error: ", runResult.error) : runResult.logs.length === 0 ? /*#__PURE__*/React.createElement("div", {
-    className: "code-question__console-empty"
-  }, "(\u043D\u0435\u0442 \u0432\u044B\u0432\u043E\u0434\u0430 console.log)") : runResult.logs.map((line, i) => /*#__PURE__*/React.createElement("div", {
-    key: i,
-    className: "mono code-question__console-line"
-  }, line))), /*#__PURE__*/React.createElement("div", {
+    minHeight: 140,
+    onRun: checked ? undefined : handleRun,
+    running: isRunning,
+    output: runResult ? runResult.logs : undefined,
+    outputError: runResult ? runResult.error : null
+  }), /*#__PURE__*/React.createElement("div", {
     className: "code-question__actions"
-  }, !checked && /*#__PURE__*/React.createElement("button", {
-    className: "code-question__run-btn",
-    onClick: handleRun,
-    disabled: isRunning
-  }, isRunning ? "Выполняется…" : "▶ Выполнить"), !checked && question.hint && /*#__PURE__*/React.createElement("button", {
+  }, !checked && question.hint && /*#__PURE__*/React.createElement("button", {
     className: "nav-btn nav__btn",
     onClick: () => setShowHint(v => !v)
   }, showHint ? "Скрыть подсказку" : "Подсказка")), showHint && !checked && /*#__PURE__*/React.createElement("div", {
@@ -160,6 +149,7 @@ function PageRoot() {
   const [feedback, setFeedback] = React.useState(null); // { isCorrect } | null
   const [achievementToast, setAchievementToast] = React.useState(null);
   const [levelToast, setLevelToast] = React.useState(null);
+  const [xpFloat, setXpFloat] = React.useState(null); // { amount, key } | null — летящий "+N XP" у бейджа в шапке
   const questionStartRef = React.useRef(Date.now());
   React.useEffect(() => {
     (async () => {
@@ -205,6 +195,17 @@ function PageRoot() {
     setCurrentIdx(i => i + 1);
   };
   const showResultToasts = result => {
+    if (result.xpGained > 0) {
+      // Триггер для летящего "+N XP" у бейджа в шапке — уникальный ключ
+      // (не просто true/false), чтобы повторный верный ответ подряд с
+      // тем же приростом XP всё равно перезапускал анимацию, а не
+      // "застревал" на уже сыгранном состоянии.
+      setXpFloat({
+        amount: result.xpGained,
+        key: Date.now()
+      });
+      setTimeout(() => setXpFloat(null), 1200);
+    }
     if (result.levelJustUnlocked) {
       const lvl = LEVELS.find(l => l.level === result.levelJustUnlocked);
       setLevelToast(lvl);
@@ -307,6 +308,7 @@ function PageRoot() {
     rankXpIntoRank: state.xp - xpThresholdForRank(state.rank),
     achievementsCount: Object.keys(state.unlockedAchievements).length,
     achievementsTotal: state.achievementsTotal,
+    xpFloat: xpFloat,
     themeMode: themeMode,
     onToggleTheme: handleToggleTheme,
     soundEnabled: soundEnabled,
@@ -383,9 +385,10 @@ function PageRoot() {
     "aria-live": "polite",
     onClick: () => setLevelToast(null),
     className: "toast toast--level"
-  }, /*#__PURE__*/React.createElement("span", {
-    className: "toast--level__emoji"
-  }, levelToast.emoji), /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement(MascotIcon, {
+    size: 22,
+    mood: "level-up"
+  }), /*#__PURE__*/React.createElement("div", {
     className: "toast--level__title"
   }, "\u041D\u043E\u0432\u044B\u0439 \u0443\u0440\u043E\u0432\u0435\u043D\u044C \u043E\u0442\u043A\u0440\u044B\u0442!"), /*#__PURE__*/React.createElement("div", {
     className: "toast--level__desc"

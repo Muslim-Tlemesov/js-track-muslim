@@ -88,6 +88,17 @@ function HomeContent({
     xp
   } = state;
   const hasStarted = state.totalAnswered > 0;
+  // Короткая последовательность настроений при клике "Перейти" —
+  // 🙂 → 👋 → 🚀 — вместо мгновенного перехода на questions.html.
+  // Реальная найденная возможность: маскот моргает/покачивается сам по
+  // себе, но ни на одно ДЕЙСТВИЕ пользователя не реагирует —
+  // добавляет ощущение качества почти бесплатно.
+  const [transitionMood, setTransitionMood] = React.useState(null);
+  const handleContinueClick = () => {
+    setTransitionMood("wave");
+    setTimeout(() => setTransitionMood("launch"), 250);
+    setTimeout(() => onContinue(), 600);
+  };
   const resumeIdx = findResumeIndex(NAV_ITEMS, answers, topicProgress);
   const resumeItem = NAV_ITEMS[resumeIdx];
   const isLessonScreen = resumeItem.type === "lesson";
@@ -107,7 +118,7 @@ function HomeContent({
     className: "home__mascot-wrap"
   }, /*#__PURE__*/React.createElement(MascotIllustration, {
     size: 72,
-    mood: overallPct >= 100 ? "launch" : streak && streak.count >= 3 ? "streak" : "wave"
+    mood: transitionMood || (overallPct >= 100 ? "launch" : streak && streak.count >= 3 ? "streak" : "wave")
   })), /*#__PURE__*/React.createElement("div", {
     className: "home__companion-line"
   }, /*#__PURE__*/React.createElement("strong", {
@@ -117,9 +128,12 @@ function HomeContent({
     streak,
     overallPct
   }, new Date().toDateString())), /*#__PURE__*/React.createElement("button", {
-    className: "home__continue-card",
-    onClick: onContinue
-  }, /*#__PURE__*/React.createElement("div", {
+    className: "card card--accent home__continue-card",
+    onClick: handleContinueClick
+  }, /*#__PURE__*/React.createElement("pre", {
+    className: "mono home__continue-watermark",
+    "aria-hidden": "true"
+  }, "const xp = 100;\nlet streak = 7;"), /*#__PURE__*/React.createElement("div", {
     className: "home__continue-label"
   }, hasStarted ? "Продолжить" : "Начать"), /*#__PURE__*/React.createElement("div", {
     className: "home__continue-topic"
@@ -161,7 +175,22 @@ function HomeContent({
     className: "home__progress-pct"
   }, overallPct, "%"), /*#__PURE__*/React.createElement("div", {
     className: "home__progress-detail"
-  }, totalCorrect, " / ", totalQuestions, " \u0432\u043E\u043F\u0440\u043E\u0441\u043E\u0432"))), touchedTopics.length > 0 ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+  }, totalCorrect, " / ", totalQuestions, " \u0432\u043E\u043F\u0440\u043E\u0441\u043E\u0432"))), /*#__PURE__*/React.createElement("div", {
+    className: "home__progress-linear"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "home__progress-linear-fill",
+    style: {
+      width: `${overallPct}%`
+    }
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "home__progress-meta"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "home__progress-meta-label"
+  }, "\u041F\u043E\u0441\u043B\u0435\u0434\u043D\u044F\u044F \u0442\u0435\u043C\u0430"), /*#__PURE__*/React.createElement("span", {
+    className: "home__progress-meta-value"
+  }, resumeItem.topicTitle)), streak && streak.count > 0 && /*#__PURE__*/React.createElement("div", {
+    className: "home__progress-meta home__progress-meta--streak"
+  }, "\uD83D\uDD25 ", streak.count, " ", streak.count === 1 ? "день" : streak.count < 5 ? "дня" : "дней", " \u043F\u043E\u0434\u0440\u044F\u0434"), touchedTopics.length > 0 ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "home__progress-topics"
   }, touchedTopics.map(t => {
     const p = topicProgress[t.id];

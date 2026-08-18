@@ -211,11 +211,15 @@ function PageRoot() {
         disabled: checked,
         onClick: () => submitQuizAnswer(i)
       }, opt);
-    })), isCode && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(CodeEditor, {
+    })), isCode && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(CodeEditorPanel, {
       value: code,
       onChange: setCode,
       disabled: checked,
       minHeight: 140,
+      onRun: checked ? undefined : submitCodeAnswer,
+      running: isRunning,
+      output: runResult ? runResult.logs : undefined,
+      outputError: runResult ? runResult.error : null,
       onKeyDown: e => {
         if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
           e.preventDefault();
@@ -224,13 +228,7 @@ function PageRoot() {
       }
     }), /*#__PURE__*/React.createElement("div", {
       className: "exam__code-hint"
-    }, "Ctrl+Enter (\u2318+Enter \u043D\u0430 Mac) \u2014 \u0431\u044B\u0441\u0442\u0440\u044B\u0439 \u0437\u0430\u043F\u0443\u0441\u043A"), !checked && /*#__PURE__*/React.createElement("button", {
-      onClick: submitCodeAnswer,
-      disabled: isRunning,
-      className: "exam__submit-code-btn"
-    }, isRunning ? "Выполняется…" : "▶ Выполнить и проверить"), runResult?.error && /*#__PURE__*/React.createElement("div", {
-      className: "exam__code-error"
-    }, "Error: ", runResult.error)), checked && /*#__PURE__*/React.createElement("div", {
+    }, "Ctrl+Enter (\u2318+Enter \u043D\u0430 Mac) \u2014 \u0431\u044B\u0441\u0442\u0440\u044B\u0439 \u0437\u0430\u043F\u0443\u0441\u043A")), checked && /*#__PURE__*/React.createElement("div", {
       className: `exam__feedback${status === "correct" ? " exam__feedback--correct" : " exam__feedback--wrong"}`
     }, /*#__PURE__*/React.createElement("div", {
       className: "exam__feedback-title"

@@ -164,10 +164,14 @@ function PageRoot() {
     className: "project__preview-btn"
   }, "\u0421\u0442\u0430\u0440\u0442 / \u0421\u0442\u043E\u043F"), /*#__PURE__*/React.createElement("div", {
     className: "project__preview-hint"
-  }, "\u25B6 \u0441\u043D\u0430\u0447\u0430\u043B\u0430 \u043D\u0430\u0436\u043C\u0438 \xAB\u0417\u0430\u043F\u0443\u0441\u0442\u0438\u0442\u044C\xBB")), /*#__PURE__*/React.createElement(CodeEditor, {
+  }, "\u25B6 \u0441\u043D\u0430\u0447\u0430\u043B\u0430 \u043D\u0430\u0436\u043C\u0438 \xAB\u0417\u0430\u043F\u0443\u0441\u0442\u0438\u0442\u044C\xBB")), /*#__PURE__*/React.createElement(CodeEditorPanel, {
     value: code,
     onChange: setCode,
     minHeight: 200,
+    onRun: run,
+    running: isRunning,
+    output: runResult ? runResult.logs : undefined,
+    outputError: runResult ? runResult.error : null,
     onKeyDown: e => {
       if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
         e.preventDefault();
@@ -176,15 +180,7 @@ function PageRoot() {
     }
   }), /*#__PURE__*/React.createElement("div", {
     className: "project__hint"
-  }, "Ctrl+Enter (\u2318+Enter \u043D\u0430 Mac) \u2014 \u0431\u044B\u0441\u0442\u0440\u044B\u0439 \u0437\u0430\u043F\u0443\u0441\u043A"), /*#__PURE__*/React.createElement("div", {
-    className: "project__actions"
-  }, /*#__PURE__*/React.createElement("button", {
-    onClick: run,
-    disabled: isRunning,
-    className: "project__run-btn"
-  }, isRunning ? "Выполняется…" : "▶ Запустить")), runResult?.error && /*#__PURE__*/React.createElement("div", {
-    className: "project__error"
-  }, "\u2297 Error: ", runResult.error))));
+  }, "Ctrl+Enter (\u2318+Enter \u043D\u0430 Mac) \u2014 \u0431\u044B\u0441\u0442\u0440\u044B\u0439 \u0437\u0430\u043F\u0443\u0441\u043A"))));
 }
 const mainRoot = ReactDOM.createRoot(document.getElementById("app-mount"));
 mainRoot.render(/*#__PURE__*/React.createElement(PageRoot, null));

@@ -28,7 +28,8 @@ const MASCOT_MOOD_COLOR_VAR = {
   wrong: "var(--mascot-wrong)",
   celebrate: "var(--mascot-celebrate)",
   streak: "var(--mascot-streak)",
-  launch: "var(--mascot-celebrate)"
+  launch: "var(--mascot-celebrate)",
+  "level-up": "var(--mascot-celebrate)"
 };
 function MascotIllustration({
   size = 120,
@@ -41,11 +42,13 @@ function MascotIllustration({
   // на случай, если где-то ещё не обновлён вызов.
   const m = pose || mood;
   const c = color || MASCOT_MOOD_COLOR_VAR[m] || MASCOT_MOOD_COLOR_VAR.idle;
-  const isCelebrate = m === "celebrate" || m === "launch";
+  // level-up — алиас launch: то же "большое достижение" (ракета,
+  // искры), просто другой повод (повышение ранга, а не 100% курса).
+  const isCelebrate = m === "celebrate" || m === "launch" || m === "level-up";
   const isThink = m === "think";
   const isWrong = m === "wrong";
   const isStreak = m === "streak";
-  const isLaunch = m === "launch";
+  const isLaunch = m === "launch" || m === "level-up";
   // Глаза-кружки (не закрытые/счастливые) есть у idle/wave/think/
   // streak/wrong — только там уместен блик "жизни" в зрачке.
   const hasOpenEyes = !isCelebrate && m !== "correct" && !isWrong;
@@ -373,7 +376,7 @@ function MascotIcon({
       flexShrink: 0
     },
     className: `mascot-icon mascot-icon--${mood}`
-  }, mood === "celebrate" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("path", {
+  }, (mood === "celebrate" || mood === "level-up") && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("path", {
     d: "M3 4.2l.5 1.2L4.7 5.9l-1.2.5L3 7.6l-.5-1.2L1.3 5.9l1.2-.5z",
     fill: c,
     opacity: "0.85"
@@ -405,7 +408,7 @@ function MascotIcon({
     rx: "4.5",
     stroke: c,
     strokeWidth: "1.8"
-  }), mood === "correct" || mood === "celebrate" ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("path", {
+  }), mood === "correct" || mood === "celebrate" || mood === "level-up" ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("path", {
     d: "M7.3 13.7c.55-1 2.15-1 2.7 0",
     stroke: c,
     strokeWidth: "1.6",

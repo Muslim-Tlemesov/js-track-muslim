@@ -11,7 +11,7 @@
 }
 
 .home__greeting {
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'Fraunces', serif;
   font-size: 24px;
   font-weight: 700;
   color: var(--text);
@@ -44,15 +44,35 @@
   display: block;
   width: 100%;
   max-width: 420px;
-  margin: 0 auto 20px;
-  background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 82%, black));
-  border: none;
-  border-radius: 14px;
-  padding: 18px 20px;
+  margin: 0 auto var(--space-5);
+  border-radius: var(--radius-card);
+  padding: var(--space-5) var(--space-6);
   text-align: left;
   cursor: pointer;
-  color: #fff;
-  box-shadow: 0 4px 14px color-mix(in srgb, var(--accent) 16%, transparent);
+  color: var(--text);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Водяной знак с кодом — почти прозрачный фрагмент JetBrains Mono в
+   углу карточки. Найденная возможность: с первого взгляда карточка
+   ничем не отличалась бы от карточки любого другого EdTech-продукта —
+   этот штрих сразу говорит "ты внутри приложения для программирования".
+   aria-hidden — чисто декоративный, ничего не сообщает пользователю. */
+.home__continue-watermark {
+  position: absolute;
+  top: 10px;
+  right: -6px;
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--text);
+  opacity: 0.08;
+  white-space: pre;
+  pointer-events: none;
+  user-select: none;
+  transform: rotate(-4deg);
 }
 
 .home__continue-label {
@@ -60,7 +80,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  opacity: 0.85;
+  color: var(--accent);
   margin-bottom: 6px;
 }
 
@@ -68,31 +88,33 @@
   font-family: 'Inter', system-ui, sans-serif;
   font-size: 20px;
   font-weight: 700;
+  color: var(--text);
   margin-bottom: 4px;
 }
 
 .home__continue-sub {
   font-size: 13px;
-  opacity: 0.9;
+  color: var(--text-dim);
   margin-bottom: 10px;
 }
 
 .home__continue-bar {
   height: 6px;
   border-radius: 3px;
-  background: rgba(255, 255, 255, 0.25);
+  background: var(--border);
   overflow: hidden;
   margin-bottom: 14px;
 }
 
 .home__continue-bar-fill {
   height: 100%;
-  background: #fff;
+  background: var(--accent);
   border-radius: 3px;
 }
 
 .home__continue-arrow {
   font-size: 14px;
+  color: var(--accent);
   font-weight: 600;
   text-align: right;
 }
@@ -158,6 +180,47 @@
   align-items: center;
   gap: 16px;
   margin-bottom: 18px;
+}
+
+.home__progress-linear {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--surface-alt);
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+
+.home__progress-linear-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 3px;
+}
+
+.home__progress-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12.5px;
+  padding: 8px 0;
+  border-top: 1px solid var(--border);
+}
+
+.home__progress-meta-label {
+  color: var(--text-dim);
+}
+
+.home__progress-meta-value {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.home__progress-meta--streak {
+  border-top: none;
+  padding-top: 0;
+  color: var(--accent2);
+  font-weight: 600;
+  justify-content: flex-start;
+  gap: 6px;
 }
 
 .home__progress-section-text {

@@ -178,24 +178,22 @@ function PageRoot() {
       }, opt);
     }))), isCode && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
       className: "quiz-question__prompt"
-    }, current.prompt), /*#__PURE__*/React.createElement(CodeEditor, {
+    }, current.prompt), /*#__PURE__*/React.createElement(CodeEditorPanel, {
       value: code,
       onChange: setCode,
       disabled: checked,
       minHeight: 140,
+      onRun: checked ? undefined : submitCode,
+      running: isRunning,
+      output: runResult ? runResult.logs : undefined,
+      outputError: runResult ? runResult.error : null,
       onKeyDown: e => {
         if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
           e.preventDefault();
           submitCode();
         }
       }
-    }), !checked && /*#__PURE__*/React.createElement("button", {
-      onClick: submitCode,
-      disabled: isRunning,
-      className: "practice__submit-code-btn"
-    }, isRunning ? "Выполняется…" : "▶ Выполнить и проверить"), runResult?.error && /*#__PURE__*/React.createElement("div", {
-      className: "practice__code-error"
-    }, "Error: ", runResult.error)), checked && /*#__PURE__*/React.createElement("div", {
+    })), checked && /*#__PURE__*/React.createElement("div", {
       className: `quiz-question__why practice__why${(isCode ? !runResult.error && logsMatch(runResult.logs, current.expectedLogs) : selected === current.correct) ? "" : " practice__why--wrong"}`
     }, isCode ? !runResult.error && logsMatch(runResult.logs, current.expectedLogs) ? current.why.right : current.why.wrong : selected === current.correct ? current.why.right : current.why.byOption?.[selected] || current.why.wrong), checked && /*#__PURE__*/React.createElement("button", {
       onClick: nextQuestion,

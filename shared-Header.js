@@ -171,6 +171,7 @@ function Header({
   rankXpIntoRank,
   achievementsCount,
   achievementsTotal,
+  xpFloat,
   themeMode,
   onToggleTheme,
   soundEnabled,
@@ -195,7 +196,7 @@ function Header({
   }, "\u041D\u0430\u0441\u0442\u0440\u043E\u0439\u043A\u0438"), /*#__PURE__*/React.createElement("div", {
     className: "app-header__menu-group-items"
   }, /*#__PURE__*/React.createElement("button", {
-    className: "nav-btn nav__btn nav__btn--dim",
+    className: "btn btn--danger",
     onClick: onResetProgress,
     "aria-label": "\u0421\u0431\u0440\u043E\u0441\u0438\u0442\u044C \u043F\u0440\u043E\u0433\u0440\u0435\u0441\u0441"
   }, "\u21BA \u0421\u0431\u0440\u043E\u0441"), /*#__PURE__*/React.createElement("button", {
@@ -215,17 +216,14 @@ function Header({
     className: "mono app-header__stats-count"
   }, totalCorrect, "/", totalQuestions), "\u0432\u0435\u0440\u043D\u043E \xB7 ", overallPct, "% \u043F\u0440\u043E\u0439\u0434\u0435\u043D\u043E"), /*#__PURE__*/React.createElement("div", {
     className: "app-header__badges"
-  }, streak && streak.count > 0 && /*#__PURE__*/React.createElement("div", {
-    className: "app-header__badge",
-    title: `Дней подряд с занятиями${streak.best > streak.count ? ` · лучшая серия: ${streak.best}` : ""}`
-  }, "\uD83D\uDD25 ", streak.count), /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement("div", {
     className: "app-header__badge app-header__badge--xp",
     title: `${xp} XP всего · до следующего звания осталось ${Math.max(0, rankXpForNext - rankXpIntoRank)} XP`
-  }, "\u2B50 ", xp, " XP"), /*#__PURE__*/React.createElement("div", {
-    className: "app-header__badge app-header__badge--achievements",
-    title: "\u041E\u0442\u043A\u0440\u044B\u0442\u044B\u0435 \u0434\u043E\u0441\u0442\u0438\u0436\u0435\u043D\u0438\u044F"
-  }, achievementsCount, "/", achievementsTotal)), /*#__PURE__*/React.createElement("button", {
-    className: `nav-btn nav__btn app-header__mode-trigger${settingsOpen ? " app-header__mode-trigger--open" : ""}`,
+  }, "\u2B50 ", xp, " XP", xpFloat && /*#__PURE__*/React.createElement("span", {
+    key: xpFloat.key,
+    className: "app-header__xp-float"
+  }, "+", xpFloat.amount, " XP"))), /*#__PURE__*/React.createElement("button", {
+    className: `btn-icon app-header__mode-trigger${settingsOpen ? " app-header__mode-trigger--open" : ""}`,
     onClick: () => setSettingsOpen(v => !v),
     "aria-expanded": settingsOpen,
     "aria-haspopup": "true",
@@ -282,17 +280,19 @@ function Header({
     className: "app-bottombar__sheet",
     role: "menu"
   }, /*#__PURE__*/React.createElement("div", {
-    className: "app-header__menu-group-items"
+    className: "app-bottombar__sheet-title"
+  }, HEADER_MAIN_NAV.find(m => m.key === tabSheetOpen)?.label), /*#__PURE__*/React.createElement("div", {
+    className: "app-bottombar__sheet-list"
   }, HEADER_MAIN_NAV.find(m => m.key === tabSheetOpen)?.items.map(item => {
     const ItemIcon = NAV_ICON_BY_PAGE[item.page];
     return /*#__PURE__*/React.createElement("a", {
       key: item.page,
       href: item.href,
-      className: `nav-btn nav__btn${currentPage === item.page ? " nav__btn--active" : ""}`,
+      className: `app-bottombar__sheet-row${currentPage === item.page ? " app-bottombar__sheet-row--active" : ""}`,
       "aria-current": currentPage === item.page ? "page" : undefined
     }, ItemIcon && /*#__PURE__*/React.createElement(ItemIcon, {
-      size: 16
-    }), " ", item.label);
+      size: 18
+    }), /*#__PURE__*/React.createElement("span", null, item.label));
   })))), BOTTOM_TABS.map(tab => {
     const Icon = NAV_ICON_BY_PAGE[tab.page] || NAV_ICON_BY_PAGE[HEADER_MAIN_NAV.find(m => m.key === tab.groupKey)?.items[0]?.page];
     const groupMode = tab.groupKey && HEADER_MAIN_NAV.find(m => m.key === tab.groupKey);

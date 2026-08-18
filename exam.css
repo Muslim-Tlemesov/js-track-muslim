@@ -21,13 +21,6 @@
 .exam__prompt { font-family: 'Inter', system-ui, sans-serif; font-size: 17px; font-weight: 600; line-height: 1.5; margin-bottom: 18px; word-break: break-word; }
 
 .exam__code-hint { font-size: 11px; color: var(--text-dim); margin-top: 6px; }
-.exam__submit-code-btn {
-  margin-top: 10px; background: var(--accent); color: #fff; border: none; border-radius: 8px;
-  padding: 9px 18px; font-size: 13.5px; font-weight: 600; cursor: pointer;
-  display: flex; align-items: center; gap: 6px;
-}
-.exam__submit-code-btn:disabled { opacity: 0.75; cursor: default; }
-.exam__code-error { margin-top: 10px; font-size: 12.5px; color: var(--error); }
 
 .exam__feedback { margin-top: 16px; padding: 16px; border-radius: 10px; }
 .exam__feedback--correct { background: var(--success-bg); border: 1px solid color-mix(in srgb, var(--success) 33%, transparent); }

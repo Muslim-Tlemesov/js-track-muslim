@@ -494,7 +494,7 @@ function PageRoot() {
       done: started && pctT === 100,
       color: started ? barColor : "var(--border)"
     }), /*#__PURE__*/React.createElement("div", {
-      className: "summary__topic-card-count"
+      className: "mono summary__topic-card-count"
     }, p.correct, "/", p.total)));
   })))));
 }
