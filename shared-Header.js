@@ -189,6 +189,14 @@ function Header({
   // Настройки (сброс/звук/тема) — отдельное всплывающее меню от
   // кнопки-шестерёнки в самой шапке (общее и для десктопа, и мобильного).
   const [settingsOpen, setSettingsOpen] = React.useState(false);
+
+  // Регистрация SW + баннер "доступно обновление" — теперь ОДИН раз
+  // здесь (Header рендерится на каждой странице), не 13 копий
+  // инлайновых <script> по одному на HTML-файл.
+  const [updateAvailable, setUpdateAvailable] = React.useState(false);
+  React.useEffect(() => {
+    registerServiceWorkerWithUpdateCheck(() => setUpdateAvailable(true));
+  }, []);
   const settingsPanel = /*#__PURE__*/React.createElement("div", {
     className: "app-header__menu-group"
   }, /*#__PURE__*/React.createElement("div", {
@@ -319,5 +327,12 @@ function Header({
     }), /*#__PURE__*/React.createElement("span", {
       className: "app-bottombar__tab-label"
     }, tab.label));
-  })));
+  })), updateAvailable && /*#__PURE__*/React.createElement("div", {
+    role: "status",
+    "aria-live": "polite",
+    className: "app-update-banner"
+  }, /*#__PURE__*/React.createElement("span", null, "\u0414\u043E\u0441\u0442\u0443\u043F\u043D\u043E \u043E\u0431\u043D\u043E\u0432\u043B\u0435\u043D\u0438\u0435"), /*#__PURE__*/React.createElement("button", {
+    className: "btn btn--primary",
+    onClick: () => window.location.reload()
+  }, "\u041E\u0431\u043D\u043E\u0432\u0438\u0442\u044C")));
 }

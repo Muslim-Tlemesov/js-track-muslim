@@ -122,22 +122,6 @@ const PWA_INSTALL_DISMISSED_KEY = "js-track-pwa-install-dismissed";
 const REMINDER_OFFER_DISMISSED_KEY = "js-track-reminder-offer-dismissed";
 
 
-const THEMES = {
-  light: {
-    bg: "#FAF7F2", surface: "#FFFFFF", surfaceAlt: "#F3ECE4", border: "#E4D9CC",
-    text: "#2B2118", textDim: "#6E5F50", accent: "#0F6B5C", accent2: "#CC4A24",
-    success: "#2D6B38", successBg: "#EEF5EA", error: "#A8371F", errorBg: "#FBEDE8",
-    console: "#1B1712", consoleText: "#E8DFD3",
-  },
-  dark: {
-    bg: "#161310", surface: "#211C17", surfaceAlt: "#2C251E", border: "#3D342A",
-    text: "#F5EDE1", textDim: "#A89684", accent: "#2BA894", accent2: "#F0794F",
-    success: "#5FB86C", successBg: "#1A2E1B", error: "#E85D42", errorBg: "#3A1712",
-    console: "#0D0B09", consoleText: "#D9CFC0",
-  },
-};
-
-
 /**
  * Читает и применяет сохранённую тему — выставляет data-theme на
  * <html>, чтобы CSS custom properties (var(--accent) и т.д. в

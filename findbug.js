@@ -131,7 +131,17 @@ function PageRoot() {
     className: "mono findbug__code"
   }, lines.map((line, i) => /*#__PURE__*/React.createElement("div", {
     key: i,
+    role: "button",
+    tabIndex: checked ? -1 : 0,
+    "aria-pressed": pickedLine === i,
+    "aria-label": `Строка ${i + 1}${pickedLine === i ? ", выбрана" : ""}`,
     onClick: () => pick(i),
+    onKeyDown: e => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        pick(i);
+      }
+    },
     className: `findbug__line${lineClass(i)}`,
     dangerouslySetInnerHTML: {
       __html: highlightJs(line) || "\u00A0"
@@ -159,4 +169,4 @@ function PageRoot() {
   }, isLast ? "Начать по кругу заново" : "Следующий пример", " \u2192")))));
 }
 const mainRoot = ReactDOM.createRoot(document.getElementById("app-mount"));
-mainRoot.render(/*#__PURE__*/React.createElement(PageRoot, null));
+mainRoot.render(/*#__PURE__*/React.createElement(ErrorBoundary, null, /*#__PURE__*/React.createElement(PageRoot, null)));

@@ -56,19 +56,11 @@
 <script src="shared-misc-share.js"></script>
 <script src="shared-mascot-icons.js"></script>
 <script src="shared-nav-icons.js"></script>
+<script src="shared-Common.js"></script>
 <script src="shared-Header.js"></script>
 <script src="shared-LessonCard.js"></script>
 <script src="shared-CodeEditor.js"></script>
 <script src="questions.js"></script>
 
-<script>
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js").catch(() => {
-      // офлайн-режим просто не заработает — само приложение это не ломает
-    });
-  });
-}
-</script>
 </body>
 </html>

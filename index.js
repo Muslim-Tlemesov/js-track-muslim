@@ -346,4 +346,4 @@ function PageRoot() {
    в реальном браузере вызвало бы предупреждение/ошибку React
    ("createRoot() on a container that has already been passed..."). */
 const mainRoot = ReactDOM.createRoot(document.getElementById("app-mount"));
-mainRoot.render(/*#__PURE__*/React.createElement(PageRoot, null));
+mainRoot.render(/*#__PURE__*/React.createElement(ErrorBoundary, null, /*#__PURE__*/React.createElement(PageRoot, null)));

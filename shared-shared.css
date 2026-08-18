@@ -1039,6 +1039,27 @@ html, body {
   color: var(--text-dim);
 }
 
+.error-boundary {
+  max-width: 360px;
+  margin: 80px auto;
+  padding: var(--space-8) var(--space-6);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+.error-boundary__title {
+  font-size: var(--text-xl);
+  font-weight: 700;
+  color: var(--text);
+}
+.error-boundary__desc {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-2);
+}
+
 @media (max-width: 700px) {
   .page-content {
     padding: 18px 16px 44px;
@@ -1292,6 +1313,38 @@ html, body {
 }
 .toast--level__title { font-family: 'Inter', system-ui, sans-serif; font-size: 18px; font-weight: 700; color: var(--text); }
 .toast--level__desc { font-size: 13.5px; color: var(--text-dim); }
+
+/* Баннер "доступно обновление" — намеренно НЕ авто-исчезающий toast
+   (как achievement/level), а постоянная полоса: пользователь мог не
+   заметить открытие вкладки в момент обновления, полоса должна
+   оставаться на виду, пока он сам не нажмёт "Обновить". */
+.app-update-banner {
+  position: fixed;
+  left: var(--space-4);
+  right: var(--space-4);
+  bottom: calc(var(--app-bottombar-h) + var(--space-3));
+  z-index: 42;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  background: var(--surface-2);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-control);
+  padding: var(--space-3) var(--space-4);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  font-size: var(--text-sm);
+  color: var(--text);
+}
+
+@media (min-width: 880px) {
+  .app-update-banner {
+    left: auto;
+    right: var(--space-6);
+    bottom: var(--space-6);
+    max-width: 320px;
+  }
+}
 
 .toast--achievement {
   padding: 12px 18px; max-width: 380px; border: 1.5px solid var(--accent2);

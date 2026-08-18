@@ -332,6 +332,16 @@ async function runUserCodeSync(code, extraArgs = {}) {
     "postMessage", "fetch", "XMLHttpRequest", "importScripts", "close", "WebSocket",
     "window", "document", "location", "navigator", "localStorage", "sessionStorage",
     "indexedDB", "alert", "confirm", "prompt", "history", "top", "parent", "frames", "opener",
+    // Реальный найденный пробел (внешний технический разбор,
+    // подтверждён тестом): globalThis не был в списке, хотя window/
+    // document и т.д. ВЫШЕ — это его же свойства. Код студента мог
+    // написать globalThis.document.body.innerHTML = '' и полностью
+    // обойти всё затенение выше — проверено эмпирически, реально
+    // стирало содержимое страницы СНАРУЖИ песочницы. Function
+    // добавлен по той же причине, что и в воркере — Function('return
+    // this')() классический способ получить неограниченную ссылку на
+    // глобальный объект в обход прямого перечисления имён.
+    "globalThis", "Reflect", "Function",
   ];
   // Мини-проект передаёт СВОИ setInterval/clearInterval через extraArgs
   // (обёрнутые вокруг реального React setState для живого таймера) —

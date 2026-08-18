@@ -60,14 +60,5 @@
 <script src="shared-Header.js"></script>
 <script src="history.js"></script>
 
-<script>
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js").catch(() => {
-      // офлайн-режим просто не заработает — само приложение это не ломает
-    });
-  });
-}
-</script>
 </body>
 </html>

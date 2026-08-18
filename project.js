@@ -183,4 +183,4 @@ function PageRoot() {
   }, "Ctrl+Enter (\u2318+Enter \u043D\u0430 Mac) \u2014 \u0431\u044B\u0441\u0442\u0440\u044B\u0439 \u0437\u0430\u043F\u0443\u0441\u043A"))));
 }
 const mainRoot = ReactDOM.createRoot(document.getElementById("app-mount"));
-mainRoot.render(/*#__PURE__*/React.createElement(PageRoot, null));
+mainRoot.render(/*#__PURE__*/React.createElement(ErrorBoundary, null, /*#__PURE__*/React.createElement(PageRoot, null)));

@@ -175,23 +175,49 @@ const PROGRESS_KEYS = [
  * подтверждении "Сбросить весь прогресс?").
  */
 async function resetAllProgress() {
-  await Promise.all(PROGRESS_KEYS.map((key) => safeStorage.remove(key)));
-  await clearHistory(); // история — отдельная IndexedDB, не safeStorage, чистится своим механизмом
+  // Реальная найденная проблема (внешний технический разбор): раньше
+  // localStorage-шаг шёл через Promise.all — если ХОТЬ ОДИН ключ
+  // падал (например safeStorage недоступен в приватном режиме
+  // браузера), Promise.all отклонялся ЦЕЛИКОМ, resetAllProgress
+  // выбрасывал исключение, и следующие два шага (история в IndexedDB,
+  // напоминания в другой IndexedDB) вообще не выполнялись —
+  // пользователь думал бы, что сбросил всё, а по факту часть данных
+  // осталась молча нетронутой. Теперь все 3 хранилища ВСЕГДА пытаются
+  // очиститься независимо от того, упал ли предыдущий шаг — через
+  // allSettled, не all — и функция возвращает, что именно не
+  // удалось, чтобы вызывающий код мог честно предупредить
+  // пользователя, а не тихо считать успехом.
+  const failed = [];
+
+  const localResults = await Promise.allSettled(PROGRESS_KEYS.map((key) => safeStorage.remove(key)));
+  localResults.forEach((r, i) => {
+    if (r.status === "rejected") failed.push(`localStorage: ${PROGRESS_KEYS[i]}`);
+  });
+
+  try {
+    await clearHistory();
+  } catch {
+    failed.push("история обучения (IndexedDB)");
+  }
+
   // IndexedDB-след для напоминаний ("последняя активная дата") — тоже
   // часть прогресса, но хранится отдельно от safeStorage (см.
   // pwa-reminders.js), поэтому чистится своим механизмом.
   try {
     if (typeof indexedDB !== "undefined") {
-      await new Promise((resolve) => {
+      const deleted = await new Promise((resolve) => {
         const req = indexedDB.deleteDatabase("js-track-reminder");
-        req.onsuccess = resolve;
-        req.onerror = resolve;
-        req.onblocked = resolve;
+        req.onsuccess = () => resolve(true);
+        req.onerror = () => resolve(false);
+        req.onblocked = () => resolve(false);
       });
+      if (!deleted) failed.push("напоминания (IndexedDB)");
     }
   } catch {
-    // IndexedDB недоступен — не критично, остальной прогресс уже сброшен
+    failed.push("напоминания (IndexedDB)");
   }
+
+  return { allCleared: failed.length === 0, failed };
 }
 
 
@@ -208,7 +234,13 @@ async function resetAllProgress() {
 async function handleResetProgressWithConfirm() {
   const ok = window.confirm("Сбросить весь прогресс? Это действие нельзя отменить.");
   if (!ok) return;
-  await resetAllProgress();
+  const result = await resetAllProgress();
+  if (!result.allCleared) {
+    window.alert(
+      "Часть данных не удалось сбросить: " + result.failed.join(", ") +
+      ". Попробуй ещё раз — если проблема повторится, дело может быть в настройках приватности браузера."
+    );
+  }
   window.location.reload();
 }
 

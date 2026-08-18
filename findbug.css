@@ -24,6 +24,7 @@
   font-size: 13px; line-height: 1.7; margin-bottom: 16px; overflow-x: auto;
 }
 .findbug__line { padding: 0 8px; margin-left: -8px; border-left: 3px solid transparent; cursor: pointer; }
+.findbug__line:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; border-radius: 4px; }
 .findbug__line--picked { background: color-mix(in srgb, var(--accent) 20%, transparent); border-left-color: var(--accent); }
 .findbug__line--correct-answer { background: color-mix(in srgb, var(--success) 20%, transparent); border-left-color: var(--success); cursor: default; }
 .findbug__line--wrong-answer { background: color-mix(in srgb, var(--error) 20%, transparent); border-left-color: var(--error); cursor: default; }

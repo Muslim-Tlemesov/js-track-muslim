@@ -217,4 +217,4 @@ function PageRoot() {
   }, "\u0414\u043E\u0441\u0442\u0438\u0436\u0435\u043D\u0438\u044F \u0438 \u0441\u0435\u0440\u0442\u0438\u0444\u0438\u043A\u0430\u0442 \u2014 \u0432 \xAB\u0418\u0442\u043E\u0433\u0430\u0445\xBB"))));
 }
 const mainRoot = ReactDOM.createRoot(document.getElementById("app-mount"));
-mainRoot.render(/*#__PURE__*/React.createElement(PageRoot, null));
+mainRoot.render(/*#__PURE__*/React.createElement(ErrorBoundary, null, /*#__PURE__*/React.createElement(PageRoot, null)));

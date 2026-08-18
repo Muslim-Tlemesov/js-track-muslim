@@ -52,3 +52,56 @@ async function dismissPwaInstallOffer() {
   await safeStorage.set(PWA_INSTALL_DISMISSED_KEY, "1");
 }
 
+/**
+ * Регистрация Service Worker + обнаружение обновления — раньше этот
+ * же код (без обнаружения обновления) был дословно продублирован в
+ * 13 HTML-файлах отдельным инлайновым <script>. Реальный найденный
+ * пробел (внешний технический разбор): даже с skipWaiting()/
+ * clients.claim() в самом sw.js (см. sw.js), новый Service Worker
+ * забирает контроль в фоне, но НЕ перезагружает уже открытую
+ * страницу — пользователь мог долго работать со старой версией
+ * JS/HTML в памяти вкладки, не зная, что вышло обновление. Теперь
+ * onUpdateAvailable вызывается именно в тот момент, когда есть ЧТО
+ * предложить обновить (не при самой первой установке — тогда
+ * navigator.serviceWorker.controller ещё null, устанавливать нечего
+ * поверх, показывать баннер не о чем).
+ *
+ * @param {Function} onUpdateAvailable - вызывается, когда новый SW
+ *   установлен И уже есть предыдущий контроллер (то есть это
+ *   обновление, а не первая установка).
+ */
+function registerServiceWorkerWithUpdateCheck(onUpdateAvailable) {
+  if (typeof navigator === "undefined" || !("serviceWorker" in navigator)) return;
+  const doRegister = () => {
+    navigator.serviceWorker.register("sw.js").then((reg) => {
+      reg.addEventListener("updatefound", () => {
+        const installing = reg.installing;
+        if (!installing) return;
+        installing.addEventListener("statechange", () => {
+          if (installing.state === "installed" && navigator.serviceWorker.controller) {
+            onUpdateAvailable();
+          }
+        });
+      });
+    }).catch(() => {
+      // офлайн-режим просто не заработает — само приложение это не ломает
+    });
+  };
+  // Реальный найденный риск гонки: раньше регистрация всегда ждала
+  // window "load" через addEventListener. Но эта функция вызывается
+  // из React useEffect — а React-страницы здесь компилируют JSX ПРЯМО
+  // В БРАУЗЕРЕ через Babel Standalone (медленнее обычного precompiled
+  // JS), так что к моменту, когда React вообще успевает
+  // смонтироваться и отработать useEffect, событие "load" на медленном
+  // соединении вполне могло УЖЕ произойти. Слушатель, добавленный
+  // ПОСЛЕ события, никогда не сработает — события не "воспроизводятся"
+  // для опоздавших подписчиков. Проверяем document.readyState:
+  // если страница уже загружена — регистрируем сразу, не ждём
+  // события, которое, возможно, уже никогда не придёт.
+  if (document.readyState === "complete") {
+    doRegister();
+  } else {
+    window.addEventListener("load", doRegister);
+  }
+}
+

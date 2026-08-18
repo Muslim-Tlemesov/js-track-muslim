@@ -126,14 +126,24 @@ self.onmessage = async function (e) {
     // одноимённые глобальные переменные ТОЛЬКО внутри тела этой функции —
     // сам воркер продолжает пользоваться ими как обычно (self.postMessage
     // ниже в этом же файле не затронут, это отдельная область видимости).
-    const paramNames = ["console", "postMessage", "self", "fetch", "XMLHttpRequest", "importScripts", "close", "WebSocket"];
+    //
+    // Реальный найденный пробел (внешний технический разбор): self был
+    // затенён, но globalThis — нет, хотя в контексте воркера это ОДИН И
+    // ТОТ ЖЕ объект. globalThis.postMessage(...)/globalThis.fetch(...)
+    // полностью обходили затенение self/postMessage/fetch выше — код
+    // студента мог подделать результат раньше настоящего, или сделать
+    // сетевой запрос в обход явного намерения песочницы. Добавлены
+    // globalThis, Reflect, Function — та же дыра затрагивала бы и
+    // Function('return self')() как обходной путь получить неурезанную
+    // ссылку на глобальную область, если бы её не перекрыть тоже.
+    const paramNames = ["console", "postMessage", "self", "fetch", "XMLHttpRequest", "importScripts", "close", "WebSocket", "globalThis", "Reflect", "Function"];
     // ВАЖНО: paramValues должен иметь ровно столько же элементов, сколько
     // paramNames ДО добавления liveVarName — иначе new Function(...)
     // просто не дошла бы до последнего параметра со значением
     // (все "опасные" имена-заглушки без явного undefined сдвигали бы
     // позицию liveVarName, и внутри пользовательского кода он был бы
     // undefined вместо реального live-объекта).
-    const paramValues = [fakeConsole, undefined, undefined, undefined, undefined, undefined, undefined, undefined];
+    const paramValues = [fakeConsole, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined];
     // Реальный найденный баг (был раньше): фиксированная пауза в 60мс
     // перед postMessage была настроена только под микрозадачи, не под
     // setTimeout/setInterval пользовательского кода — console.log

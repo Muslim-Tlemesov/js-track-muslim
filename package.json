@@ -1,0 +1,16 @@
+{
+  "name": "js-track-tests",
+  "private": true,
+  "description": "Постоянный регрессионный набор тестов для js.track (многостраничная версия) — см. подробности в шапке test-suite.js",
+  "scripts": {
+    "test": "node test-suite.js"
+  },
+  "devDependencies": {
+    "jsdom": "^29.0.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "@babel/core": "^7.24.0",
+    "@babel/preset-react": "^7.24.0",
+    "fake-indexeddb": "^6.2.5"
+  }
+}
