@@ -116,7 +116,10 @@ function PageRoot() {
   }, "\u041D\u0438\u043A\u0430\u043A\u0438\u0445 \u0432\u0430\u0440\u0438\u0430\u043D\u0442\u043E\u0432 \u043E\u0442\u0432\u0435\u0442\u0430 \u2014 \u043D\u0430\u043F\u0438\u0448\u0438 \u0441\u0430\u043C, \u0447\u0442\u043E \u043F\u043E\u043A\u0430\u0436\u0435\u0442 console.log. \u0415\u0441\u043B\u0438 \u0432\u044B\u0437\u043E\u0432\u043E\u0432 \u043D\u0435\u0441\u043A\u043E\u043B\u044C\u043A\u043E, \u043F\u0438\u0448\u0438 \u043A\u0430\u0436\u0434\u044B\u0439 \u0440\u0435\u0437\u0443\u043B\u044C\u0442\u0430\u0442 \u0441 \u043D\u043E\u0432\u043E\u0439 \u0441\u0442\u0440\u043E\u043A\u0438, \u0432 \u0442\u043E\u043C \u043F\u043E\u0440\u044F\u0434\u043A\u0435, \u0432 \u043A\u043E\u0442\u043E\u0440\u043E\u043C \u043E\u043D\u0438 \u0440\u0435\u0430\u043B\u044C\u043D\u043E \u0432\u044B\u0432\u0435\u0434\u0443\u0442\u0441\u044F."), /*#__PURE__*/React.createElement("div", {
     className: "predict__progress-row"
   }, /*#__PURE__*/React.createElement("span", null, "\u041F\u0440\u0438\u043C\u0435\u0440 ", idx + 1, " \u0438\u0437 ", PREDICT_SHUFFLED.length), /*#__PURE__*/React.createElement("span", null, "\u0412\u0435\u0440\u043D\u043E: ", score.correct, " \u0438\u0437 ", score.total)), /*#__PURE__*/React.createElement("div", {
-    className: "predict__topic-badge"
+    className: "badge",
+    style: {
+      marginBottom: "12px"
+    }
   }, snippet.topic), /*#__PURE__*/React.createElement("pre", {
     className: "mono predict__code"
   }, snippet.code), /*#__PURE__*/React.createElement("textarea", {
@@ -138,11 +141,15 @@ function PageRoot() {
     className: "predict__textarea"
   }), /*#__PURE__*/React.createElement("div", {
     className: "predict__hint"
-  }, "Ctrl+Enter (\u2318+Enter \u043D\u0430 Mac) \u2014 ", result ? "следующий пример" : "проверить"), !result ? /*#__PURE__*/React.createElement("button", {
+  }, "Ctrl+Enter (\u2318+Enter \u043D\u0430 Mac) \u2014 ", result ? "следующий пример" : "проверить"), !result ? /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: "12px"
+    }
+  }, /*#__PURE__*/React.createElement("button", {
     onClick: check,
     disabled: !input.trim(),
-    className: "predict__check-btn"
-  }, "\u2713 \u041F\u0440\u043E\u0432\u0435\u0440\u0438\u0442\u044C") : /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    className: "btn btn--primary"
+  }, "\u2713 \u041F\u0440\u043E\u0432\u0435\u0440\u0438\u0442\u044C")) : /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: `predict__result${result.allCorrect ? " predict__result--correct" : " predict__result--wrong"}`
   }, /*#__PURE__*/React.createElement("div", {
     className: "predict__result-title"
@@ -161,10 +168,14 @@ function PageRoot() {
     className: "predict__result-actual"
   }, r.actual ?? "—"))))), /*#__PURE__*/React.createElement("div", {
     className: "predict__explanation"
-  }, snippet.explanation)), /*#__PURE__*/React.createElement("button", {
+  }, snippet.explanation)), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: "14px"
+    }
+  }, /*#__PURE__*/React.createElement("button", {
     onClick: next,
-    className: "predict__next-btn"
-  }, isLast ? "Начать по кругу заново" : "Следующий пример", " \u2192")))));
+    className: "btn btn--primary"
+  }, isLast ? "Начать по кругу заново" : "Следующий пример", " \u2192"))))));
 }
 const mainRoot = ReactDOM.createRoot(document.getElementById("app-mount"));
 mainRoot.render(/*#__PURE__*/React.createElement(ErrorBoundary, null, /*#__PURE__*/React.createElement(PageRoot, null)));

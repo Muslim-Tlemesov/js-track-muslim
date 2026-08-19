@@ -14,15 +14,31 @@
    + оранжевый, эмодзи в навигации) и developer tool (JetBrains Mono,
    code-editor) — каждый элемент сам по себе нормальный, но вместе не
    дают одного сильного бренда. Выбранное направление — developer
-   tool (VS Code/Linear/GitHub): нейтральная нетёплая палитра, один
-   синий акцент вместо зелёного+оранжевого, Fraunces убран в пользу
-   Inter везде.
+   tool (VS Code/Linear/GitHub аналогия), нейтральная нетёплая
+   палитра. Промежуточные итерации перебирали синий, затем снова
+   зелёный+оранжевый — ОФИЦИАЛЬНО ЗАФИКСИРОВАННЫЙ бренд после Design
+   System 2.0:
+
+     js.track = Dark + Emerald + Violet + Developer Mono
+
+   Не Blue — --accent сейчас изумрудный (#20D4A2), не синий, несмотря
+   на то, что более старые комментарии в истории правок могли это
+   утверждать. Fraunces тогда был убран полностью — позже, на этапе
+   Design System 2.0 (типографика), осознанно возвращён, но СТРОГО
+   ограниченно: только hero-заголовок главного экрана
+   (.home__greeting), больше нигде в основной UI-системе. Список
+   разрешённых мест — в постоянном тесте
+   ("Design System 2.0: Fraunces разрешён ТОЛЬКО в...").
    ================================================================== */
 
 :root[data-theme="dark"] {
   /* ==================================================================
      js.track Design System 2.0 — Этап 1: единая система токенов вместо
-     хаотичного подбора цвета под каждый элемент. Понятная таблица:
+     хаотичного подбора цвета под каждый элемент. Официально
+     зафиксированный бренд: Dark + Emerald + Violet + Developer Mono
+     (НЕ Blue — старые комментарии в истории правок могли утверждать
+     обратное, актуальное состояние всегда здесь, в самих значениях
+     переменных). Понятная таблица:
      🟢 зелёный — действие/обучение · 🟣 фиолетовый — XP/достижения ·
      🟢 светлый — успех · 🔴 красный — ошибка · 🟡 жёлтый —
      streak/предупреждение · ⚪ серый — второстепенная информация.
@@ -106,7 +122,7 @@ html, body {
   background: var(--accent);
   color: #fff;
   padding: 10px 16px;
-  border-radius: 8px;
+  border-radius: var(--radius-control);
   text-decoration: none;
   font-size: 13.5px;
   font-weight: 600;
@@ -218,7 +234,7 @@ html, body {
 
   /* ==================================================================
      Design System 2.0 — Этап 1, шаг 3: шкала размеров вместо
-     font-size: 14px / 14.5px / 15px / 15.5px в каждом файле по
+     font-size: var(--text-sm) / 14.5px / 15px / 15.5px в каждом файле по
      отдельности. Не мигрирована КАЖДАЯ существующая цифра по всем 14
      страницам разом (это тысячи точечных правок) — применена к общим
      компонентам в shared.css (кнопки, бейджи, карточки, навигация) и
@@ -247,6 +263,24 @@ html, body {
      мелких элементов внутри (бейджи, чипы, кнопки). */
   --radius-card: 12px;
   --radius-control: 8px;
+
+  /* Design System 2.0 — Фаза 1, shadows: найдено 9 разных значений
+     box-shadow по проекту (blur 10-48px, opacity 0.18-0.35) без единой
+     системы — каждый элемент придумывал свою тень заново. 3 уровня
+     "приподнятости" + отдельная пара для панелей на весь экран
+     (bottombar sheet/menu-panel — открываются в разные стороны,
+     поэтому знак Y-смещения разный, но глубина/размытость общие).
+     toast--level (повышение уровня) и topic-card__stripe (цветная
+     полоса с цветом конкретной темы) НЕ мигрированы намеренно — оба
+     завязаны на что-то помимо голой "приподнятости" (у первого —
+     редкий, специально более драматичный момент праздника + кольцо
+     акцентного цвета, у второго — сам цвет полосы каждый раз разный). */
+  --shadow-xs: 0 2px 10px rgba(0, 0, 0, 0.18);
+  --shadow-sm: 0 6px 20px rgba(0, 0, 0, 0.25);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.25);
+  --shadow-lg: 0 20px 48px rgba(0, 0, 0, 0.35);
+  --shadow-panel-up: 0 -16px 40px rgba(0, 0, 0, 0.25);
+  --shadow-panel-down: 0 16px 40px rgba(0, 0, 0, 0.25);
 }
 
 .app-header {
@@ -255,7 +289,7 @@ html, body {
   padding: 0 16px;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--space-3);
   box-sizing: border-box;
   position: sticky;
   top: 0;
@@ -266,7 +300,7 @@ html, body {
 .app-header__brand {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-2);
   text-decoration: none;
   flex-shrink: 0;
 }
@@ -304,7 +338,7 @@ html, body {
   color: var(--text-dim);
   display: none;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-2);
 }
 
 .app-header__stats-count {
@@ -315,7 +349,7 @@ html, body {
 .app-header__badges {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-2);
   margin-left: auto;
 }
 
@@ -326,10 +360,10 @@ html, body {
   color: var(--accent2);
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--space-1);
   background: color-mix(in srgb, var(--accent2) 9%, transparent);
   padding: 5px 10px;
-  border-radius: 8px;
+  border-radius: var(--radius-control);
   font-weight: 600;
   position: relative;
   white-space: nowrap;
@@ -348,7 +382,7 @@ html, body {
   position: absolute;
   top: -6px;
   right: 4px;
-  font-size: 12px;
+  font-size: var(--text-xs);
   font-weight: 700;
   color: var(--xp);
   pointer-events: none;
@@ -393,7 +427,7 @@ html, body {
   align-items: center;
   gap: 10px;
   padding: 9px 12px;
-  border-radius: 8px;
+  border-radius: var(--radius-control);
   color: var(--text);
   text-decoration: none;
   font-size: 13.5px;
@@ -520,8 +554,8 @@ html, body {
   bottom: calc(var(--app-bottombar-h) + 8px);
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 14px;
-  box-shadow: 0 -16px 40px rgba(0, 0, 0, 0.25);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-panel-up);
   padding: var(--space-2) 0;
   z-index: 41;
   max-height: 60vh;
@@ -604,7 +638,7 @@ html, body {
 .nav__btn {
   background: var(--surface-alt);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius-control);
   padding: 7px 14px;
   cursor: pointer;
   color: var(--text);
@@ -637,11 +671,6 @@ html, body {
    выпадающим списком (кроме Главной — прямая ссылка).
    ------------------------------------------------------------------ */
 
-.app-header__mode-caret {
-  font-size: 10px;
-  opacity: 0.7;
-}
-
 .app-header__menu-backdrop {
   position: fixed;
   inset: 0;
@@ -664,9 +693,9 @@ html, body {
   margin-left: auto;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 14px;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
-  padding: 16px;
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-panel-down);
+  padding: var(--space-4);
   z-index: 41;
   max-height: min(70vh, 560px);
   overflow-y: auto;
@@ -679,7 +708,7 @@ html, body {
 }
 
 .app-header__menu-group {
-  margin-bottom: 16px;
+  margin-bottom: var(--space-4);
 }
 
 .app-header__menu-group:last-child {
@@ -692,13 +721,13 @@ html, body {
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--text-dim);
-  margin-bottom: 8px;
+  margin-bottom: var(--space-2);
 }
 
 .app-header__menu-group-items {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: var(--space-2);
 }
 
 @media (max-width: 480px) {
@@ -774,6 +803,32 @@ html, body {
   box-sizing: border-box;
 }
 
+/* Реальный найденный баг (обнаружен через комплексный аудит
+   осиротевшего CSS): этот блок раньше жил ТОЛЬКО в questions.css, а
+   practice.jsx и exam.jsx тоже используют .quiz-question__option, но
+   НЕ подключают questions.css — их кнопки вариантов рендерились
+   голыми браузерными стилями (серый 3D-скос, Arial), совсем не как
+   часть приложения. Подтверждено эмпирически через getComputedStyle
+   и скриншот. Плюс: .opt-btn--correct/--wrong (РЕАЛЬНЫЕ имена
+   классов в JSX всех трёх страниц) не были стилизованы НИГДЕ —
+   старое правило называлось .quiz-question__option--correct/--wrong
+   (не совпадает с тем, что реально применяется), так что после
+   ответа не было ВООБЩЕ никакой подсветки, какой вариант верный.
+   Оба переехали сюда одним блоком, раз используются на 3+ страницах. */
+.quiz-question__option {
+  text-align: left; padding: 14px 16px; border-radius: var(--radius-card); width: 100%;
+  border: 1px solid var(--border); background: var(--surface); color: var(--text);
+  cursor: pointer; font-size: var(--text-sm); font-family: 'JetBrains Mono', monospace;
+  box-sizing: border-box; white-space: normal; word-break: break-word;
+}
+.quiz-question__option:disabled { cursor: default; }
+.opt-btn--correct { border-color: var(--success); background: var(--success-bg); }
+.opt-btn--wrong { border-color: var(--error); background: var(--error-bg); }
+.quiz-question__why {
+  margin-top: var(--space-4); padding: 12px 14px; background: var(--surface-alt); border: 1px solid var(--border);
+  border-radius: var(--radius-card); font-size: 13.5px; line-height: 1.6; color: var(--text);
+}
+
 /* ==========================================================================
    Design System 2.0 — Этап 1, шаг 5: система кнопок. 5 типов вместо
    того, чтобы каждая страница красила <button> по-своему. У каждого —
@@ -838,6 +893,25 @@ html, body {
   outline-offset: 2px;
 }
 
+/* ==========================================================================
+   Design System 2.0 — Фаза 1, badges: найдено 3 практически идентичных
+   дублирующихся правила (findbug__topic-badge, practice__topic-badge,
+   predict__topic-badge — отличались только margin-bottom), каждое на
+   своей странице. Один общий .badge вместо копирования одного и того
+   же блока в третий раз при следующей похожей странице.
+   ========================================================================== */
+
+.badge {
+  display: inline-block;
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 27%, transparent);
+  border-radius: var(--radius-control);
+  padding: 3px 10px;
+  font-size: 11.5px;
+  color: var(--accent);
+  font-weight: 600;
+}
+
 
 /* ==========================================================================
    Блок: mascot-feedback — речевой пузырь Байта с реакцией на ответ
@@ -849,7 +923,7 @@ html, body {
   display: flex;
   gap: 10px;
   align-items: flex-start;
-  margin-bottom: 12px;
+  margin-bottom: var(--space-3);
 }
 
 .mascot-feedback__avatar {
@@ -864,18 +938,18 @@ html, body {
 
 .mascot-feedback__avatar--correct {
   background: color-mix(in srgb, var(--success) 10%, transparent);
-  border: 1.5px solid color-mix(in srgb, var(--success) 33%, transparent);
+  border: 1px solid color-mix(in srgb, var(--success) 33%, transparent);
 }
 
 .mascot-feedback__avatar--wrong {
   background: color-mix(in srgb, var(--accent) 10%, transparent);
-  border: 1.5px solid color-mix(in srgb, var(--accent) 33%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 33%, transparent);
 }
 
 .mascot-feedback__bubble {
   background: var(--surface-alt);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--radius-card);
   border-top-left-radius: 4px;
   padding: 8px 12px;
   font-size: 13px;
@@ -901,8 +975,8 @@ html, body {
 
 .topic-card {
   background: var(--surface);
-  border: 1.5px solid var(--border);
-  border-radius: 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
   overflow: hidden;
   box-sizing: border-box;
 }
@@ -917,7 +991,7 @@ html, body {
   align-items: center;
   text-align: center;
   padding: 28px 20px;
-  gap: 12px;
+  gap: var(--space-3);
 }
 
 .empty-state__message {
@@ -930,12 +1004,6 @@ html, body {
 /* ==========================================================================
    Блок: skeleton — заглушка с бегущим градиентом на время загрузки.
    ========================================================================== */
-
-.skeleton {
-  background: linear-gradient(90deg, var(--border) 25%, color-mix(in srgb, var(--surface-alt) 60%, transparent) 37%, var(--border) 63%);
-  background-size: 400% 100%;
-  animation: skeleton-pulse 1.4s ease-in-out infinite;
-}
 
 @media (prefers-reduced-motion: reduce) {
   .skeleton {
@@ -950,7 +1018,7 @@ html, body {
 .stat-card {
   background: var(--surface-alt);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: var(--radius-card);
   padding: 12px 18px;
   min-width: 110px;
 }
@@ -988,14 +1056,14 @@ html, body {
 
 .dashboard-card__emoji {
   font-size: 26px;
-  margin-bottom: 8px;
+  margin-bottom: var(--space-2);
 }
 
 .dashboard-card__value {
   font-size: 19px;
   font-weight: 700;
   color: var(--text);
-  margin-bottom: 4px;
+  margin-bottom: var(--space-1);
   line-height: 1.2;
 }
 
@@ -1022,6 +1090,19 @@ html, body {
   z-index: 1;
 }
 
+/* IDE-зона — "Консоль" сознательно НЕ выглядит как обычная страница
+   (карточка урока + зелёный акцент). У нас уже есть Code Editor +
+   Console + Debugger + Variables + Worker + подсветка синтаксиса —
+   это уже developer-tool зона внутри приложения, и визуально она
+   должна читаться именно так: свой более тёмный фон (тот же токен,
+   что и у самих code-панелей — --console, не --bg), не карточка
+   урока в зелёных тонах. */
+.page-content--ide {
+  background: var(--console);
+  border-radius: var(--radius-card);
+  margin-top: var(--space-3);
+}
+
 /* Тот же breakpoint, что и у app-sidebar/app-bottombar (880px) — на
    десктопе контент больше не проваливается под нижнюю таб-панель
    (её там просто нет), но должен уступать место боковой панели
@@ -1034,7 +1115,7 @@ html, body {
 }
 
 .page-loading {
-  padding: 40px;
+  padding: var(--space-10);
   text-align: center;
   color: var(--text-dim);
 }
@@ -1072,37 +1153,55 @@ html, body {
    ========================================================================== */
 
 .lesson-card { padding: 26px; }
+
+/* «Учёба» — спокойный характер раздела (Фаза 3, визуальная
+   иерархия): та же Design System, что и везде — только темп другой.
+   Урок (теория для чтения) заходит заметно медленнее и мягче базовой
+   0.25s (0.5s, меньшая амплитуда смещения) — время осмыслиться, не
+   спешить. Сравни с "Практикой" (practice__why) — там нарочно
+   обратное: быстрый перехлёст вместо неспешного появления. */
+.lesson-card.lesson-card--calm {
+  animation: lesson-calm-enter 0.5s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+}
+@keyframes lesson-calm-enter {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lesson-card.lesson-card--calm { animation: none; }
+}
+
 .lesson-card__badge-wrap { display: flex; justify-content: center; }
 .lesson-card__badge {
   display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 600;
   color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent);
-  padding: 4px 10px; border-radius: 8px; margin-bottom: 14px; letter-spacing: 0.01em;
+  padding: 4px 10px; border-radius: var(--radius-control); margin-bottom: 14px; letter-spacing: 0.01em;
 }
 .lesson-card__title {
-  font-family: 'Inter', system-ui, sans-serif; font-size: 19px; font-weight: 700; margin-bottom: 12px; text-align: center;
+  font-family: 'Inter', system-ui, sans-serif; font-size: 19px; font-weight: 700; margin-bottom: var(--space-3); text-align: center;
 }
-.lesson-card__intro { font-size: 14.5px; line-height: 1.75; color: var(--text); margin-bottom: 20px; }
+.lesson-card__intro { font-size: 14.5px; line-height: 1.75; color: var(--text); margin-bottom: var(--space-5); }
 .lesson-card__section-label {
   font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-dim);
   font-weight: 600; margin-bottom: 10px;
 }
 .lesson-card__section-label--example { margin-top: 22px; }
 .lesson-card__terms { display: flex; flex-direction: column; gap: 10px; }
-.lesson-card__term { background: var(--surface-alt); border: 1px solid var(--border); border-radius: 9px; padding: 10px 14px; }
-.lesson-card__term-name { color: var(--accent); font-weight: 700; font-size: 13.5px; margin-right: 8px; }
+.lesson-card__term { background: var(--surface-alt); border: 1px solid var(--border); border-radius: var(--radius-card); padding: 10px 14px; }
+.lesson-card__term-name { color: var(--accent); font-weight: 700; font-size: 13.5px; margin-right: var(--space-2); }
 .lesson-card__term-def { font-size: 13.5px; line-height: 1.6; color: var(--text-dim); }
 .lesson-card__example-code {
-  background: var(--console); color: var(--console-text); border-radius: 9px; padding: 12px 14px;
+  background: var(--console); color: var(--console-text); border-radius: var(--radius-card); padding: 12px 14px;
   font-size: 13px; line-height: 1.6; overflow-x: auto; margin-bottom: 10px; white-space: pre-wrap;
 }
 .lesson-card__example-output {
-  background: var(--surface-alt); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; font-size: 12.5px;
+  background: var(--surface-alt); border: 1px solid var(--border); border-radius: var(--radius-control); padding: 8px 12px; font-size: 12.5px;
 }
 .lesson-card__example-output-label { color: var(--text-dim); margin-right: 6px; }
 .lesson-card__example-output-line { color: var(--accent); }
 .lesson-card__example-output-arrow { color: var(--text-dim); }
 .lesson-card__start-btn {
-  margin-top: 22px; background: var(--accent); color: #fff; border: none; border-radius: 8px;
+  margin-top: 22px; background: var(--accent); color: #fff; border: none; border-radius: var(--radius-control);
   padding: 10px 20px; font-size: 13.5px; font-weight: 600; cursor: pointer;
   display: flex; align-items: center; gap: 6px;
 }
@@ -1115,40 +1214,40 @@ html, body {
 .code-editor { position: relative; }
 .code-editor__frame {
   display: flex; width: 100%; background: var(--surface-alt);
-  border: 1px solid var(--border); border-radius: 9px; overflow: hidden;
+  border: 1px solid var(--border); border-radius: var(--radius-card); overflow: hidden;
 }
 .code-editor__gutter {
   flex-shrink: 0; padding: 8px 0; text-align: right; color: var(--text-dim);
   opacity: 0.6; user-select: none; overflow: hidden;
   border-right: 1px solid var(--border); background: var(--surface);
 }
-.code-editor__gutter-line { padding-right: 8px; position: relative; }
+.code-editor__gutter-line { padding-right: var(--space-2); position: relative; }
 .code-editor__gutter-dot {
   position: absolute; left: 3px; top: 50%; transform: translateY(-50%);
   width: 6px; height: 6px; border-radius: 50%; background: var(--error);
 }
 .code-editor__body { position: relative; flex: 1; min-width: 0; }
 .code-editor__highlight {
-  position: absolute; inset: 0; margin: 0; padding: 8px;
+  position: absolute; inset: 0; margin: 0; padding: var(--space-2);
   font-family: 'JetBrains Mono', monospace; color: var(--text);
   white-space: pre; overflow: hidden; pointer-events: none;
 }
 .code-editor__textarea {
   position: relative; width: 100%; height: 100%;
   background: transparent; color: transparent; caret-color: var(--text);
-  border: none; padding: 8px; font-family: 'JetBrains Mono', monospace;
+  border: none; padding: var(--space-2); font-family: 'JetBrains Mono', monospace;
   resize: vertical; white-space: pre; overflow-wrap: normal; box-sizing: border-box;
 }
 .code-editor__error {
-  margin-top: 4px; font-size: 11.5px; color: var(--error);
+  margin-top: var(--space-1); font-size: 11.5px; color: var(--error);
   display: flex; align-items: center; gap: 5px;
 }
 .code-editor__autocomplete {
   position: absolute; z-index: 20;
   background: color-mix(in srgb, var(--surface) 93%, transparent);
   backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-  border: 1px solid var(--border); border-radius: 8px;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.25); overflow: hidden; min-width: 140px;
+  border: 1px solid var(--border); border-radius: var(--radius-control);
+  box-shadow: var(--shadow-sm); overflow: hidden; min-width: 140px;
 }
 .code-editor__autocomplete-item { padding: 9px 12px; font-size: 13px; cursor: pointer; color: var(--text); }
 .code-editor__autocomplete-item--active {
@@ -1165,8 +1264,8 @@ html, body {
    ------------------------------------------------------------------ */
 
 .code-editor-panel {
-  border: 1.5px solid var(--border);
-  border-radius: 9px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
   overflow: hidden;
   background: var(--surface-alt);
 }
@@ -1177,7 +1276,7 @@ html, body {
 .code-editor-panel__titlebar {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--space-3);
   padding: 8px 12px;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
@@ -1301,17 +1400,17 @@ html, body {
   position: fixed; top: 18px; left: 50%; transform: translateX(-50%); z-index: 10000;
   background: color-mix(in srgb, var(--surface) 90%, transparent);
   backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-  border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+  border-radius: var(--radius-card); box-shadow: var(--shadow-md);
   display: flex; align-items: center; gap: 10px; cursor: pointer;
   animation: toast-in 0.3s ease;
 }
 
 .toast--level {
-  flex-direction: column; gap: 4px; text-align: center; max-width: 320px;
+  flex-direction: column; gap: var(--space-1); text-align: center; max-width: 320px;
   padding: 22px 30px; border: 2px solid var(--accent);
   box-shadow: 0 20px 48px rgba(0,0,0,0.35), 0 0 0 5px color-mix(in srgb, var(--accent) 13%, transparent);
 }
-.toast--level__title { font-family: 'Inter', system-ui, sans-serif; font-size: 18px; font-weight: 700; color: var(--text); }
+.toast--level__title { font-family: 'Inter', system-ui, sans-serif; font-size: var(--text-lg); font-weight: 700; color: var(--text); }
 .toast--level__desc { font-size: 13.5px; color: var(--text-dim); }
 
 /* Баннер "доступно обновление" — намеренно НЕ авто-исчезающий toast
@@ -1332,7 +1431,7 @@ html, body {
   border: 1px solid var(--accent);
   border-radius: var(--radius-control);
   padding: var(--space-3) var(--space-4);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-md);
   font-size: var(--text-sm);
   color: var(--text);
 }
@@ -1347,13 +1446,13 @@ html, body {
 }
 
 .toast--achievement {
-  padding: 12px 18px; max-width: 380px; border: 1.5px solid var(--accent2);
+  padding: 12px 18px; max-width: 380px; border: 1px solid var(--accent2);
   top: 90px;
 }
 .toast--achievement__avatar {
   width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
   background: color-mix(in srgb, var(--accent2) 10%, transparent);
-  border: 1.5px solid color-mix(in srgb, var(--accent2) 33%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent2) 33%, transparent);
   display: flex; align-items: center; justify-content: center;
 }
 .toast--achievement__text { font-size: 13.5px; color: var(--text); }

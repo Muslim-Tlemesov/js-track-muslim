@@ -248,15 +248,15 @@ function EventLoopViz() {
   }, /*#__PURE__*/React.createElement("button", {
     onClick: () => setStepIdx(0),
     disabled: isFirst,
-    className: "viz__nav-btn"
+    className: "btn btn--secondary"
   }, "\u21BA \u0421\u043D\u0430\u0447\u0430\u043B\u0430"), /*#__PURE__*/React.createElement("button", {
     onClick: () => setStepIdx(i => Math.max(0, i - 1)),
     disabled: isFirst,
-    className: "viz__nav-btn"
+    className: "btn btn--secondary"
   }, "\u2190 \u041D\u0430\u0437\u0430\u0434"), /*#__PURE__*/React.createElement("button", {
     onClick: () => setStepIdx(i => Math.min(EVENT_LOOP_STEPS.length - 1, i + 1)),
     disabled: isLast,
-    className: "viz__nav-btn viz__nav-btn--primary"
+    className: "btn btn--primary"
   }, isLast ? "Готово" : "Следующий шаг →"))));
 }
 function ComingSoonViz({
@@ -482,15 +482,15 @@ function ScopeViz() {
   }, /*#__PURE__*/React.createElement("button", {
     onClick: () => setStepIdx(0),
     disabled: isFirst,
-    className: "viz__nav-btn"
+    className: "btn btn--secondary"
   }, "\u21BA \u0421\u043D\u0430\u0447\u0430\u043B\u0430"), /*#__PURE__*/React.createElement("button", {
     onClick: () => setStepIdx(i => Math.max(0, i - 1)),
     disabled: isFirst,
-    className: "viz__nav-btn"
+    className: "btn btn--secondary"
   }, "\u2190 \u041D\u0430\u0437\u0430\u0434"), /*#__PURE__*/React.createElement("button", {
     onClick: () => setStepIdx(i => Math.min(SCOPE_STEPS.length - 1, i + 1)),
     disabled: isLast,
-    className: "viz__nav-btn viz__nav-btn--primary"
+    className: "btn btn--primary"
   }, isLast ? "Готово" : "Следующий шаг →"))));
 }
 
@@ -657,15 +657,15 @@ function ClosureViz() {
   }, /*#__PURE__*/React.createElement("button", {
     onClick: () => setStepIdx(0),
     disabled: isFirst,
-    className: "viz__nav-btn"
+    className: "btn btn--secondary"
   }, "\u21BA \u0421\u043D\u0430\u0447\u0430\u043B\u0430"), /*#__PURE__*/React.createElement("button", {
     onClick: () => setStepIdx(i => Math.max(0, i - 1)),
     disabled: isFirst,
-    className: "viz__nav-btn"
+    className: "btn btn--secondary"
   }, "\u2190 \u041D\u0430\u0437\u0430\u0434"), /*#__PURE__*/React.createElement("button", {
     onClick: () => setStepIdx(i => Math.min(CLOSURE_STEPS.length - 1, i + 1)),
     disabled: isLast,
-    className: "viz__nav-btn viz__nav-btn--primary"
+    className: "btn btn--primary"
   }, isLast ? "Готово" : "Следующий шаг →"))));
 }
 
@@ -785,15 +785,15 @@ function ThisViz() {
   }, /*#__PURE__*/React.createElement("button", {
     onClick: () => setStepIdx(0),
     disabled: isFirst,
-    className: "viz__nav-btn"
+    className: "btn btn--secondary"
   }, "\u21BA \u0421\u043D\u0430\u0447\u0430\u043B\u0430"), /*#__PURE__*/React.createElement("button", {
     onClick: () => setStepIdx(i => Math.max(0, i - 1)),
     disabled: isFirst,
-    className: "viz__nav-btn"
+    className: "btn btn--secondary"
   }, "\u2190 \u041D\u0430\u0437\u0430\u0434"), /*#__PURE__*/React.createElement("button", {
     onClick: () => setStepIdx(i => Math.min(THIS_STEPS.length - 1, i + 1)),
     disabled: isLast,
-    className: "viz__nav-btn viz__nav-btn--primary"
+    className: "btn btn--primary"
   }, isLast ? "Готово" : "Следующий шаг →"))));
 }
 
@@ -1018,15 +1018,15 @@ function PrototypeViz() {
   }, /*#__PURE__*/React.createElement("button", {
     onClick: () => setStepIdx(0),
     disabled: isFirst,
-    className: "viz__nav-btn"
+    className: "btn btn--secondary"
   }, "\u21BA \u0421\u043D\u0430\u0447\u0430\u043B\u0430"), /*#__PURE__*/React.createElement("button", {
     onClick: () => setStepIdx(i => Math.max(0, i - 1)),
     disabled: isFirst,
-    className: "viz__nav-btn"
+    className: "btn btn--secondary"
   }, "\u2190 \u041D\u0430\u0437\u0430\u0434"), /*#__PURE__*/React.createElement("button", {
     onClick: () => setStepIdx(i => Math.min(PROTOTYPE_STEPS.length - 1, i + 1)),
     disabled: isLast,
-    className: "viz__nav-btn viz__nav-btn--primary"
+    className: "btn btn--primary"
   }, isLast ? "Готово" : "Следующий шаг →"))));
 }
 
@@ -1179,15 +1179,15 @@ function BubblingViz() {
   }, /*#__PURE__*/React.createElement("button", {
     onClick: () => setStepIdx(0),
     disabled: isFirst,
-    className: "viz__nav-btn"
+    className: "btn btn--secondary"
   }, "\u21BA \u0421\u043D\u0430\u0447\u0430\u043B\u0430"), /*#__PURE__*/React.createElement("button", {
     onClick: () => setStepIdx(i => Math.max(0, i - 1)),
     disabled: isFirst,
-    className: "viz__nav-btn"
+    className: "btn btn--secondary"
   }, "\u2190 \u041D\u0430\u0437\u0430\u0434"), /*#__PURE__*/React.createElement("button", {
     onClick: () => setStepIdx(i => Math.min(BUBBLING_STEPS.length - 1, i + 1)),
     disabled: isLast,
-    className: "viz__nav-btn viz__nav-btn--primary"
+    className: "btn btn--primary"
   }, isLast ? "Готово" : "Следующий шаг →"))));
 }
 function PageRoot() {

@@ -161,7 +161,7 @@ function PageRoot() {
     className: "mono project__display"
   }, displayText), /*#__PURE__*/React.createElement("button", {
     onClick: handlePreviewClick,
-    className: "project__preview-btn"
+    className: "btn btn--primary"
   }, "\u0421\u0442\u0430\u0440\u0442 / \u0421\u0442\u043E\u043F"), /*#__PURE__*/React.createElement("div", {
     className: "project__preview-hint"
   }, "\u25B6 \u0441\u043D\u0430\u0447\u0430\u043B\u0430 \u043D\u0430\u0436\u043C\u0438 \xAB\u0417\u0430\u043F\u0443\u0441\u0442\u0438\u0442\u044C\xBB")), /*#__PURE__*/React.createElement(CodeEditorPanel, {

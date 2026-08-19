@@ -55,7 +55,11 @@ function CelebrationView({
     className: "summary-celebration__cert-input"
   }), /*#__PURE__*/React.createElement("button", {
     onClick: onDownloadCertificate,
-    className: "summary-celebration__cert-btn"
+    className: "btn btn--primary",
+    style: {
+      width: "100%",
+      marginBottom: "10px"
+    }
   }, "\u0421\u043A\u0430\u0447\u0430\u0442\u044C \u0441\u0435\u0440\u0442\u0438\u0444\u0438\u043A\u0430\u0442 (PNG)"), /*#__PURE__*/React.createElement("button", {
     onClick: onShare,
     className: "summary-celebration__share-btn"
@@ -357,7 +361,7 @@ function PageRoot() {
     className: "summary__complete-banner-input"
   }), /*#__PURE__*/React.createElement("button", {
     onClick: downloadCertificate,
-    className: "summary__complete-banner-btn"
+    className: "btn btn--primary"
   }, "\u0421\u043A\u0430\u0447\u0430\u0442\u044C \u0441\u0435\u0440\u0442\u0438\u0444\u0438\u043A\u0430\u0442 (PNG)")), /*#__PURE__*/React.createElement("button", {
     onClick: copyShareLink,
     className: "summary__share-btn"
@@ -436,7 +440,14 @@ function PageRoot() {
     className: "summary__weak-topic-row"
   }, /*#__PURE__*/React.createElement("span", {
     className: "summary__weak-topic-name"
-  }, t.title), /*#__PURE__*/React.createElement("span", {
+  }, t.title), /*#__PURE__*/React.createElement("div", {
+    className: "summary__weak-topic-bar-track"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "summary__weak-topic-bar-fill",
+    style: {
+      width: `${pctT}%`
+    }
+  })), /*#__PURE__*/React.createElement("span", {
     className: "mono summary__weak-topic-pct"
   }, pctT, "% (", p.correct, "/", p.total, ")"))))), state.dueReviewQuestions.length > 0 && /*#__PURE__*/React.createElement("div", {
     className: "summary__wrong-questions"

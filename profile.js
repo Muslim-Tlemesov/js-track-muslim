@@ -10,6 +10,17 @@ function pluralizeRu(n, one, few, many) {
   if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) return few;
   return many;
 }
+
+// Чисто визуальный тир (1-4) для звёзд-индикатора звания на этой
+// странице — те же пороги, что и у rankTitle() в core-progress.js, но
+// не добавлено туда же: используется исключительно здесь, не имеет
+// смысла раздувать общий движок ради одной декоративной детали.
+function rankTier(rank) {
+  if (rank <= 2) return 1;
+  if (rank <= 5) return 2;
+  if (rank <= 9) return 3;
+  return 4;
+}
 function PageRoot() {
   const [state, setState] = React.useState(null);
   const [themeMode, setThemeMode] = React.useState("dark");
@@ -124,9 +135,13 @@ function PageRoot() {
   }, /*#__PURE__*/React.createElement("div", {
     className: "profile__header"
   }, /*#__PURE__*/React.createElement("div", {
-    className: "profile__avatar"
+    className: "profile__avatar",
+    style: {
+      "--avatar-mood": state.streak && state.streak.count >= 3 ? "var(--warning)" : "var(--accent)"
+    }
   }, /*#__PURE__*/React.createElement(MascotIcon, {
-    size: 30
+    size: 30,
+    mood: state.streak && state.streak.count >= 3 ? "streak" : "idle"
   })), /*#__PURE__*/React.createElement("div", {
     className: "profile__header-text"
   }, /*#__PURE__*/React.createElement("input", {
@@ -141,18 +156,103 @@ function PageRoot() {
     className: "profile__member-since"
   }, memberSince ? `С нами с ${memberSince}` : "Только начинаешь путь — добро пожаловать"))), /*#__PURE__*/React.createElement("div", {
     className: "profile__cards-grid"
-  }, /*#__PURE__*/React.createElement(DashboardCard, {
-    label: "\u041E\u043F\u044B\u0442",
-    stripeColor: "var(--accent)",
-    value: `${state.xp} XP`
-  }), /*#__PURE__*/React.createElement(DashboardCard, {
-    label: "\u0417\u0432\u0430\u043D\u0438\u0435",
-    stripeColor: "var(--error)",
-    value: rankTitle(state.rank)
-  }), /*#__PURE__*/React.createElement(DashboardCard, {
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "dashboard-card profile__xp-card",
+    style: {
+      "--stripe-color": "var(--accent)"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "dashboard-card__stripe"
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "dashboard-card__body"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "mono dashboard-card__value"
+  }, state.xp, " XP"), /*#__PURE__*/React.createElement("div", {
+    className: "dashboard-card__label"
+  }, "\u041E\u043F\u044B\u0442"), /*#__PURE__*/React.createElement("div", {
+    className: "profile__xp-progress-track"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "profile__xp-progress-fill",
+    style: {
+      width: `${Math.min(100, Math.round((state.xp - xpThresholdForRank(state.rank)) / (xpThresholdForRank(state.rank + 1) - xpThresholdForRank(state.rank)) * 100))}%`
+    }
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "profile__xp-progress-label"
+  }, "\u0434\u043E \xAB", rankTitle(state.rank + 1), "\xBB: ", Math.max(0, xpThresholdForRank(state.rank + 1) - state.xp), " XP"))), /*#__PURE__*/React.createElement("div", {
+    className: "topic-card dashboard-card profile__rank-card",
+    style: {
+      "--stripe-color": "var(--error)"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "dashboard-card__stripe"
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "dashboard-card__body"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "mono dashboard-card__value"
+  }, rankTitle(state.rank)), /*#__PURE__*/React.createElement("div", {
+    className: "dashboard-card__label"
+  }, "\u0417\u0432\u0430\u043D\u0438\u0435"), /*#__PURE__*/React.createElement("div", {
+    className: "profile__rank-tiers",
+    title: `Тир ${rankTier(state.rank)} из 4`
+  }, [1, 2, 3, 4].map(tier => /*#__PURE__*/React.createElement("svg", {
+    key: tier,
+    width: "12",
+    height: "12",
+    viewBox: "0 0 24 24",
+    fill: tier <= rankTier(state.rank) ? "var(--error)" : "none",
+    stroke: "var(--error)",
+    strokeWidth: "1.5"
+  }, /*#__PURE__*/React.createElement("path", {
+    d: "M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+  })))))), /*#__PURE__*/React.createElement(DashboardCard, {
     label: "\u0421\u0435\u0440\u0438\u044F",
     stripeColor: "var(--accent2)",
     value: state.streak && state.streak.count > 0 ? `${state.streak.count} ${pluralizeRu(state.streak.count, "день", "дня", "дней")}` : "—"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "profile__section-label"
+  }, "\u0414\u043E\u0441\u0442\u0438\u0436\u0435\u043D\u0438\u044F (", Object.keys(state.unlockedAchievements).length, "/", state.achievementsTotal, ")"), /*#__PURE__*/React.createElement("div", {
+    className: "profile__achievements-grid"
+  }, ACHIEVEMENTS.map(a => {
+    const unlocked = !!state.unlockedAchievements[a.id];
+    return /*#__PURE__*/React.createElement("div", {
+      key: a.id,
+      title: a.description,
+      className: `profile__achievement${unlocked ? " profile__achievement--unlocked" : ""}`
+    }, unlocked ? /*#__PURE__*/React.createElement("svg", {
+      width: "16",
+      height: "16",
+      viewBox: "0 0 24 24",
+      fill: "none",
+      stroke: "var(--xp)",
+      strokeWidth: "2",
+      strokeLinecap: "round",
+      strokeLinejoin: "round",
+      className: "profile__achievement-icon"
+    }, /*#__PURE__*/React.createElement("path", {
+      d: "M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4zM7 4H4a3 3 0 0 0 3 5M17 4h3a3 3 0 0 1-3 5"
+    })) : /*#__PURE__*/React.createElement("svg", {
+      width: "16",
+      height: "16",
+      viewBox: "0 0 24 24",
+      fill: "none",
+      stroke: "var(--text-muted)",
+      strokeWidth: "2",
+      strokeLinecap: "round",
+      strokeLinejoin: "round",
+      className: "profile__achievement-icon"
+    }, /*#__PURE__*/React.createElement("rect", {
+      width: "16",
+      height: "11",
+      x: "4",
+      y: "11",
+      rx: "2"
+    }), /*#__PURE__*/React.createElement("path", {
+      d: "M7 11V7a5 5 0 0 1 10 0v4"
+    })), /*#__PURE__*/React.createElement("div", {
+      className: "profile__achievement-title"
+    }, a.title), /*#__PURE__*/React.createElement("div", {
+      className: "profile__achievement-desc"
+    }, a.description));
   })), /*#__PURE__*/React.createElement("div", {
     className: "profile__section-label"
   }, "\u041F\u0440\u043E\u0433\u0440\u0435\u0441\u0441 \u043F\u043E \u0432\u0441\u0435\u043C \u0442\u0435\u043C\u0430\u043C"), /*#__PURE__*/React.createElement("div", {

@@ -4,11 +4,11 @@
 
 .sandbox { padding: 26px; }
 
-.sandbox__header-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px; gap: 12px; flex-wrap: wrap; }
-.sandbox__title { font-family: 'Inter', system-ui, sans-serif; font-size: 19px; font-weight: 700; margin-bottom: 4px; }
+.sandbox__header-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px; gap: var(--space-3); flex-wrap: wrap; }
+.sandbox__title { font-family: 'JetBrains Mono', monospace; font-size: 19px; font-weight: 700; margin-bottom: var(--space-1); }
 .sandbox__subtitle { font-size: 13px; color: var(--text-dim); }
 .sandbox__reset-btn {
-  background: transparent; border: 1px solid var(--border); border-radius: 8px;
+  background: transparent; border: 1px solid var(--border); border-radius: var(--radius-control);
   padding: 7px 12px; font-size: 12.5px; color: var(--text-dim); cursor: pointer;
   display: flex; align-items: center; gap: 6px; flex-shrink: 0;
 }
@@ -17,13 +17,13 @@
 
 .sandbox__actions { display: flex; gap: 10px; margin-top: 10px; align-items: center; flex-wrap: wrap; }
 .sandbox__copy-btn {
-  background: transparent; border: 1px solid var(--border); border-radius: 8px;
+  background: transparent; border: 1px solid var(--border); border-radius: var(--radius-control);
   padding: 8px 14px; font-size: 12.5px; color: var(--text-dim); cursor: pointer;
   display: flex; align-items: center; gap: 6px;
 }
 
 @media (max-width: 700px) {
-  .sandbox { padding: 16px; }
+  .sandbox { padding: var(--space-4); }
 }
 
 /* ==========================================================================
@@ -32,49 +32,49 @@
    ========================================================================== */
 
 .sandbox__debug-btn {
-  background: transparent; border: 1px solid var(--border); border-radius: 8px;
+  background: transparent; border: 1px solid var(--border); border-radius: var(--radius-control);
   padding: 9px 16px; font-size: 13.5px; color: var(--text); cursor: pointer;
   display: flex; align-items: center; gap: 6px;
 }
 
-.debug-panel__header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
+.debug-panel__header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-3); flex-wrap: wrap; gap: var(--space-2); }
 .debug-panel__label { font-size: 12.5px; color: var(--text-dim); display: flex; align-items: center; gap: 6px; }
 .debug-panel__exit-btn {
-  background: transparent; border: 1px solid var(--border); border-radius: 8px;
+  background: transparent; border: 1px solid var(--border); border-radius: var(--radius-control);
   padding: 7px 12px; font-size: 12.5px; color: var(--text-dim); cursor: pointer;
   display: flex; align-items: center; gap: 6px;
 }
 
-.ide-split { display: grid; grid-template-columns: 1.3fr 1fr; gap: 16px; }
-.ide-split-left, .ide-split-right { min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+.ide-split { display: grid; grid-template-columns: 1.3fr 1fr; gap: var(--space-4); }
+.ide-split-left, .ide-split-right { min-width: 0; display: flex; flex-direction: column; gap: var(--space-3); }
 
 .debug-panel__code {
-  background: var(--console); color: var(--console-text); border-radius: 9px; padding: 12px 14px;
+  background: var(--console); color: var(--console-text); border-radius: var(--radius-card); padding: 12px 14px;
   font-size: 13px; line-height: 1.7; overflow-x: auto; margin: 0;
 }
 .debug-panel__code-line { padding: 0 8px; margin-left: -8px; border-left: 3px solid transparent; }
 .debug-panel__code-line--active { background: color-mix(in srgb, var(--accent) 20%, transparent); border-left-color: var(--accent); }
 
-.debug-panel__vars-label { font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 8px; }
-.debug-panel__vars-empty { font-size: 12px; color: var(--text-dim); font-style: italic; }
-.debug-panel__vars-list { display: flex; flex-wrap: wrap; gap: 8px; }
-.debug-panel__var-chip { background: var(--surface-alt); border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; font-size: 12.5px; }
+.debug-panel__vars-label { font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-dim); margin-bottom: var(--space-2); }
+.debug-panel__vars-empty { font-size: var(--text-xs); color: var(--text-dim); font-style: italic; }
+.debug-panel__vars-list { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.debug-panel__var-chip { background: var(--surface-alt); border: 1px solid var(--border); border-radius: var(--radius-control); padding: 6px 10px; font-size: 12.5px; }
 .debug-panel__var-name { color: var(--accent); }
 .debug-panel__var-eq { color: var(--text-dim); }
 .debug-panel__var-value { color: var(--accent2); }
 
-.debug-panel__console { background: var(--console); border-radius: 9px; overflow: hidden; border: 1px solid var(--border); }
+.debug-panel__console { background: var(--console); border-radius: var(--radius-card); overflow: hidden; border: 1px solid var(--border); }
 .debug-panel__console-label {
   padding: 6px 12px; font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase;
-  color: #7A7A90; border-bottom: 1px solid rgba(255,255,255,0.08);
+  color: var(--text-muted); border-bottom: 1px solid var(--border);
 }
 .debug-panel__console-body { padding: 10px 12px; font-size: 13px; min-height: 20px; }
-.debug-panel__console-empty { color: #7A7A90; }
+.debug-panel__console-empty { color: var(--text-muted); }
 .debug-panel__console-line { color: var(--console-text); }
 .debug-panel__console-arrow { color: var(--accent2); }
 
 .debug-panel__error {
-  background: var(--error-bg); border: 1px solid color-mix(in srgb, var(--error) 40%, transparent); border-radius: 9px;
+  background: var(--error-bg); border: 1px solid color-mix(in srgb, var(--error) 40%, transparent); border-radius: var(--radius-card);
   padding: 10px 14px; font-size: 13px; color: var(--error); display: flex; align-items: center; gap: 6px;
 }
 

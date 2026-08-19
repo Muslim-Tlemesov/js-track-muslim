@@ -9,7 +9,7 @@ function LessonCard({
   onStart
 }) {
   return /*#__PURE__*/React.createElement("div", {
-    className: "question-card question-enter lesson-card"
+    className: "question-card question-enter lesson-card lesson-card--calm"
   }, /*#__PURE__*/React.createElement("div", {
     className: "lesson-card__badge-wrap"
   }, /*#__PURE__*/React.createElement("div", {

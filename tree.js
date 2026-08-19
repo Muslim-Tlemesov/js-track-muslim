@@ -22,7 +22,7 @@ const KNOWLEDGE_TREE = [{
   id: "advanced",
   label: "Продвинутое",
   color: "#FF6B6B",
-  topicIds: ["async", "classes", "dom"]
+  topicIds: ["closures", "eventloop", "prototype", "this", "async", "classes", "dom"]
 }, {
   id: "typescript",
   label: "TypeScript",
@@ -46,6 +46,10 @@ const TREE_LEAF_LABEL = {
   objects: "Объекты",
   "object-methods": "Методы объектов",
   loops: "Циклы",
+  closures: "Замыкания",
+  eventloop: "Event Loop",
+  prototype: "Прототипы",
+  this: "this",
   async: "Async / await",
   classes: "Классы",
   dom: "DOM"

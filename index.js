@@ -32,7 +32,7 @@ function PwaInstallBanner({
     className: "pwa-banner__actions"
   }, /*#__PURE__*/React.createElement("button", {
     onClick: handleInstall,
-    className: "pwa-banner__install-btn"
+    className: "btn btn--primary"
   }, "\u0423\u0441\u0442\u0430\u043D\u043E\u0432\u0438\u0442\u044C"), /*#__PURE__*/React.createElement("button", {
     onClick: onDismiss,
     className: "pwa-banner__dismiss-btn",
@@ -55,7 +55,7 @@ function ReminderBanner({
     className: "pwa-banner__actions"
   }, /*#__PURE__*/React.createElement("button", {
     onClick: onEnable,
-    className: "pwa-banner__install-btn"
+    className: "btn btn--primary"
   }, "\u0412\u043A\u043B\u044E\u0447\u0438\u0442\u044C"), /*#__PURE__*/React.createElement("button", {
     onClick: onDismiss,
     className: "pwa-banner__dismiss-btn",
@@ -85,7 +85,8 @@ function HomeContent({
     certName,
     answers,
     topicProgress,
-    xp
+    xp,
+    dueReviewQuestions
   } = state;
   const hasStarted = state.totalAnswered > 0;
   // Короткая последовательность настроений при клике "Перейти" —
@@ -127,7 +128,16 @@ function HomeContent({
     hasStarted,
     streak,
     overallPct
-  }, new Date().toDateString())), /*#__PURE__*/React.createElement("button", {
+  }, new Date().toDateString())), dueReviewQuestions && dueReviewQuestions.length > 0 && /*#__PURE__*/React.createElement("a", {
+    href: `questions.html?topic=${dueReviewQuestions[0].topicId}`,
+    className: "card card--xp home__review-banner"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "home__review-banner-label"
+  }, "\u041F\u043E\u0440\u0430 \u043F\u043E\u0432\u0442\u043E\u0440\u0438\u0442\u044C"), /*#__PURE__*/React.createElement("div", {
+    className: "home__review-banner-count"
+  }, dueReviewQuestions.length, " ", dueReviewQuestions.length === 1 ? "вопрос" : dueReviewQuestions.length < 5 ? "вопроса" : "вопросов"), /*#__PURE__*/React.createElement("div", {
+    className: "home__review-banner-hint"
+  }, "\u0412\u043E\u043F\u0440\u043E\u0441\u044B, \u0433\u0434\u0435 \u0440\u0430\u043D\u044C\u0448\u0435 \u0431\u044B\u043B\u0430 \u043E\u0448\u0438\u0431\u043A\u0430 \u2014 \u0438\u043D\u0442\u0435\u0440\u0432\u0430\u043B \u0440\u0430\u0441\u0442\u0451\u0442 \u0441 \u043A\u0430\u0436\u0434\u044B\u043C \u0432\u0435\u0440\u043D\u044B\u043C \u043E\u0442\u0432\u0435\u0442\u043E\u043C")), /*#__PURE__*/React.createElement("button", {
     className: "card card--accent home__continue-card",
     onClick: handleContinueClick
   }, /*#__PURE__*/React.createElement("pre", {
@@ -246,10 +256,19 @@ function PageRoot() {
         const certRes = await safeStorage.get(CERT_NAME_KEY);
         if (certRes && certRes.value) certName = certRes.value;
       } catch {/* имя ещё не вводили */}
+
+      // Реальная найденная проблема (внешний технический разбор):
+      // система повторения (spaced repetition) существовала, но была
+      // слабо интегрирована в основной поток "Продолжить" — видна
+      // была только на отдельной странице "Итоги", куда нужно было
+      // специально зайти. Теперь due-повторения загружаются вместе с
+      // остальным состоянием ГЛАВНОГО экрана.
+      const dueReviewQuestions = await getDueReviewQuestions();
       setState({
         ...core,
         certName,
-        achievementsTotal: 26
+        achievementsTotal: 26,
+        dueReviewQuestions
       });
       setShowPwaBanner(await shouldOfferPwaInstall(core.streak));
       setShowReminderBanner(await shouldOfferReminders(core.streak));

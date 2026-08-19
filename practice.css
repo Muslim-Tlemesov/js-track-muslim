@@ -3,30 +3,40 @@
    ========================================================================== */
 
 .practice { padding: 26px; }
-.practice__header-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; gap: 12px; flex-wrap: wrap; }
-.practice__title { font-family: 'Inter', system-ui, sans-serif; font-size: 19px; font-weight: 700; margin-bottom: 4px; }
+.practice__header-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; gap: var(--space-3); flex-wrap: wrap; }
+.practice__title { font-family: 'Inter', system-ui, sans-serif; font-size: 19px; font-weight: 700; margin-bottom: var(--space-1); }
 .practice__subtitle { font-size: 13px; color: var(--text-dim); max-width: 460px; line-height: 1.5; }
 .practice__score { font-size: 12.5px; color: var(--text-dim); white-space: nowrap; flex-shrink: 0; }
 
-.practice__topic-badge {
-  display: inline-block; background: color-mix(in srgb, var(--accent) 8%, transparent);
-  border: 1px solid color-mix(in srgb, var(--accent) 27%, transparent); border-radius: 8px;
-  padding: 3px 10px; font-size: 11.5px; color: var(--accent); font-weight: 600; margin-bottom: 16px;
-}
-
 .practice__why {
-  margin-top: 16px; padding: 12px 14px; background: var(--success-bg);
+  margin-top: var(--space-4); padding: 12px 14px; background: var(--success-bg);
   border: 1px solid color-mix(in srgb, var(--success) 33%, transparent);
-  border-radius: 10px; font-size: 13.5px; line-height: 1.6; color: var(--text);
+  border-radius: var(--radius-card); font-size: 13.5px; line-height: 1.6; color: var(--text);
+  animation: practice-feedback-pop 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 .practice__why--wrong { background: var(--error-bg); border-color: color-mix(in srgb, var(--error) 33%, transparent); }
 
-.practice__next-btn {
-  margin-top: 16px; background: var(--accent); color: #fff; border: none; border-radius: 8px;
-  padding: 9px 18px; font-size: 13.5px; font-weight: 600; cursor: pointer;
-  display: flex; align-items: center; gap: 6px;
+/* «Практика» — энергичный характер раздела (Фаза 3, визуальная
+   иерархия): та же Design System, что и везде (те же токены,
+   радиусы, тени) — только темп и выразительность взаимодействия
+   другие. Быстрый тактильный отклик при выборе варианта + панель
+   объяснения "влетает" с лёгким перехлёстом (cubic-bezier с
+   overshoot), а не просто появляется статично. Сравни с "Учёбой"
+   (questions.jsx) — тот же .quiz-question__option, но БЕЗ этого
+   усиления, там нарочно спокойнее. */
+.practice__option { transition: transform 0.1s ease; }
+.practice__option:active:not(:disabled) { transform: scale(0.97); }
+
+@keyframes practice-feedback-pop {
+  0% { opacity: 0; transform: translateY(-4px) scale(0.98); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .practice__why { animation: none; }
+  .practice__option { transition: none; }
 }
 
 @media (max-width: 700px) {
-  .practice { padding: 16px; }
+  .practice { padding: var(--space-4); }
 }

@@ -428,6 +428,34 @@ async function runEngineTests() {
     assert(result.historyCleared, "resetAllProgress() должен очищать историю в IndexedDB через clearHistory()");
   });
 
+  await test("Главный экран: баннер 'Пора повторить' появляется при наличии due-повторений (реальная интеграция spaced repetition в основной поток)", async () => {
+    // Реальная найденная проблема (внешний технический разбор):
+    // getDueReviewQuestions() существовал, но был виден только на
+    // отдельной странице "Итоги" — findResumeIndex (питает главную
+    // карточку "Продолжить") вообще не знал об этой системе. Теперь
+    // главный экран загружает due-повторения вместе с остальным
+    // состоянием и показывает отдельный баннер, если есть что
+    // повторить.
+    // Реальная найденная проблема (внешний технический разбор):
+    // getDueReviewQuestions() существовал, но был виден только на
+    // отдельной странице "Итоги" — findResumeIndex (питает главную
+    // карточку "Продолжить") вообще не знал об этой системе. Теперь
+    // главный экран загружает due-повторения вместе с остальным
+    // состоянием и показывает отдельный баннер, если есть что
+    // повторить. "vars-1" — известный реальный id вопроса темы "vars"
+    // (используется и в других тестах этого файла).
+    const yesterday = Date.now() - 24 * 60 * 60 * 1000;
+    const schedule = JSON.stringify({ "vars-1": { stepIdx: 0, nextReviewDay: yesterday } });
+    const env = createEnv("index.jsx", SHARED.common, { "js-track-review-schedule": schedule });
+    env.load();
+    await env.wait(400);
+
+    const banner = env.doc.querySelector(".home__review-banner");
+    assert(banner !== null, "баннер 'Пора повторить' должен появиться, когда есть due-повторение");
+    assert(banner.textContent.includes("Пора повторить"), `текст баннера неожиданный: "${banner.textContent}"`);
+    assert(banner.getAttribute("href") === "questions.html?topic=vars", `ссылка баннера должна вести на тему due-вопроса (vars), получили: ${banner.getAttribute("href")}`);
+  });
+
   await test("resetAllProgress: сбой ОДНОГО ключа localStorage не должен блокировать очистку истории/напоминаний (устойчивость к частичному сбою)", async () => {
     // Реальная найденная проблема (внешний технический разбор):
     // раньше localStorage-шаг шёл через Promise.all — если ХОТЬ ОДИН
@@ -864,23 +892,30 @@ async function runEngineTests() {
     assert(violations.length === 0, `dangerouslySetInnerHTML в обход highlightJs: ${JSON.stringify(violations)}`);
   });
 
-  await test("ИЗВЕСТНОЕ ОГРАНИЧЕНИЕ (принято осознанно): highlightJs не подсвечивает regex/bigint/numeric-разделители, но HTML не ломается", async () => {
-    // Не "тест на будущий фикс" — документирует ТЕКУЩЕЕ, обсуждённое и
-    // принятое поведение самописной regex-подсветки (вместо CodeMirror/
-    // Monaco/Prism/Shiki). Эти конструкции просто остаются БЕЗ цвета —
-    // не искажаются и не ломают HTML, только менее приметны визуально.
-    // Если этот тест начнёт падать по первым 4 проверкам — значит
-    // кто-то улучшил highlightJs (хорошо, но обнови комментарий над
-    // функцией); если по последней (вложенные template literals
-    // сломали HTML) — это уже РЕАЛЬНАЯ регрессия, нужно чинить.
+  await test("highlightJs: числовые разделители/bigint/приватные поля ТЕПЕРЬ подсвечиваются (улучшение), regex-литералы остаются осознанным исключением", async () => {
+    // Обновлено (внешний технический разбор, пункт про подсветку
+    // синтаксиса): раньше 1_000_000/123n/#x оставались БЕЗ цвета —
+    // это было принятое, но не идеальное ограничение самописной
+    // regex-подсветки. Добавлены безопасно, однозначным расширением
+    // паттерна. Regex-литералы (/foo/g) СОЗНАТЕЛЬНО остаются без
+    // подсветки и дальше — не микро-недоработка, а осознанный отказ:
+    // без разбора предыдущего токена regex неотличим от оператора
+    // деления (a / b против /regex/), дешёвая эвристика будет чаще
+    // ошибаться, чем давать пользу.
     const cases = [
-      ["1_000_000", "числовой разделитель"],
-      ["123n", "bigint"],
-      ["/foo/g", "regex-литерал"],
+      ["1_000_000", "числовой разделитель", true],
+      ["123n", "bigint", true],
+      ["this.#count", "приватное поле", true],
+      ["/foo/g", "regex-литерал", false],
     ];
-    for (const [snippet, label] of cases) {
+    for (const [snippet, label, shouldHighlight] of cases) {
       const result = runEngineScript(`globalThis.__testResult = highlightJs(${JSON.stringify(snippet)});`, {});
-      assert(!result.includes("var(--accent2)"), `${label} неожиданно получил подсветку числа — если это осознанное улучшение, обнови комментарий над highlightJs`);
+      const hasColor = result.includes("var(--accent2)") || result.includes("var(--xp)");
+      if (shouldHighlight) {
+        assert(hasColor, `${label} должен получить подсветку (это уже реализовано) — получили: ${result}`);
+      } else {
+        assert(!hasColor, `${label} НЕ должен получить подсветку (сознательно не реализовано — риск неоднозначности с делением) — если добавили детектор regex, обнови этот тест и комментарий над highlightJs`);
+      }
     }
     // Главный инвариант, который ДОЛЖЕН оставаться истинным всегда,
     // даже для вложенных template literals с неверными границами —
@@ -1032,10 +1067,12 @@ async function runEngineTests() {
   await test("Design System 2.0: Fraunces разрешён ТОЛЬКО в hero-заголовках/крупных эмоциональных моментах, не в кнопках/бейджах/статистике", async () => {
     // Эволюция правила: сначала Fraunces убрали полностью (developer
     // tool направление), затем по итогам Design System 2.0 вернули —
-    // но строго ограниченно. Разрешённый список — hero-заголовок
-    // главного экрана (.home__greeting) и заголовок празднования
-    // прохождения курса (.summary-celebration__title), больше нигде.
-    const ALLOWED_FRAUNCES_SELECTORS = [".home__greeting", ".summary-celebration__title"];
+    // но строго ограниченно, и список СУЖАЕТСЯ по мере миграции:
+    // .summary-celebration__title был во временном списке, но затем
+    // тоже переведён на Inter (см. summary.css) — единственное
+    // оставшееся разрешённое место теперь hero-заголовок главного
+    // экрана (.home__greeting).
+    const ALLOWED_FRAUNCES_SELECTORS = [".home__greeting"];
     const cssFiles = fs.readdirSync(BASE_DIR).filter((f) => f.endsWith(".css") && !f.startsWith("shared" + path.sep));
     const sharedCssFiles = fs.existsSync(path.join(BASE_DIR, "shared"))
       ? fs.readdirSync(path.join(BASE_DIR, "shared")).filter((f) => f.endsWith(".css")).map((f) => path.join("shared", f))
@@ -1061,6 +1098,181 @@ async function runEngineTests() {
     assert(violations.length === 0, `Fraunces вне разрешённого списка (кнопка/бейдж/статистика?): ${JSON.stringify(violations)}`);
   });
 
+  await test("Design System 2.0: ни в одном .css файле не осталось border-radius: 8px/9px/10px/12px — только var(--radius-control)/var(--radius-card)", async () => {
+    // Реальная найденная проблема Фазы 1 (CONSISTENCY): каждая
+    // страница придумывала свой радиус скругления заново (8px? 9px?
+    // 10px?) вместо использования уже существующих --radius-control/
+    // --radius-card — 10 файлов, ~64 захардкоженных вхождения по
+    // всему проекту, найдено и мигрировано за один проход. Этот тест
+    // не даёт значениям токенов вернуться назад литералами при
+    // будущих правках — специально проверяет ИМЕННО те 4 числа,
+    // что совпадают со значениями токенов (8/9/10/12px), а не любой
+    // border-radius вообще (тонкие полосы прогресса на 3-4px и
+    // круглые аватары на 50% — намеренно другая визуальная категория,
+    // не должны стать токенами).
+    const TOKEN_MATCHING_VALUES = ["8px", "9px", "10px", "12px"];
+    // Реальный найденный пробел в самом тесте: shared/ исключался из
+    // сканирования, но ни разу не добавлялся обратно отдельным
+    // списком (в отличие от соседнего теста на Fraunces, где та же
+    // конструкция сделана правильно) — 8 захардкоженных значений в
+    // shared/shared.css оставались невидимыми для этой проверки всё
+    // время, пока Фаза 1 шла дальше. Нашёл вручную, поймал именно
+    // потому, что заметил конкретную строку глазами — тест был обязан
+    // поймать это сам.
+    const cssFiles = fs.readdirSync(BASE_DIR).filter((f) => f.endsWith(".css") && !f.startsWith("shared" + path.sep));
+    const sharedCssFiles = fs.existsSync(path.join(BASE_DIR, "shared"))
+      ? fs.readdirSync(path.join(BASE_DIR, "shared")).filter((f) => f.endsWith(".css")).map((f) => path.join("shared", f))
+      : [];
+    const violations = [];
+    for (const f of [...cssFiles, ...sharedCssFiles]) {
+      const content = fs.readFileSync(path.join(BASE_DIR, f), "utf8");
+      for (const val of TOKEN_MATCHING_VALUES) {
+        if (content.includes(`border-radius: ${val}`)) {
+          violations.push(`${f}: border-radius: ${val}`);
+        }
+      }
+    }
+    assert(violations.length === 0, `найден захардкоженный border-radius, совпадающий со значением токена (должен быть var(--radius-control) или var(--radius-card)): ${JSON.stringify(violations)}`);
+  });
+
+  await test("Design System 2.0: ни в одном .css файле не осталось захардкоженных box-shadow, совпадающих со значением токена elevation", async () => {
+    // Реальная найденная проблема Фазы 1 (CONSISTENCY): 9 разных
+    // значений box-shadow по проекту (blur 10-48px, opacity
+    // 0.18-0.35) без единой системы — каждый элемент придумывал тень
+    // заново. Заведена шкала --shadow-xs/-sm/-md/-lg + отдельная пара
+    // --shadow-panel-up/-down для полноэкранных панелей. Проверяем
+    // ТОЧНЫЕ строки токенов — не любой box-shadow вообще (toast--level
+    // и topic-card__stripe намеренно не мигрированы, у них есть
+    // причина отличаться — см. комментарий у самих токенов).
+    const TOKEN_SHADOW_VALUES = [
+      "0 2px 10px rgba(0, 0, 0, 0.18)",
+      "0 6px 20px rgba(0,0,0,0.25)",
+      "0 6px 20px rgba(0, 0, 0, 0.25)",
+      "0 8px 24px rgba(0,0,0,0.18)",
+      "0 8px 24px rgba(0, 0, 0, 0.18)",
+      "0 8px 24px rgba(0, 0, 0, 0.3)",
+      "0 -16px 40px rgba(0, 0, 0, 0.25)",
+      "0 16px 40px rgba(0, 0, 0, 0.25)",
+    ];
+    const cssFiles = fs.readdirSync(BASE_DIR).filter((f) => f.endsWith(".css"));
+    const violations = [];
+    for (const f of cssFiles) {
+      const content = fs.readFileSync(path.join(BASE_DIR, f), "utf8");
+      for (const val of TOKEN_SHADOW_VALUES) {
+        if (content.includes(`box-shadow: ${val}`)) violations.push(`${f}: box-shadow: ${val}`);
+      }
+    }
+    assert(violations.length === 0, `найдена захардкоженная тень, совпадающая со значением токена elevation (должна быть var(--shadow-*)): ${JSON.stringify(violations)}`);
+  });
+
+  await test("Design System 2.0: нигде не осталось border: 1.5px (только 1px — рамки без семантики толщины нормализованы)", async () => {
+    // Реальная найденная проблема Фазы 1 (CONSISTENCY): 1px (67
+    // случаев) и 1.5px (19-20 случаев) сосуществовали БЕЗ смысловой
+    // разницы — просто непоследовательность авторства на разных
+    // страницах. 3px/2px НЕ трогали — у них есть смысл (акцентные
+    // полосы карточек/code-line, focus-ring, "сегодня" в календаре,
+    // специально более заметный toast повышения уровня).
+    const allCssFiles = [];
+    for (const f of fs.readdirSync(BASE_DIR)) {
+      const full = path.join(BASE_DIR, f);
+      if (f.endsWith(".css")) allCssFiles.push(f);
+      else if (fs.statSync(full).isDirectory()) {
+        for (const sub of fs.readdirSync(full)) {
+          if (sub.endsWith(".css")) allCssFiles.push(path.join(f, sub));
+        }
+      }
+    }
+    const violations = [];
+    for (const f of allCssFiles) {
+      const content = fs.readFileSync(path.join(BASE_DIR, f), "utf8");
+      // Точный паттерн — иначе "11.5px" (font-size, законное значение)
+      // ложно совпадает с наивной проверкой .includes("1.5px").
+      if (/\b1\.5px (solid|dashed)/.test(content)) violations.push(f);
+    }
+    assert(violations.length === 0, `найден border: 1.5px (должен быть 1px): ${JSON.stringify(violations)}`);
+  });
+
+  await test("Design System 2.0: нигде не осталось border-radius: 14px (только var(--radius-card))", async () => {
+    const cssFilesFlat = [];
+    for (const f of fs.readdirSync(BASE_DIR)) {
+      const full = path.join(BASE_DIR, f);
+      if (f.endsWith(".css")) cssFilesFlat.push(f);
+      else if (fs.statSync(full).isDirectory()) {
+        for (const sub of fs.readdirSync(full)) {
+          if (sub.endsWith(".css")) cssFilesFlat.push(path.join(f, sub));
+        }
+      }
+    }
+    const violations = [];
+    for (const f of cssFilesFlat) {
+      const content = fs.readFileSync(path.join(BASE_DIR, f), "utf8");
+      if (content.includes("border-radius: 14px")) violations.push(f);
+    }
+    assert(violations.length === 0, `найден border-radius: 14px (должен быть var(--radius-card)): ${JSON.stringify(violations)}`);
+  });
+
+  await test("Design System 2.0: ни в одном .css файле не осталось font-size: 12px/14px/18px/24px — только var(--text-xs/-sm/-lg/-xl)", async () => {
+    // Реальная найденная проблема Фазы 1 (CONSISTENCY): 25 точных
+    // совпадений font-size с уже существующей шкалой --text-*,
+    // разбросанных по 11 файлам — литеральные числа вместо токенов,
+    // хотя шкала для них уже была заведена ранее в этой же Фазе.
+    const TOKEN_MATCHING_SIZES = ["12px", "14px", "18px", "24px"];
+    const cssFilesFlat = [];
+    for (const f of fs.readdirSync(BASE_DIR)) {
+      const full = path.join(BASE_DIR, f);
+      if (f.endsWith(".css")) cssFilesFlat.push(f);
+      else if (fs.statSync(full).isDirectory()) {
+        for (const sub of fs.readdirSync(full)) {
+          if (sub.endsWith(".css")) cssFilesFlat.push(path.join(f, sub));
+        }
+      }
+    }
+    const violations = [];
+    for (const f of cssFilesFlat) {
+      const content = fs.readFileSync(path.join(BASE_DIR, f), "utf8");
+      for (const size of TOKEN_MATCHING_SIZES) {
+        if (content.includes(`font-size: ${size}`)) violations.push(`${f}: font-size: ${size}`);
+      }
+    }
+    assert(violations.length === 0, `найден захардкоженный font-size, совпадающий со значением токена (должен быть var(--text-*)): ${JSON.stringify(violations)}`);
+  });
+
+  await test("Design System 2.0: ни в одном .css файле не осталось ОДИНОЧНЫХ значений padding/margin/gap: 4/8/12/16/20/24/32/40px", async () => {
+    // Реальная найденная проблема Фазы 1 (CONSISTENCY): 131 точное
+    // одиночное совпадение с уже существующей шкалой --space-*,
+    // разбросанных по 15 файлам. Проверяем ТОЛЬКО одиночные значения
+    // (property: Npx; — сразу точка с запятой) — то же ограничение,
+    // что было и у самой миграции: multi-value shorthand (padding:
+    // 8px 14px;) сознательно не трогали, там наивная замена по числу
+    // рискует перепутать, к какой стороне отступа какое значение
+    // относится.
+    const TOKEN_MAP = { 4: 1, 8: 2, 12: 3, 16: 4, 20: 5, 24: 6, 32: 8, 40: 10 };
+    const PROPS = ["padding", "margin", "gap", "margin-top", "margin-bottom", "margin-left", "margin-right",
+      "padding-top", "padding-bottom", "padding-left", "padding-right", "row-gap", "column-gap"];
+    const cssFilesFlat = [];
+    for (const f of fs.readdirSync(BASE_DIR)) {
+      const full = path.join(BASE_DIR, f);
+      if (f.endsWith(".css")) cssFilesFlat.push(f);
+      else if (fs.statSync(full).isDirectory()) {
+        for (const sub of fs.readdirSync(full)) {
+          if (sub.endsWith(".css")) cssFilesFlat.push(path.join(f, sub));
+        }
+      }
+    }
+    const violations = [];
+    for (const f of cssFilesFlat) {
+      const content = fs.readFileSync(path.join(BASE_DIR, f), "utf8");
+      for (const prop of PROPS) {
+        for (const px of Object.keys(TOKEN_MAP)) {
+          const re = new RegExp(`\\b${prop}: ${px}px;`);
+          if (re.test(content)) violations.push(`${f}: ${prop}: ${px}px`);
+        }
+      }
+    }
+    assert(violations.length === 0, `найдено одиночное значение отступа, совпадающее со значением токена (должно быть var(--space-*)): ${JSON.stringify(violations)}`);
+  });
+
+
   await test("Ни в одном из 18 engine-*.js файлов не осталось устаревших заголовков от старой 6-файловой структуры", async () => {
     // Реальный найденный баг: при разбивке 6 файлов на 18 некоторые
     // блоки (TOPICS, logsMatch, isIdentStart, highlightJs) унаследовали
@@ -1080,6 +1292,137 @@ async function runEngineTests() {
       }
     }
     assert(violations.length === 0, `застрявшие заголовки старой структуры: ${JSON.stringify(violations)}`);
+  });
+
+  await test("Новая тема 'Замыкания': все 4 solution реально дают заявленный expectedLogs через движок выполнения", async () => {
+    // Продолжение пункта 7 разбора (контент/педагогика): 4 из 6
+    // концепций (замыкания/Event Loop/прототипы/this) существовали
+    // только как визуализации, без единого вопроса с растущей
+    // сложностью. Добавлена первая — "Замыкания", 4 вопроса. Каждый
+    // code-сниппет вручную проверен через `node -e` при написании, но
+    // это тест ЧЕРЕЗ РЕАЛЬНЫЙ движок приложения (runUserCode, тот же
+    // Worker, что видит студент), не ручную проверку — ловит
+    // расхождение, если solution/expectedLogs разойдутся при будущей
+    // правке темы.
+    const result = await runEngineScript(`
+      globalThis.__testResult = (async () => {
+        const topic = TOPICS.find((t) => t.id === "closures");
+        if (!topic) return { error: "тема 'closures' не найдена в TOPICS" };
+        const codeQuestions = topic.questions.filter((q) => q.type === "code");
+        const quizQuestions = topic.questions.filter((q) => q.type === "quiz");
+        const results = [];
+        for (const q of codeQuestions) {
+          const run = await runUserCode(q.solution, {});
+          const actual = (run.logs || []).join("\\n");
+          const expected = (q.expectedLogs || []).join("\\n");
+          results.push({ id: q.id, ok: !run.error && actual === expected, actual, expected, error: run.error });
+        }
+        return { codeCount: codeQuestions.length, quizCount: quizQuestions.length, results };
+      })();
+    `, {});
+    const outcome = await result;
+    assert(!outcome.error, outcome.error);
+    assert(outcome.quizCount === 2, `ожидали 2 quiz-вопроса в теме closures, получили ${outcome.quizCount}`);
+    assert(outcome.codeCount === 2, `ожидали 2 code-вопроса в теме closures, получили ${outcome.codeCount}`);
+    for (const r of outcome.results) {
+      assert(r.ok, `${r.id}: solution НЕ дал заявленный expectedLogs — ожидали "${r.expected}", получили "${r.actual}"${r.error ? `, ошибка: ${r.error}` : ""}`);
+    }
+  });
+
+  await test("Новая тема 'Event Loop': все 4 solution реально дают заявленный expectedLogs через движок выполнения", async () => {
+    // Продолжение той же работы, что и с 'Замыкания' — вторая из 4
+    // недостающих тем (Event Loop/прототипы/this). Решения используют
+    // setTimeout(fn, 0) вперемешку с промисами — реальная проверка
+    // через движок особенно важна здесь: именно микро/макрозадачи
+    // легко перепутать местами при малейшей правке кода темы.
+    const result = await runEngineScript(`
+      globalThis.__testResult = (async () => {
+        const topic = TOPICS.find((t) => t.id === "eventloop");
+        if (!topic) return { error: "тема 'eventloop' не найдена в TOPICS" };
+        const codeQuestions = topic.questions.filter((q) => q.type === "code");
+        const quizQuestions = topic.questions.filter((q) => q.type === "quiz");
+        const results = [];
+        for (const q of codeQuestions) {
+          const run = await runUserCode(q.solution, {});
+          const actual = (run.logs || []).join("\\n");
+          const expected = (q.expectedLogs || []).join("\\n");
+          results.push({ id: q.id, ok: !run.error && actual === expected, actual, expected, error: run.error });
+        }
+        return { codeCount: codeQuestions.length, quizCount: quizQuestions.length, results };
+      })();
+    `, {});
+    const outcome = await result;
+    assert(!outcome.error, outcome.error);
+    assert(outcome.quizCount === 2, `ожидали 2 quiz-вопроса в теме eventloop, получили ${outcome.quizCount}`);
+    assert(outcome.codeCount === 2, `ожидали 2 code-вопроса в теме eventloop, получили ${outcome.codeCount}`);
+    for (const r of outcome.results) {
+      assert(r.ok, `${r.id}: solution НЕ дал заявленный expectedLogs — ожидали "${r.expected}", получили "${r.actual}"${r.error ? `, ошибка: ${r.error}` : ""}`);
+    }
+  });
+
+  await test("Новая тема 'Прототипы': все 4 solution реально дают заявленный expectedLogs через движок выполнения", async () => {
+    // Продолжение той же работы — третья из 4 недостающих тем
+    // (замыкания/Event Loop/прототипы/this). Object.create и общий
+    // прототип между несколькими объектами — самое частое место для
+    // ошибки в объяснении, реальная проверка через движок обязательна.
+    const result = await runEngineScript(`
+      globalThis.__testResult = (async () => {
+        const topic = TOPICS.find((t) => t.id === "prototype");
+        if (!topic) return { error: "тема 'prototype' не найдена в TOPICS" };
+        const codeQuestions = topic.questions.filter((q) => q.type === "code");
+        const quizQuestions = topic.questions.filter((q) => q.type === "quiz");
+        const results = [];
+        for (const q of codeQuestions) {
+          const run = await runUserCode(q.solution, {});
+          const actual = (run.logs || []).join("\\n");
+          const expected = (q.expectedLogs || []).join("\\n");
+          results.push({ id: q.id, ok: !run.error && actual === expected, actual, expected, error: run.error });
+        }
+        return { codeCount: codeQuestions.length, quizCount: quizQuestions.length, results };
+      })();
+    `, {});
+    const outcome = await result;
+    assert(!outcome.error, outcome.error);
+    assert(outcome.quizCount === 2, `ожидали 2 quiz-вопроса в теме prototype, получили ${outcome.quizCount}`);
+    assert(outcome.codeCount === 2, `ожидали 2 code-вопроса в теме prototype, получили ${outcome.codeCount}`);
+    for (const r of outcome.results) {
+      assert(r.ok, `${r.id}: solution НЕ дал заявленный expectedLogs — ожидали "${r.expected}", получили "${r.actual}"${r.error ? `, ошибка: ${r.error}` : ""}`);
+    }
+  });
+
+  await test("Новая тема 'this': все 4 solution реально дают заявленный expectedLogs через движок выполнения", async () => {
+    // Продолжение той же работы — последняя из 4 недостающих тем
+    // (замыкания/Event Loop/прототипы/this). При написании обнаружил
+    // и обошёл реальную ловушку: console.log(this) в non-strict
+    // sandbox сериализует весь global-объект vm-контекста в грязный
+    // JSON, а this.count на оторванном вызове даёт "" (пустую
+    // строку), не "undefined" — из-за того, как JSON.stringify(undefined)
+    // взаимодействует с Array.join(). Вопросы спроектированы в обход
+    // этих искажений (либо через this.name с реальным значением на
+    // "живом" вызове, либо через понятийный quiz без точного вывода).
+    const result = await runEngineScript(`
+      globalThis.__testResult = (async () => {
+        const topic = TOPICS.find((t) => t.id === "this");
+        if (!topic) return { error: "тема 'this' не найдена в TOPICS" };
+        const codeQuestions = topic.questions.filter((q) => q.type === "code");
+        const quizQuestions = topic.questions.filter((q) => q.type === "quiz");
+        const results = [];
+        for (const q of codeQuestions) {
+          const run = await runUserCode(q.solution, {});
+          const actual = (run.logs || []).join("\\n");
+          const expected = (q.expectedLogs || []).join("\\n");
+          results.push({ id: q.id, ok: !run.error && actual === expected, actual, expected, error: run.error });
+        }
+        return { codeCount: codeQuestions.length, quizCount: quizQuestions.length, results };
+      })();
+    `, {});
+    const outcome = await result;
+    assert(!outcome.error, outcome.error);
+    assert(outcome.quizCount === 2, `ожидали 2 quiz-вопроса в теме this, получили ${outcome.quizCount}`);
+    assert(outcome.codeCount === 2, `ожидали 2 code-вопроса в теме this, получили ${outcome.codeCount}`);
+    for (const r of outcome.results) {
+      assert(r.ok, `${r.id}: solution НЕ дал заявленный expectedLogs — ожидали "${r.expected}", получили "${r.actual}"${r.error ? `, ошибка: ${r.error}` : ""}`);
+    }
   });
 }
 
@@ -1225,7 +1568,7 @@ async function runIndexTests() {
     // (код-вопросы не участвуют в этой проверке) — переходим вперёд
     // через "Далее", пока не найдём именно квиз с вариантами ответа.
     let opt = env.doc.querySelector(".quiz-question__option");
-    for (let i = 0; i < 6 && !opt; i++) {
+    for (let i = 0; i < 15 && !opt; i++) {
       const next = Array.from(env.doc.querySelectorAll("button")).find((b) => b.textContent.includes("Далее") && !b.disabled);
       if (!next) break;
       env.click(next);
@@ -1352,12 +1695,33 @@ async function runPracticeTests() {
     assert(env.doc.querySelector(".empty-state") !== null, "без прогресса должно быть честное пустое состояние");
   });
 
+  await test("КРИТИЧНО: варианты ответа реально стилизованы приложением, не голыми браузерными дефолтами (реальный найденный баг)", async () => {
+    // Реальная найденная проблема (комплексный аудит осиротевшего
+    // CSS): .quiz-question__option раньше жила ТОЛЬКО в questions.css
+    // — practice.jsx использует тот же класс, но НЕ подключает
+    // questions.css, так что кнопки вариантов рендерились голыми
+    // браузерными стилями (2px outset чёрная рамка, Arial, серый фон)
+    // — подтверждено эмпирически через getComputedStyle И скриншот в
+    // реальном браузере ДО фикса. Плюс: .opt-btn--correct/--wrong
+    // (реальные имена классов в JSX) не были стилизованы НИГДЕ —
+    // старое правило называлось .quiz-question__option--correct/
+    // --wrong, не совпадало с тем, что реально применяется, так что
+    // после ответа не было вообще никакой подсветки верного варианта.
+    // jsdom не всегда надёжно вычисляет CSS, поэтому проверяем текстом
+    // самого CSS-файла — правило должно жить в shared.css (грузится
+    // на всех страницах), не только в questions.css.
+    const sharedContent = fs.readFileSync(path.join(BASE_DIR, "shared", "shared.css"), "utf8");
+    assert(/\.quiz-question__option\s*\{/.test(sharedContent), "базовый стиль .quiz-question__option должен жить в shared.css (грузится на всех страницах: questions/practice/exam), не только в questions.css");
+    assert(/\.opt-btn--correct\s*\{/.test(sharedContent), "должно быть правило для .opt-btn--correct — это РЕАЛЬНОЕ имя класса, применяемое в JSX (не .quiz-question__option--correct)");
+    assert(/\.opt-btn--wrong\s*\{/.test(sharedContent), "должно быть правило для .opt-btn--wrong — это РЕАЛЬНОЕ имя класса, применяемое в JSX");
+  });
+
   await test("С прогрессом — вопрос показывается, ответ не пишется в общий прогресс", async () => {
     const initialAnswers = JSON.stringify({ "vars-1": { status: "correct" } });
     const env = createEnv("practice.jsx", SHARED.code, { "js-track-answers": initialAnswers });
     env.load();
     await env.wait(300);
-    assert(env.doc.querySelector(".practice__topic-badge") !== null, "должен показаться вопрос из пройденной темы");
+    assert(env.doc.querySelector(".badge") !== null, "должен показаться вопрос из пройденной темы");
     const opt = env.doc.querySelector(".quiz-question__option");
     if (opt) {
       env.click(opt);
@@ -1425,13 +1789,50 @@ async function runSummaryTests() {
 
 async function runProfileTests() {
   console.log("\n=== profile.html (Профиль) ===");
-  await test("Показывает прогресс по всем 12 темам и позволяет ввести имя", async () => {
+  await test("Показывает прогресс по всем 16 темам и позволяет ввести имя", async () => {
     const env = createEnv("profile.jsx", SHARED.common);
     env.load();
     await env.wait(300);
-    assert(env.doc.querySelectorAll(".profile__topic-row").length === 12, "должны быть строки для всех 12 тем");
+    // env.win.eval() не видит const из отдельно загруженных скриптов
+    // (та же особенность области видимости, что уже встречалась в
+    // vm-модуле Node в других тестах этого файла) — число тем
+    // захардкожено сознательно; поправить вручную при добавлении темы.
+    assert(env.doc.querySelectorAll(".profile__topic-row").length === 16, "должны быть строки для всех 16 тем (12 + closures + eventloop + prototype + this)");
     const nameInput = env.doc.querySelector(".profile__name-input");
     assert(nameInput !== null, "должно быть поле для имени");
+  });
+
+  await test("Профиль: секция достижений теперь реально отображается (раньше данные отслеживались, но нигде не показывались на этой странице)", async () => {
+    // Реальная найденная возможность (game-like редизайн Профиля):
+    // achievementsCount/achievementsTotal уже передавались в Header,
+    // но сама страница профиля никогда не рендерила список
+    // достижений — только отдельный экран "Итоги". "Мои достижения"
+    // был явно назван одной из 5 ключевых вещей, которые пользователь
+    // видит в профиле.
+    const env = createEnv("profile.jsx", SHARED.common, { "js-track-achievements": JSON.stringify({ unlocked: ["first_correct"] }) });
+    env.load();
+    await env.wait(300);
+    const cards = env.doc.querySelectorAll(".profile__achievement");
+    assert(cards.length > 0, "секция достижений должна показывать карточки");
+    const unlockedCards = env.doc.querySelectorAll(".profile__achievement--unlocked");
+    assert(unlockedCards.length >= 1, "хотя бы одно предзаполненное достижение должно отображаться как открытое");
+    const lockedCards = Array.from(cards).filter((c) => !c.className.includes("--unlocked"));
+    assert(lockedCards.length > 0, "должны быть и запертые (ещё не открытые) достижения — не все сразу разблокированы");
+    // Иконка замка/трофея — не просто затемнение текста.
+    assert(env.doc.querySelector(".profile__achievement svg") !== null, "у карточек достижений должна быть иконка (замок для запертых, трофей для открытых)");
+  });
+
+  await test("Профиль: индикатор тира звания — ровно 4 звезды, число закрашенных соответствует реальному тиру", async () => {
+    // xpThresholdForRank(6) = 30*6*5 = 900, xpThresholdForRank(7) = 1260
+    // — xp=900 детерминированно даёт rank=6, что попадает в тир 3
+    // (rank<=9) из 4 согласно тем же порогам, что у rankTitle().
+    const env = createEnv("profile.jsx", SHARED.common, { "js-track-xp": JSON.stringify({ xp: 900 }) });
+    env.load();
+    await env.wait(300);
+    const stars = env.doc.querySelectorAll(".profile__rank-tiers svg");
+    assert(stars.length === 4, `должно быть ровно 4 звезды тира, получили ${stars.length}`);
+    const filled = Array.from(stars).filter((s) => s.getAttribute("fill") !== "none").length;
+    assert(filled === 3, `при xp=900 (rank=6, тир 3 из 4) должно быть закрашено ровно 3 звезды, получили ${filled}`);
   });
 }
 
@@ -1513,14 +1914,38 @@ async function runPredictTests() {
 
 async function runTreeTests() {
   console.log("\n=== tree.html (Карта знаний) ===");
-  await test("Все 12 тем присутствуют в дереве (включая 3 более новые)", async () => {
+  await test("Все 16 тем присутствуют в дереве (включая 'Замыкания', 'Event Loop', 'Прототипы', 'this')", async () => {
     const env = createEnv("tree.jsx", SHARED.common);
     env.load();
     await env.wait(300);
-    const labels = ["let / const", "Именование", "Строки", "Деструктуризация", "Массивы", "Мутабельность", "Объекты", "Методы объектов", "Циклы", "Async / await", "Классы", "DOM"];
+    const labels = ["let / const", "Именование", "Строки", "Деструктуризация", "Массивы", "Мутабельность", "Объекты", "Методы объектов", "Циклы", "Замыкания", "Event Loop", "Прототипы", "Async / await", "Классы", "DOM"];
     const text = env.doc.body.textContent;
     const missing = labels.filter((l) => !text.includes(l));
     assert(missing.length === 0, `отсутствуют темы в дереве: ${JSON.stringify(missing)}`);
+    // "this" отдельно — слишком короткая строка для надёжного .includes()
+    // (могла бы случайно совпасть с частью другого слова), ищем по
+    // границе слова (\b) во всём тексте страницы.
+    assert(/\bthis\b/.test(text), "тема 'this' должна присутствовать в дереве");
+  });
+
+  await test("«Учёба»: спокойная анимация урока (.lesson-card--calm) реально побеждает общую .question-enter — составной селектор, не порядок в файле", async () => {
+    // Реальная найденная проблема (Фаза 3, визуальная иерархия):
+    // .lesson-card--calm была объявлена РАНЬШЕ .question-enter в
+    // файле — при равной специфичности (оба одноклассовых селектора)
+    // побеждает более ПОЗДНЕЕ правило по каскаду, а не то, что я
+    // писал последним по смыслу. Подтверждено эмпирически через
+    // getComputedStyle в реальном браузере ДО фикса — реально
+    // применялась базовая question-enter 0.25s, не спокойная 0.5s.
+    // Исправлено через составной селектор (.lesson-card.lesson-card--
+    // calm — специфичность выше одного класса), не через перестановку
+    // порядка в файле — так безопаснее для будущих правок. Проверяем
+    // текстом CSS, не через jsdom render — jsdom не всегда надёжно
+    // вычисляет CSS-анимации через getComputedStyle.
+    const content = fs.readFileSync(path.join(BASE_DIR, "shared", "shared.css"), "utf8");
+    assert(
+      /\.lesson-card\.lesson-card--calm\s*\{/.test(content),
+      "правило должно использовать составной селектор .lesson-card.lesson-card--calm (выше специфичность), не одиночный .lesson-card--calm — иначе базовая question-enter снова победит по каскаду"
+    );
   });
 }
 

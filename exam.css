@@ -5,15 +5,9 @@
 .exam { padding: 26px; }
 .exam__title { font-family: 'Inter', system-ui, sans-serif; font-size: 19px; font-weight: 700; margin-bottom: 10px; }
 .exam__intro-text { font-size: 13.5px; color: var(--text-dim); line-height: 1.65; margin-bottom: 18px; max-width: 480px; }
-.exam__start-btn {
-  background: var(--accent); color: #fff; border: none; border-radius: 8px;
-  padding: 10px 20px; font-size: 13.5px; font-weight: 600; cursor: pointer;
-  display: flex; align-items: center; gap: 6px;
-}
-
 .exam__progress-row {
   display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;
-  font-size: 12px; color: var(--text-dim); flex-wrap: wrap; gap: 8px;
+  font-size: var(--text-xs); color: var(--text-dim); flex-wrap: wrap; gap: var(--space-2);
 }
 .exam__timer { font-weight: 700; font-size: 13px; color: var(--text-dim); }
 .exam__timer--low { color: var(--error); }
@@ -22,7 +16,7 @@
 
 .exam__code-hint { font-size: 11px; color: var(--text-dim); margin-top: 6px; }
 
-.exam__feedback { margin-top: 16px; padding: 16px; border-radius: 10px; }
+.exam__feedback { margin-top: var(--space-4); padding: var(--space-4); border-radius: var(--radius-card); }
 .exam__feedback--correct { background: var(--success-bg); border: 1px solid color-mix(in srgb, var(--success) 33%, transparent); }
 .exam__feedback--wrong { background: var(--error-bg); border: 1px solid color-mix(in srgb, var(--error) 33%, transparent); }
 .exam__feedback-title { font-weight: 700; font-size: 13.5px; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
@@ -30,31 +24,19 @@
 .exam__feedback--wrong .exam__feedback-title { color: var(--error); }
 .exam__feedback-text { font-size: 13.5px; line-height: 1.6; color: var(--text); }
 
-.exam__next-btn {
-  margin-top: 16px; background: var(--accent); color: #fff; border: none; border-radius: 8px;
-  padding: 9px 18px; font-size: 13.5px; font-weight: 600; cursor: pointer;
-  display: flex; align-items: center; gap: 6px;
-}
-
 /* ------------------------------------------------------------------
    exam--done — экран результата.
    ------------------------------------------------------------------ */
 
 .exam--done { text-align: center; padding: 36px 28px; }
-.exam__done-title { font-family: 'Inter', system-ui, sans-serif; font-weight: 700; margin-bottom: 8px; font-size: 19px; }
-.exam__done-title--strong { font-size: 24px; }
+.exam__done-title { font-family: 'Inter', system-ui, sans-serif; font-weight: 700; margin-bottom: var(--space-2); font-size: 19px; }
+.exam__done-title--strong { font-size: var(--text-xl); }
 .exam__done-pct { font-weight: 700; margin-bottom: 6px; font-size: 34px; }
 .exam__done-pct--strong { font-size: 44px; color: var(--success); }
 .exam__done-pct--mid { color: var(--accent); }
 .exam__done-pct--low { color: var(--error); }
 .exam__done-detail { font-size: 13.5px; color: var(--text-dim); margin-bottom: 22px; }
 .exam__done-mascot-wrap { max-width: 420px; margin: 0 auto 22px; text-align: left; display: flex; gap: 10px; align-items: flex-start; }
-.exam__restart-btn {
-  background: var(--accent); color: #fff; border: none; border-radius: 8px;
-  padding: 10px 20px; font-size: 13.5px; font-weight: 600; cursor: pointer;
-  display: inline-flex; align-items: center; gap: 6px;
-}
-
 @media (max-width: 700px) {
-  .exam { padding: 16px; }
+  .exam { padding: var(--space-4); }
 }

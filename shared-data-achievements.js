@@ -106,13 +106,6 @@ const ACHIEVEMENTS = [
 const TOPIC_LEVEL = Object.fromEntries(TOPICS.map((t) => [t.id, t.level]));
 
 
-const TOPIC_EMOJI = {
-  vars: "🧩", naming: "🏷️", strings: "🔤", destructuring: "📤",
-  arrays: "🔢", "array-mutability": "♻️", objects: "🗂️", "object-methods": "🔧",
-  loops: "🔁", async: "⏳", classes: "🏗️", dom: "🌐",
-};
-
-
 const MASCOT_NAME = "Байт";
 
 const MASCOT_CORRECT = [

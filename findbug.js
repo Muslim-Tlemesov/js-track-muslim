@@ -126,7 +126,10 @@ function PageRoot() {
   }, "\u041A\u043B\u0438\u043A\u043D\u0438 \u043D\u0430 \u0441\u0442\u0440\u043E\u043A\u0443, \u0433\u0434\u0435 \u0441\u043F\u0440\u044F\u0442\u0430\u043D\u0430 \u043F\u0440\u043E\u0431\u043B\u0435\u043C\u0430 \u2014 \u043D\u0435 \u0432\u044B\u0431\u0438\u0440\u0430\u0439 \u0438\u0437 \u0441\u043F\u0438\u0441\u043A\u0430, \u0430 \u0438\u043C\u0435\u043D\u043D\u043E \u043D\u0430\u0439\u0434\u0438 \u0435\u0451 \u0432 \u043A\u043E\u0434\u0435."), /*#__PURE__*/React.createElement("div", {
     className: "findbug__progress-row"
   }, /*#__PURE__*/React.createElement("span", null, "\u041F\u0440\u0438\u043C\u0435\u0440 ", idx + 1, " \u0438\u0437 ", BUG_SHUFFLED.length), /*#__PURE__*/React.createElement("span", null, "\u0412\u0435\u0440\u043D\u043E: ", score.correct, " \u0438\u0437 ", score.total)), /*#__PURE__*/React.createElement("div", {
-    className: "findbug__topic-badge"
+    className: "badge",
+    style: {
+      marginBottom: "12px"
+    }
   }, snippet.topic), /*#__PURE__*/React.createElement("pre", {
     className: "mono findbug__code"
   }, lines.map((line, i) => /*#__PURE__*/React.createElement("div", {
@@ -149,7 +152,7 @@ function PageRoot() {
   }))), !checked ? /*#__PURE__*/React.createElement("button", {
     onClick: check,
     disabled: pickedLine === null,
-    className: "findbug__check-btn"
+    className: "btn btn--primary"
   }, "\u2713 \u041F\u0440\u043E\u0432\u0435\u0440\u0438\u0442\u044C") : /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: `findbug__result${isCorrect ? " findbug__result--correct" : " findbug__result--wrong"}`
   }, /*#__PURE__*/React.createElement("div", {
@@ -165,7 +168,7 @@ function PageRoot() {
     }
   })), /*#__PURE__*/React.createElement("button", {
     onClick: next,
-    className: "findbug__next-btn"
+    className: "btn btn--primary"
   }, isLast ? "Начать по кругу заново" : "Следующий пример", " \u2192")))));
 }
 const mainRoot = ReactDOM.createRoot(document.getElementById("app-mount"));

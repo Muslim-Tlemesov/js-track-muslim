@@ -96,15 +96,15 @@ function DebugPanel({
   }, /*#__PURE__*/React.createElement("button", {
     onClick: goToFirstStep,
     disabled: isFirst,
-    className: "viz__nav-btn"
+    className: "btn btn--secondary"
   }, "\u21BA \u0421\u043D\u0430\u0447\u0430\u043B\u0430"), /*#__PURE__*/React.createElement("button", {
     onClick: () => goToStep(-1),
     disabled: isFirst,
-    className: "viz__nav-btn"
+    className: "btn btn--secondary"
   }, "\u2190 \u041D\u0430\u0437\u0430\u0434"), /*#__PURE__*/React.createElement("button", {
     onClick: () => goToStep(1),
     disabled: isLast,
-    className: "viz__nav-btn viz__nav-btn--primary"
+    className: "btn btn--primary"
   }, isLast ? "Готово" : "Следующая строка →"))));
 }
 function PageRoot() {
@@ -231,7 +231,7 @@ function PageRoot() {
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Header, headerProps), /*#__PURE__*/React.createElement("main", {
     id: "main-content",
     tabIndex: -1,
-    className: "page-content"
+    className: "page-content page-content--ide"
   }, /*#__PURE__*/React.createElement("div", {
     className: "question-card question-enter sandbox"
   }, /*#__PURE__*/React.createElement("div", {
